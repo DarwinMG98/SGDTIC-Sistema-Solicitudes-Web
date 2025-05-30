@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Administrador</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body class="fondo-azul">
+
+  <!-- Logo arriba izquierda -->
+  <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" class="logo-superior" />
+
+  <!-- Iconos superiores derecha -->
+  <div class="iconos-superiores">
+    <img src="{{ url_for('static', filename='img/engranaje.png') }}" class="icono" />
+    <img src="{{ url_for('static', filename='img/logout.png') }}" class="icono-salida" />
+    <a href="/logout">
+      <button class="cerrar-sesion">Cerrar Sesión</button>
+    </a>
+  </div>
+
+  <!-- Contenedor central -->
+  <div class="contenedor-dashboard">
+
+    <!-- Título -->
+    <h1 class="titulo-bienvenida">Bienvenido, Administrador</h1>
+
+    <!-- Tabla -->
+    <div class="contenedor-tabla">
+      <h3 class="subtitulo-tabla">Historial de solicitudes</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Tipo de Solicitud</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for solicitud in solicitudes %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ solicitud[2] }}</td>
+            <td>{{ solicitud[3].strftime('%d/%m/%Y') }}</td>
+            <td>
+              {% if solicitud[4] == 'pendiente' %}
+              <span class="estado pendiente"></span>
+              {% elif solicitud[4] == 'aprobado' %}
+              <span class="estado aprobado"></span>
+              {% elif solicitud[4] == 'rechazado' %}
+              <span class="estado rechazado"></span>
+              {% endif %}
+            </td>
+            <td>
+              {% if solicitud[4] == 'pendiente' %}
+              <a href="/revisar/{{ solicitud[0] }}">
+                <button class="btn-revisar">Revisar</button>
+              </a>
+              {% else %}
+              {{ solicitud[4].capitalize() }}
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Botón volver -->
+  <a href="{{ url_for('inicio') }}">
+    <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+  </a>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Sistema de Solicitudes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+
+    <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" class="decoracion-izquierda">
+
+
+
+    <div class="contenedor">
+        <h1>Bienvenido al Sistema de Solicitudes</h1>
+        <p>Seleccione su tipo de usuario para continuar</p>
+
+        <div class="opciones">
+            <div class="opcion">
+                <a href="{{ url_for('login_admin') }}">
+                    <img src="{{ url_for('static', filename='img/admin.png') }}" alt="Administrador">
+                    <button>ADMINISTRADOR</button>
+                </a>
+            </div>
+            <div class="opcion">
+                <a href="/login_solicitante">
+                    <img src="{{ url_for('static', filename='img/solicitante.png') }}" alt="Solicitante">
+                    <button>SOLICITANTE</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,330 @@
+
+.opciones {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+
+}
+
+.opcion img {
+    width: 200px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    
+}
+
+.opcion button {
+    margin-top: 15px;
+    padding: 20px 30px;
+    font-weight: bold;
+    background-color: #203658;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background-color: #38579A;
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start; /* <-- sube el contenido */
+  min-height: 100vh;
+  padding-top: 80px; /* Ajusta este valor para subir más */
+  text-align: center;
+}
+
+h1 {
+    font-size: 80px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: black;
+
+}
+
+p {
+  font-size: 50px;
+  margin-top: 30px;
+}
+
+.decoracion {
+    position: absolute;
+    top: 30;
+    height: 30%;
+    opacity: 0.40;
+    z-index: 0;
+
+}
+
+.izquierda {
+    left: 0;
+}
+
+.derecha {
+    right: 0;
+}
+
+.decoracion-izquierda {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 150px;  /* Ajusta el tamaño */
+  height: auto;
+  z-index: 10;
+}
+
+
+/*.decoracion-inferior {
+  position: absolute;
+  bottom: 0;
+  width: 80%;
+  height: 80px;
+  object-fit: 0.12;
+  opacity: 0.60; 
+  pointer-events: none;
+}*/
+
+
+body.fondo-azul {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: #38579A;
+  color: white;
+  font-family: sans-serif;
+  position: relative;
+}
+
+.contenedor-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding-top: 80px;
+  text-align: center;
+}
+
+.logo-superior {
+  width: 120px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+
+.titulo-login {
+  font-size: 40px;
+  font-weight: bold;
+  color: black;
+  margin-bottom: 15px;
+}
+
+.subtitulo-login {
+  font-size: 25px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 40px;
+}
+
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.grupo-campo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.grupo-campo label {
+  font-weight: bold;
+  font-size: 20px;
+  color: white;
+  min-width: 120px;
+  text-align: right;
+}
+
+.grupo-campo input {
+  padding: 12px;
+  font-size: 18px;
+  width: 320px;
+  border: none;
+  border-radius: 6px;
+  background-color: #c2c2c2;
+}
+
+
+form button {
+  background-color: #203658;
+  color: white;
+  font-weight: bold;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+.volver {
+  width: 50px;
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+}
+
+/* Dashboard Admin*/
+
+/* Contenedor central */
+.contenedor-dashboard {
+  margin-top: 100px;
+  text-align: left;
+  padding: 0 80px;
+}
+
+/* Título */
+.titulo-bienvenida {
+  font-size: 35px;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+/* Tabla */
+.contenedor-tabla {
+  background-color: #e0e0e0;
+  padding: 25px;
+  border-radius: 10px;
+  width: 700px;
+  max-width: 100%;
+  margin: 0;
+}
+
+.contenedor-tabla h3 {
+  color: #1a1a1a;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #e0e0e0;
+}
+
+table th, table td {
+  padding: 10px 15px;
+  text-align: left;
+  font-size: 15px;
+  color: black;
+}
+
+table th {
+  background-color: #e9f3f3;
+  color: black;
+}
+
+/* Estados */
+.estado {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+}
+
+.estado.pendiente {
+  background-color: #fff176;
+}
+
+.estado.aprobado {
+  background-color: #4caf50;
+}
+
+.estado.rechazado {
+  background-color: #f44336;
+}
+
+/* Botón revisar */
+.btn-revisar {
+  background-color: #b39ddb;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Logo superior */
+.logo-superior {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 100px;
+}
+
+/* Iconos y cerrar sesión */
+.iconos-superiores {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icono {
+  width: 50px;
+}
+
+.cerrar-sesion {
+  background-color: #00BCD4;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Botón volver */
+.volver {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  width: 50px;
+}
+
+.icono-salida {
+  width: 60px;
+  vertical-align: middle;
+}
+
+
+/* login_solicitante*/
+
+ 
+
+
+

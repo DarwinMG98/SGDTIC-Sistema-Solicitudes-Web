@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login Administrador</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body class="fondo-azul">
+  <div class="contenedor-login">
+    <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" class="decoracion-izquierda" />
+    <h1 class="titulo-login">Sistema de Gestión de Solicitudes de Infraestructura</h1>
+    <h2 class="subtitulo-login">Iniciar sesión como Administrador</h2>
+
+    <form method="POST" action="{{ url_for('verificar_login_admin') }}">
+        <div class="grupo-campo">
+            <label for="usuario">Usuario:</label>
+            <input type="text" name="usuario" required />
+        </div>
+
+        <div class="grupo-campo">
+            <label for="password">Contraseña:</label>
+            <input type="password" name="password" required />
+        </div>
+
+        <button type="submit">Iniciar Sesion</button>
+    </form>
+
+    <a href="{{ url_for('inicio') }}"><img src="{{ url_for('static', filename='img/volver.png') }}" class="volver" /></a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Solicitante</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body class="fondo-azul">
+
+  <!-- Logo -->
+  <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" class="logo-superior">
+
+  <!-- Cerrar sesión -->
+  <div class="iconos-superiores">
+    <img src="{{ url_for('static', filename='img/logout.png') }}" class="icono" />
+    <a href="{{ url_for('logout') }}">
+      <button class="cerrar-sesion">Cerrar Sesión</button>
+    </a>
+  </div>
+
+  <!-- Bienvenida -->
+  <h2 class="titulo-dashboard">Bienvenido, {{ nombre }}</h2>
+
+  <!-- Icono de usuario -->
+  <div class="icono-usuario">
+    <img src="{{ url_for('static', filename='img/solicitante.png') }}" alt="usuario" />
+  </div>
+
+  <!-- Texto de selección -->
+  <h3 class="subtitulo-dashboard">Escoja su solicitud que desea:</h3>
+
+  <!-- Opciones de solicitud -->
+  <div class="opciones-dashboard">
+    <!-- Crear Servidor -->
+    <div class="opcion">
+      <a href="/crear_solicitud?tipo=crear">
+        <img src="{{ url_for('static', filename='img/crear.png') }}" class="icono-opcion" />
+        <p class="texto-opcion">Crear Servidor</p>
+      </a>
+    </div>
+
+    <!-- Eliminar Servidor -->
+    <div class="opcion">
+      <a href="/crear_solicitud?tipo=eliminar">
+        <img src="{{ url_for('static', filename='img/eliminar.png') }}" class="icono-opcion" />
+        <p class="texto-opcion">Eliminar Servidor</p>
+      </a>
+    </div>
+
+    <!-- Historial -->
+    <div class="opcion">
+      <a href="/historial_solicitudes">
+        <img src="{{ url_for('static', filename='img/historial.png') }}" class="icono-opcion" />
+        <p class="texto-opcion">Historial de solicitudes</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Botón volver -->
+  <a href="{{ url_for('inicio') }}">
+    <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+  </a>
+
+</body>
+</html>
