@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario de Creación de Servidor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body class="fondo-azul">
+  <div class="formulario-multipaso">
+    <!-- PASO 1 -->
+    <div class="paso paso-activo" id="paso-1">
+      <h2>1. Información del Solicitante</h2>
+      <label>Fecha de la Solicitud: <input type="date" name="fecha" /></label>
+      <label>Nombre completo: <input type="text" name="nombre" /></label>
+      <label>Unidad: <input type="text" name="unidad" /></label>
+      <label>Correo institucional: <input type="email" name="correo" /></label>
+      <label>Teléfono: <input type="tel" name="telefono" /></label>
+      <label>Responsable técnico: <input type="text" name="responsable" /></label>
+      <button onclick="cambiarPaso(2)">Siguiente</button>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="paso" id="paso-2">
+      <h2>2. Justificación</h2>
+      <label>Origen de la solicitud:</label>
+      <label><input type="checkbox" name="origen" value="correo"> Correo institucional</label>
+      <label><input type="checkbox" name="origen" value="anteproyecto"> Anteproyecto</label>
+      <label>Otro: <input type="text" name="otro_origen" /></label>
+      <label>Motivo: <textarea name="motivo"></textarea></label>
+      <label>Archivo de respaldo (máx 4MB): <input type="file" name="archivo" accept=".pdf,.doc,.docx" /></label>
+      <button onclick="cambiarPaso(1)">Anterior</button>
+      <button onclick="cambiarPaso(3)">Siguiente</button>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="paso" id="paso-3">
+      <h2>3. Tipo de servidor</h2>
+      <label><input type="checkbox" name="tipo" value="Producción"> Producción</label>
+      <label><input type="checkbox" name="tipo" value="Desarrollo"> Desarrollo</label>
+      <label><input type="checkbox" name="tipo" value="Pruebas"> Pruebas</label>
+      <button onclick="cambiarPaso(2)">Anterior</button>
+      <button onclick="cambiarPaso(4)">Siguiente</button>
+    </div>
+
+    <!-- PASO 4 -->
+    <div class="paso" id="paso-4">
+      <h2>4. Especificaciones técnicas</h2>
+      <label>Nombre del servidor: <input type="text" name="nombre_servidor" /></label>
+      <label>Sistema Operativo: <input type="text" name="so" /></label>
+      <label>vCPU: <input type="number" name="vcpu" /></label>
+      <label>RAM (GB): <input type="number" name="ram" /></label>
+      <label>Disco (GB): <input type="number" name="disco" /></label>
+      <label>Tiempo útil (meses): <input type="number" name="vida" /></label>
+      <button onclick="cambiarPaso(3)">Anterior</button>
+      <button onclick="cambiarPaso(5)">Siguiente</button>
+    </div>
+
+    <!-- PASO 5 -->
+    <div class="paso" id="paso-5">
+      <h2>5. Accesos y Observaciones</h2>
+      <label>Usuarios con acceso: <input type="text" name="accesos" /></label>
+      <label>Unidad responsable: <input type="text" name="unidad_responsable" /></label>
+      <label>Contacto soporte: <input type="text" name="contacto" /></label>
+      <label>Observaciones: <textarea name="observaciones"></textarea></label>
+      <button onclick="cambiarPaso(4)">Anterior</button>
+      <button onclick="enviarFormulario()">Enviar</button>
+    </div>
+
+    <!-- ÉXITO -->
+    <div class="paso" id="paso-exito" style="display:none;">
+      <h2>Solicitud enviada con éxito</h2>
+      <a href="/historial_solicitudes"><button>Ir a mi Historial</button></a>
+      <a href="/dashboard_solicitante"><button>Salir</button></a>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/formulario.js') }}"></script>
+</body>
+</html>

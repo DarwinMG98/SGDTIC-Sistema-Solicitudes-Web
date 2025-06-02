@@ -5,12 +5,12 @@
   <title>Dashboard Solicitante</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
-<body class="fondo-azul">
+<body class="fondo-azul dashboard-solicitante">
 
   <!-- Logo -->
   <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" class="logo-superior">
 
-  <!-- Cerrar sesión -->
+  <!-- Icono cerrar sesión -->
   <div class="iconos-superiores">
     <img src="{{ url_for('static', filename='img/logout.png') }}" class="icono" />
     <a href="{{ url_for('logout') }}">
@@ -18,41 +18,39 @@
     </a>
   </div>
 
-  <!-- Bienvenida -->
-  <h2 class="titulo-dashboard">Bienvenido, {{ nombre }}</h2>
+  <!-- Contenedor principal -->
+  <div class="contenedor-dashboard-solicitante">
 
-  <!-- Icono de usuario -->
-  <div class="icono-usuario">
-    <img src="{{ url_for('static', filename='img/solicitante.png') }}" alt="usuario" />
+  <!-- Bienvenida y texto de selección -->
+  <div class="bloque-superior">
+    <h2 class="titulo-dashboard">Bienvenido, {{ nombre }}</h2>
+    <div class="icono-usuario">
+      <img src="{{ url_for('static', filename='img/logo_solicitante.png') }}" alt="usuario" />
+    </div>
+    <h3 class="subtitulo-dashboard">Escoja su solicitud que desea:</h3>
   </div>
 
-  <!-- Texto de selección -->
-  <h3 class="subtitulo-dashboard">Escoja su solicitud que desea:</h3>
 
-  <!-- Opciones de solicitud -->
-  <div class="opciones-dashboard">
-    <!-- Crear Servidor -->
-    <div class="opcion">
-      <a href="/crear_solicitud?tipo=crear">
-        <img src="{{ url_for('static', filename='img/crear.png') }}" class="icono-opcion" />
-        <p class="texto-opcion">Crear Servidor</p>
-      </a>
-    </div>
-
-    <!-- Eliminar Servidor -->
-    <div class="opcion">
-      <a href="/crear_solicitud?tipo=eliminar">
-        <img src="{{ url_for('static', filename='img/eliminar.png') }}" class="icono-opcion" />
-        <p class="texto-opcion">Eliminar Servidor</p>
-      </a>
-    </div>
-
-    <!-- Historial -->
-    <div class="opcion">
-      <a href="/historial_solicitudes">
-        <img src="{{ url_for('static', filename='img/historial.png') }}" class="icono-opcion" />
-        <p class="texto-opcion">Historial de solicitudes</p>
-      </a>
+    <!-- Opciones -->
+    <div class="opciones-dashboard">
+      <div class="opcion">
+        <a href="/crear_solicitud?tipo=crear">
+          <img src="{{ url_for('static', filename='img/crear.png') }}" class="icono-opcion" />
+          <p class="texto-opcion">Crear Servidor</p>
+        </a>
+      </div>
+      <div class="opcion">
+        <a href="/crear_solicitud?tipo=eliminar">
+          <img src="{{ url_for('static', filename='img/eliminar.png') }}" class="icono-opcion" />
+          <p class="texto-opcion">Eliminar Servidor</p>
+        </a>
+      </div>
+      <div class="opcion">
+        <a href="/historial_solicitudes">
+          <img src="{{ url_for('static', filename='img/historial.png') }}" class="icono-opcion" />
+          <p class="texto-opcion">Historial de solicitudes</p>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -63,3 +61,4 @@
 
 </body>
 </html>
+

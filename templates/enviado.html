@@ -1,0 +1,14 @@
+<!-- templates/enviado.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitud Enviada</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body class="fondo-azul">
+  <h2>✅ Solicitud enviada con éxito</h2>
+  <a href="{{ url_for('dashboard_solicitante') }}">Ir al Historial</a>
+  <a href="{{ url_for('logout') }}">Salir</a>
+</body>
+</html>
