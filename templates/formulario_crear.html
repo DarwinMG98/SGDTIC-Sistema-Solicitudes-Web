@@ -1,79 +1,331 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Formulario de Creación de Servidor</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+  <meta charset="UTF-8" />
+  <title>Solicitud Creación Servidor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <style>
+    body {
+      background: #f5f6fa; /* Fondo claro, puedes cambiar a tu color institucional */
+    }
+    .formbold-main-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 0;
+      background: #f5f6fa;
+    }
+    .formbold-form-wrapper {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 24px #0001;
+      padding: 2rem 2.5rem;
+      max-width: 650px;
+      width: 100%;
+      margin: auto;
+    }
+    .formbold-form-step {
+      display: none;
+    }
+    .formbold-form-step.active {
+      display: block;
+      animation: fadeIn .4s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px);}
+      to { opacity: 1; transform: none;}
+    }
+    .formbold-btn { margin-top: 1.5rem;}
+    .formbold-btn-secondary {
+      margin-left: 1rem;
+      background: #e0e7ef;
+      color: #6366f1;
+      border: none;
+    }
+    .formbold-step-menu { margin-bottom: 2rem;}
+    .exito-mensaje {
+      text-align: center;
+      padding: 3rem 0 2rem;
+    }
+    .icon-check {
+      margin: 0 auto 1rem; background: #4ade80;
+      width: 54px; height: 54px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.3rem; color: #fff;
+    }
+  </style>
 </head>
-<body class="fondo-azul">
-  <div class="formulario-multipaso">
-    <!-- PASO 1 -->
-    <div class="paso paso-activo" id="paso-1">
-      <h2>1. Información del Solicitante</h2>
-      <label>Fecha de la Solicitud: <input type="date" name="fecha" /></label>
-      <label>Nombre completo: <input type="text" name="nombre" /></label>
-      <label>Unidad: <input type="text" name="unidad" /></label>
-      <label>Correo institucional: <input type="email" name="correo" /></label>
-      <label>Teléfono: <input type="tel" name="telefono" /></label>
-      <label>Responsable técnico: <input type="text" name="responsable" /></label>
-      <button onclick="cambiarPaso(2)">Siguiente</button>
+<body>
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+    <form id="crearServidorForm" method="POST" action="{{ url_for('crear_solicitud') }}" enctype="multipart/form-data" autocomplete="off">
+
+      <!-- Barra de progreso -->
+
+    <div class="formbold-step-menu">
+      <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 1 %}active{% endif %}">1</span>
+        <span class="formbold-step-label">Solicitante</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 2 %}active{% endif %}">2</span>
+        <span class="formbold-step-label">Justificación</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 3 %}active{% endif %}">3</span>
+        <span class="formbold-step-label">Técnico</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 4 %}active{% endif %}">4</span>
+        <span class="formbold-step-label">Accesos</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 5 %}active{% endif %}">5</span>
+        <span class="formbold-step-label">Firmas</span>
+      </div>
     </div>
 
-    <!-- PASO 2 -->
-    <div class="paso" id="paso-2">
-      <h2>2. Justificación</h2>
-      <label>Origen de la solicitud:</label>
-      <label><input type="checkbox" name="origen" value="correo"> Correo institucional</label>
-      <label><input type="checkbox" name="origen" value="anteproyecto"> Anteproyecto</label>
-      <label>Otro: <input type="text" name="otro_origen" /></label>
-      <label>Motivo: <textarea name="motivo"></textarea></label>
-      <label>Archivo de respaldo (máx 4MB): <input type="file" name="archivo" accept=".pdf,.doc,.docx" /></label>
-      <button onclick="cambiarPaso(1)">Anterior</button>
-      <button onclick="cambiarPaso(3)">Siguiente</button>
-    </div>
+      <!-- Paso 1 -->
+      <div class="formbold-form-step active" id="step-1">
+        <h2>Información del solicitante</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Fecha de la Solicitud</label>
+            <input type="date" name="fecha" class="formbold-form-input" required>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre completo</label>
+            <input type="text" name="nombre_completo" class="formbold-form-input" required>
+          </div>
+          <div>
+            <label class="formbold-form-label">Unidad/Dirección solicitante</label>
+            <input type="text" name="unidad" class="formbold-form-input" required>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Correo institucional</label>
+            <input type="email" name="correo" class="formbold-form-input" required>
+          </div>
+          <div>
+            <label class="formbold-form-label">Teléfono de contacto</label>
+            <input type="tel" name="telefono" class="formbold-form-input" required>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Responsable técnico (si aplica)</label>
+            <input type="text" name="responsable_tecnico" class="formbold-form-input">
+          </div>
+        </div>
+        <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
+      </div>
 
-    <!-- PASO 3 -->
-    <div class="paso" id="paso-3">
-      <h2>3. Tipo de servidor</h2>
-      <label><input type="checkbox" name="tipo" value="Producción"> Producción</label>
-      <label><input type="checkbox" name="tipo" value="Desarrollo"> Desarrollo</label>
-      <label><input type="checkbox" name="tipo" value="Pruebas"> Pruebas</label>
-      <button onclick="cambiarPaso(2)">Anterior</button>
-      <button onclick="cambiarPaso(4)">Siguiente</button>
-    </div>
+      <!-- Paso 2 -->
+      <div class="formbold-form-step" id="step-2">
+        <h2>Justificación y respaldo</h2><br>
+        <label class="formbold-form-label">Origen de la solicitud</label>
+        <div>
+          <label><input type="checkbox" name="origen[]" value="Correo institucional"> Correo institucional (adjuntar copia)</label><br>
+          <label><input type="checkbox" name="origen[]" value="Anteproyecto aprobado"> Anteproyecto aprobado</label><br>
+          <label><input type="checkbox" name="origen[]" value="Otro"> Otro</label><br>
+        </div>
+        <div>
+          <label class="formbold-form-label">Número o nombre del anteproyecto (si aplica)</label>
+          <input type="text" name="anteproyecto" class="formbold-form-input">
+        </div>
+        <div>
+          <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
+          <textarea name="motivo" rows="3" class="formbold-form-input" required></textarea>
+        </div>
+        <div>
+          <label class="formbold-form-label">Adjuntar documentación de respaldo</label>
+          <input type="file" name="documentos_respaldo" id="documentos_respaldo" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
+          <small>Máximo 5 MB por archivo.</small>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(2)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(2)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
 
-    <!-- PASO 4 -->
-    <div class="paso" id="paso-4">
-      <h2>4. Especificaciones técnicas</h2>
-      <label>Nombre del servidor: <input type="text" name="nombre_servidor" /></label>
-      <label>Sistema Operativo: <input type="text" name="so" /></label>
-      <label>vCPU: <input type="number" name="vcpu" /></label>
-      <label>RAM (GB): <input type="number" name="ram" /></label>
-      <label>Disco (GB): <input type="number" name="disco" /></label>
-      <label>Tiempo útil (meses): <input type="number" name="vida" /></label>
-      <button onclick="cambiarPaso(3)">Anterior</button>
-      <button onclick="cambiarPaso(5)">Siguiente</button>
-    </div>
+      <!-- Paso 3 -->
+      <div class="formbold-form-step" id="step-3">
+        <h2>Tipo de servidor y especificaciones técnicas</h2><br>
+        <label class="formbold-form-label">Tipo de servidor requerido</label>
+        <div>
+            <label><input type="checkbox" name="tipo_servidor[]" value="Producción"> Producción</label><br>
+            <label><input type="checkbox" name="tipo_servidor[]" value="Desarrollo"> Desarrollo</label><br>
+            <label><input type="checkbox" name="tipo_servidor[]" value="Pruebas"> Pruebas</label><br>
+            <label><input type="checkbox" name="tipo_servidor[]" value="Contingencia"> Contingencia</label><br>
+            <label><input type="checkbox" name="tipo_servidor[]" value="Otro"> Otro</label><br>
+        </div>
+        <div class="formbold-form-section">
+          <label class="formbold-form-label">Sistema operativo requerido</label>
+          <select id="soSelect" name="sistema_operativo" class="formbold-form-input" onchange="toggleSOVersion()" required>
+            <option value="">Seleccione</option>
+            <option value="Windows Server">Windows Server</option>
+            <option value="Linux">Alma Linux</option>
+            <option value="Otro">Otro</option>
+          </select>
+          <div id="windowsVersion" style="display:none; margin-top:.7rem;">
+            <label class="formbold-form-label">Versión (ej: 2022)</label>
+            <input type="text" name="version_windows" class="formbold-form-input" placeholder="Versión (ej: 2022)">
+          </div>
+          <div id="linuxVersion" style="display:none; margin-top:.7rem;">
+            <label class="formbold-form-label">Distribución y versión</label>
+            <input type="text" name="version_linux" class="formbold-form-input" placeholder="Distribución y versión">
+          </div>
+          <div id="otroSO" style="display:none; margin-top:.7rem;">
+            <label class="formbold-form-label">Especifique</label>
+            <input type="text" name="so_otro" class="formbold-form-input" placeholder="Especifique">
+          </div>
+        </div>
 
-    <!-- PASO 5 -->
-    <div class="paso" id="paso-5">
-      <h2>5. Accesos y Observaciones</h2>
-      <label>Usuarios con acceso: <input type="text" name="accesos" /></label>
-      <label>Unidad responsable: <input type="text" name="unidad_responsable" /></label>
-      <label>Contacto soporte: <input type="text" name="contacto" /></label>
-      <label>Observaciones: <textarea name="observaciones"></textarea></label>
-      <button onclick="cambiarPaso(4)">Anterior</button>
-      <button onclick="enviarFormulario()">Enviar</button>
-    </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">vCPU</label>
+            <input type="number" name="vcpu" class="formbold-form-input" min="1" required>
+          </div>
+          <div>
+            <label class="formbold-form-label">Memoria RAM (GB)</label>
+            <input type="number" name="ram" class="formbold-form-input" min="1" required>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Disco de sistema (GB)</label>
+            <input type="number" name="disco_sistema" class="formbold-form-input" min="1" required>
+          </div>
+          <div>
+            <label class="formbold-form-label">Disco de datos (GB)</label>
+            <input type="number" name="disco_datos" class="formbold-form-input" min="0" required>
+          </div>
+        </div>
+        <div>
+          <label class="formbold-form-label">Tiempo estimado de vida útil (meses/años)</label>
+          <input type="text" name="vida_util" class="formbold-form-input">
+        </div>
+        <div>
+          <label class="formbold-form-label">Justificación detallada de los recursos solicitados</label>
+          <textarea name="justificacion_recursos" rows="2" class="formbold-form-input"></textarea>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(3)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(3)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
 
-    <!-- ÉXITO -->
-    <div class="paso" id="paso-exito" style="display:none;">
-      <h2>Solicitud enviada con éxito</h2>
-      <a href="/historial_solicitudes"><button>Ir a mi Historial</button></a>
-      <a href="/dashboard_solicitante"><button>Salir</button></a>
-    </div>
+      <!-- Paso 4 -->
+      <div class="formbold-form-step" id="step-4">
+        <h2>Accesos y responsables</h2><br>
+        <div>
+          <label class="formbold-form-label">Grupos o usuarios que accederán al servidor</label>
+          <textarea name="accesos" rows="2" class="formbold-form-input"></textarea>
+        </div>
+        <div>
+          <label class="formbold-form-label">Nombre responsable de la aplicación</label>
+          <input type="text" name="responsable_aplicacion" class="formbold-form-input">
+        </div>
+        <div>
+          <label class="formbold-form-label">Unidad responsable de la aplicación</label>
+          <input type="text" name="unidad_responsable" class="formbold-form-input">
+        </div>
+        <div>
+          <label class="formbold-form-label">Correo/contacto para soporte</label>
+          <input type="text" name="contacto_soporte" class="formbold-form-input">
+        </div>
+        <div>
+          <label class="formbold-form-label">Observaciones adicionales</label>
+          <textarea name="observaciones" rows="2" class="formbold-form-input"></textarea>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(4)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(4)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 5 -->
+      <div class="formbold-form-step" id="step-5">
+        <h2>Firmas y envío</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
+            <input type="text" name="firma_solicitante" class="formbold-form-input" required>
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" name="cargo_solicitante" class="formbold-form-input" required>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
+            <input type="text" name="firma_jefe" class="formbold-form-input" required>
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" name="cargo_jefe" class="formbold-form-input" required>
+          </div>
+        </div>
+
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(5)">← Anterior</button>
+          <button type="submit" class="formbold-btn">Enviar solicitud</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 6: Exito -->
+      <div class="formbold-form-step" id="step-6">
+        <div class="exito-mensaje">
+          <div class="icon-check">✔</div>
+          <h2>¡Solicitud enviada con éxito!</h2>
+          <a href="{{ url_for('historial') }}" class="formbold-btn">Ir a mi historial</a>
+          <a href="{{ url_for('logout') }}" class="formbold-btn-secondary">Salir</a>
+        </div>
+      </div>
+    </form>
   </div>
-
-  <script src="{{ url_for('static', filename='js/formulario.js') }}"></script>
+</div>
+<script>
+  // Manejo de pasos
+  let currentStep = 1;
+  function showStep(n) {
+    document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+    let circles = document.querySelectorAll('.formbold-step-circle');
+    circles.forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+  }
+  function nextStep(n) {
+    if (n < 5) {
+      currentStep = n + 1;
+      showStep(currentStep);
+    }
+  }
+  function prevStep(n) {
+    if (n > 1) {
+      currentStep = n - 1;
+      showStep(currentStep);
+    }
+  }
+  document.getElementById('crearServidorForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    // Aquí puedes validar si todo está bien, luego mostrar paso 6:
+    showStep(6);
+    // Si quieres enviar realmente, puedes hacer un fetch/ajax o quitar el preventDefault
+  });
+  // Mostrar el primer paso al cargar
+  showStep(1);
+</script>
 </body>
 </html>

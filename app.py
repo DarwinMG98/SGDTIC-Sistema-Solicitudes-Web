@@ -148,6 +148,10 @@ def dashboard_solicitante():
 
     return render_template('dashboard_solicitante.html', nombre=nombre_completo)
 
+@app.route('/historial_solicitante')
+def historial():
+    # Solo para evitar el error, luego lo implementas bien
+    return "<h2>En construcción... Aquí irá tu historial de solicitudes.</h2>"
 
 
 # Iniciar servidor
