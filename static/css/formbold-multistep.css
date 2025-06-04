@@ -256,7 +256,30 @@
   display: inline-block;
 }
 
+/*.decoracion-izquierda {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 150px;  /* Ajusta el tamaño 
+  height: auto;
+  z-index: 10;
+}*/
 
+.bg-logo-superior {
+  position: absolute;
+  top: 20px;
+  left: 50px;
+  width: 80px;
+  height: auto;
+  z-index: 10;
+}
+
+.volver {
+  width: 50px;
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+}
 
 
 

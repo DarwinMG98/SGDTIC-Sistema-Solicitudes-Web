@@ -1,5 +1,6 @@
 from flask import Flask, render_template,redirect, request, session, url_for, flash
 from werkzeug.utils import secure_filename
+from datetime import datetime
 import os
 import pymysql
 
@@ -15,23 +16,28 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+from datetime import datetime
+
 @app.route("/crear_solicitud", methods=["GET", "POST"])
 def crear_solicitud():
     if request.method == "POST":
-        archivo = request.files.get("archivo")
-        if archivo and allowed_file(archivo.filename):
-            if len(archivo.read()) > MAX_FILE_SIZE:
-                flash("Archivo demasiado grande. Máximo 4MB.")
-                return redirect(request.url)
-            archivo.seek(0)  # volver al inicio para guardar
-            nombre_seguro = secure_filename(archivo.filename)
-            archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], nombre_seguro))
-            return redirect(url_for("solicitud_enviada"))
-        else:
-            flash("Archivo inválido o no enviado.")
-            return redirect(request.url)
+        tipo = request.form.get('tipo')
+        observaciones = request.form.get('observaciones')
+        usuario_id = session.get('usuario_id')
+        fecha = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO solicitudes (usuario_id, tipo, fecha_solicitud, estado, observaciones)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (usuario_id, tipo, fecha, "pendiente", observaciones))
+        conn.commit()
+        conn.close()
+        return redirect(url_for("enviado"))
 
     return render_template("formulario_crear.html")
+
 
 @app.route("/solicitud_enviada")
 def solicitud_enviada():
@@ -167,6 +173,13 @@ def dashboard_admin():
     solicitudes = cursor.fetchall()
     conn.close()
     return render_template('dashboard_admin.html', solicitudes=solicitudes)
+
+@app.route("/enviado")
+def enviado():
+    return render_template("enviado.html")
+
+
+
 
 
 

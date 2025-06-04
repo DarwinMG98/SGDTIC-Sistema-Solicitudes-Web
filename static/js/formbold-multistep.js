@@ -14,37 +14,57 @@
   const fileList = document.getElementById('fileList');
   let selectedFiles = [];
 
-fileInput.addEventListener('change', function(event) {
-  selectedFiles = Array.from(fileInput.files);
-  renderFileList();
-});
 
+document.addEventListener('DOMContentLoaded', function () {
+  const fileInput = document.getElementById('fileInput');
+  const fileList = document.getElementById('fileList');
+  let selectedFiles = [];
 
-function renderFileList() {
-  fileList.innerHTML = '';
-  selectedFiles.forEach((file, idx) => {
-    const li = document.createElement('li');
-    li.textContent = file.name + ' ';
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = 'Quitar';
-    btn.style.marginLeft = '1rem';
-    btn.onclick = function() {
-      selectedFiles.splice(idx, 1);
+  if (fileInput) { // Solo si existe el input
+    fileInput.addEventListener('change', function(event) {
+      const files = Array.from(fileInput.files);
+      for (const f of files) {
+        if (!selectedFiles.some(sf => sf.name === f.name && sf.size === f.size)) {
+          if (f.size > 5 * 1024 * 1024) {
+            alert(`El archivo ${f.name} supera los 5 MB y no se agregará.`);
+          } else {
+            selectedFiles.push(f);
+          }
+        }
+      }
       renderFileList();
-      // Actualiza input
       updateFileInput();
-    };
-    li.appendChild(btn);
-    fileList.appendChild(li);
-  });
-}
+      fileInput.value = '';
+    });
+  }
 
-function updateFileInput() {
-  const dataTransfer = new DataTransfer();
-  selectedFiles.forEach(f => dataTransfer.items.add(f));
-  fileInput.files = dataTransfer.files;
-}
+  function renderFileList() {
+    if (!fileList) return;
+    fileList.innerHTML = '';
+    selectedFiles.forEach((file, idx) => {
+      const li = document.createElement('li');
+      li.textContent = file.name + ' ';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = 'Quitar';
+      btn.style.marginLeft = '1rem';
+      btn.onclick = function() {
+        selectedFiles.splice(idx, 1);
+        renderFileList();
+        updateFileInput();
+      };
+      li.appendChild(btn);
+      fileList.appendChild(li);
+    });
+  }
+
+  function updateFileInput() {
+    if (!fileInput) return;
+    const dataTransfer = new DataTransfer();
+    selectedFiles.forEach(f => dataTransfer.items.add(f));
+    fileInput.files = dataTransfer.files;
+  }
+});
 
   formSubmitBtn.addEventListener("click", function(event){
     event.preventDefault()
@@ -93,6 +113,8 @@ function toggleSOVersion() {
   document.getElementById('linuxVersion').style.display = so === 'Linux' ? 'block' : 'none';
   document.getElementById('otroSO').style.display = so === 'Otro' ? 'block' : 'none';
 }
+
+
 
 
 

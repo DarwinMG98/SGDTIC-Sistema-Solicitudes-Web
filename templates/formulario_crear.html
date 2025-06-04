@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Solicitud Creación Servidor</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  
   <style>
     body {
       background: #f5f6fa; /* Fondo claro, puedes cambiar a tu color institucional */
@@ -56,7 +57,13 @@
     }
   </style>
 </head>
+
 <body>
+
+<div class="bg-logo-superior">
+  <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" alt="Logo Municipio" height="150">
+</div>
+
 <div class="formbold-main-wrapper">
   <div class="formbold-form-wrapper">
     <form id="crearServidorForm" method="POST" action="{{ url_for('crear_solicitud') }}" enctype="multipart/form-data" autocomplete="off">
@@ -141,10 +148,13 @@
           <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
           <textarea name="motivo" rows="3" class="formbold-form-input" required></textarea>
         </div>
-        <div>
+        <div class="formbold-form-section" style="margin-bottom: 1.2rem;">
           <label class="formbold-form-label">Adjuntar documentación de respaldo</label>
-          <input type="file" name="documentos_respaldo" id="documentos_respaldo" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
+          <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
+          <ul id="fileList" style="margin-top: 0.7rem;"></ul>
           <small>Máximo 5 MB por archivo.</small>
+          <!-- IMPORTANTE: este input oculto para el envío real -->
+          <input type="hidden" id="archivosHidden" name="archivosHidden">
         </div>
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(2)">← Anterior</button>
@@ -267,11 +277,11 @@
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
-            <input type="text" name="firma_jefe" class="formbold-form-input" required>
+            <input type="text" name="firma_jefe" class="formbold-form-input">
           </div>
           <div>
             <label class="formbold-form-label">Cargo</label>
-            <input type="text" name="cargo_jefe" class="formbold-form-input" required>
+            <input type="text" name="cargo_jefe" class="formbold-form-input">
           </div>
         </div>
 
@@ -295,7 +305,7 @@
   </div>
 </div>
 <script>
-  // Manejo de pasos
+  // ========== MULTIPASO ==========
   let currentStep = 1;
   function showStep(n) {
     document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
@@ -319,13 +329,80 @@
     }
   }
   document.getElementById('crearServidorForm').addEventListener('submit', function(e){
-    e.preventDefault();
+    //e.preventDefault();
     // Aquí puedes validar si todo está bien, luego mostrar paso 6:
-    showStep(6);
+    //showStep(6);
     // Si quieres enviar realmente, puedes hacer un fetch/ajax o quitar el preventDefault
   });
   // Mostrar el primer paso al cargar
   showStep(1);
+
+  // ========== ARCHIVOS MÚLTIPLES ==========
+  // Espera que el DOM esté listo
+  document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    let selectedFiles = [];
+
+    if (fileInput) {
+      fileInput.addEventListener('change', function(event) {
+        const files = Array.from(fileInput.files);
+        for (const f of files) {
+          if (!selectedFiles.some(sf => sf.name === f.name && sf.size === f.size)) {
+            if (f.size > 5 * 1024 * 1024) {
+              alert(`El archivo ${f.name} supera los 5 MB y no se agregará.`);
+            } else {
+              selectedFiles.push(f);
+            }
+          }
+        }
+        renderFileList();
+        updateFileInput();
+        fileInput.value = '';
+      });
+    }
+
+    function renderFileList() {
+      if (!fileList) return;
+      fileList.innerHTML = '';
+      selectedFiles.forEach((file, idx) => {
+        const li = document.createElement('li');
+        li.textContent = file.name + ' ';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Quitar';
+        btn.style.marginLeft = '1rem';
+        btn.onclick = function() {
+          selectedFiles.splice(idx, 1);
+          renderFileList();
+          updateFileInput();
+        };
+        li.appendChild(btn);
+        fileList.appendChild(li);
+      });
+    }
+
+    function updateFileInput() {
+      if (!fileInput) return;
+      const dataTransfer = new DataTransfer();
+      selectedFiles.forEach(f => dataTransfer.items.add(f));
+      fileInput.files = dataTransfer.files;
+    }
+  });
+
+  // ========== SISTEMA OPERATIVO VERSIÓN ==========
+  function toggleSOVersion() {
+    const so = document.getElementById('soSelect').value;
+    document.getElementById('windowsVersion').style.display = so === 'Windows Server' ? 'block' : 'none';
+    document.getElementById('linuxVersion').style.display = so === 'Linux' ? 'block' : 'none';
+    document.getElementById('otroSO').style.display = so === 'Otro' ? 'block' : 'none';
+  }
 </script>
+
+
+  <a href="{{ url_for('dashboard_solicitante') }}">
+    <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+  </a>
+
 </body>
 </html>

@@ -1,14 +1,78 @@
-<!-- templates/enviado.html -->
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Solicitud Enviada</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+  <title>Solicitud enviada</title>
+  <style>
+    body { background: #38579A; color: #222; font-family: sans-serif; }
+    .exito-box {
+      background: #38579A;
+      color: #111;
+      width: 370px;
+      margin: 70px auto;
+      border-radius: 16px;
+      padding: 36px 18px 32px 18px;
+      text-align: center;
+      box-shadow: 0 2px 18px #1112;
+    }
+    .exito-box h2 {
+      color: #111;
+      margin-bottom: 22px;
+      font-size: 1.34rem;
+      font-weight: 700;
+    }
+    .icon-exito {
+      display: block;
+      margin: 0 auto 26px auto;
+      width: 108px; height: 108px;
+      background: #4ec8e0;
+      border-radius: 50%;
+      position: relative;
+    }
+    .icon-exito:after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 34px; top: 27px;
+      width: 26px; height: 54px;
+      border-right: 8px solid #234c62;
+      border-bottom: 8px solid #234c62;
+      border-radius: 6px;
+      transform: rotate(45deg);
+    }
+    .btn-historial, .btn-cerrar-sesion {
+      display: block;
+      width: 200px;
+      margin: 22px auto 0 auto;
+      background: #b3c9e6;
+      color: #222;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.13rem;
+      padding: 0.8em 0.5em;
+      cursor: pointer;
+      transition: background .19s;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn-historial:hover { background: #9ae3ff; }
+    .btn-cerrar-sesion {
+      background: transparent;
+      color: #fff;
+      border: 2px solid #fff;
+      margin-top: 16px;
+      font-size: 1rem;
+      padding: 0.6em 0.5em;
+    }
+    .btn-cerrar-sesion:hover { background: #fff; color: #38579A; }
+  </style>
 </head>
-<body class="fondo-azul">
-  <h2>✅ Solicitud enviada con éxito</h2>
-  <a href="{{ url_for('dashboard_solicitante') }}">Ir al Historial</a>
-  <a href="{{ url_for('logout') }}">Salir</a>
+<body>
+  <div class="exito-box">
+    <h2>Solicitud enviada con éxito</h2>
+    <div class="icon-exito"></div>
+    <a href="{{ url_for('logo_historial') }}" class="btn-historial">Ir a mi Historial</a>
+    <a href="{{ url_for('logout') }}" class="btn-cerrar-sesion">Cerrar Sesión</a>
+  </div>
 </body>
 </html>
