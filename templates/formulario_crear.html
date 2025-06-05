@@ -96,30 +96,31 @@
       <!-- Paso 1 -->
       <div class="formbold-form-step active" id="step-1">
         <h2>Información del solicitante</h2><br>
+        <input type="hidden" name="tipo" value="{{ request.args.get('tipo', 'crear') }}">
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Fecha de la Solicitud</label>
-            <input type="date" name="fecha" class="formbold-form-input" required>
+            <input type="date" name="fecha" class="formbold-form-input">
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre completo</label>
-            <input type="text" name="nombre_completo" class="formbold-form-input" required>
+            <input type="text" name="nombre_completo" class="formbold-form-input">
           </div>
           <div>
             <label class="formbold-form-label">Unidad/Dirección solicitante</label>
-            <input type="text" name="unidad" class="formbold-form-input" required>
+            <input type="text" name="unidad" class="formbold-form-input">
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Correo institucional</label>
-            <input type="email" name="correo" class="formbold-form-input" required>
+            <input type="text" name="correo" class="formbold-form-input">
           </div>
           <div>
             <label class="formbold-form-label">Teléfono de contacto</label>
-            <input type="tel" name="telefono" class="formbold-form-input" required>
+            <input type="tel" name="telefono" class="formbold-form-input">
           </div>
         </div>
         <div class="formbold-input-flex">
@@ -146,7 +147,7 @@
         </div>
         <div>
           <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
-          <textarea name="motivo" rows="3" class="formbold-form-input" required></textarea>
+          <textarea name="motivo" rows="3" class="formbold-form-input"></textarea>
         </div>
         <div class="formbold-form-section" style="margin-bottom: 1.2rem;">
           <label class="formbold-form-label">Adjuntar documentación de respaldo</label>
@@ -176,7 +177,7 @@
         </div>
         <div class="formbold-form-section">
           <label class="formbold-form-label">Sistema operativo requerido</label>
-          <select id="soSelect" name="sistema_operativo" class="formbold-form-input" onchange="toggleSOVersion()" required>
+          <select id="soSelect" name="sistema_operativo" class="formbold-form-input" onchange="toggleSOVersion()">
             <option value="">Seleccione</option>
             <option value="Windows Server">Windows Server</option>
             <option value="Linux">Alma Linux</option>
@@ -199,21 +200,21 @@
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">vCPU</label>
-            <input type="number" name="vcpu" class="formbold-form-input" min="1" required>
+            <input type="number" name="vcpu" class="formbold-form-input" min="1">
           </div>
           <div>
             <label class="formbold-form-label">Memoria RAM (GB)</label>
-            <input type="number" name="ram" class="formbold-form-input" min="1" required>
+            <input type="number" name="ram" class="formbold-form-input" min="1">
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Disco de sistema (GB)</label>
-            <input type="number" name="disco_sistema" class="formbold-form-input" min="1" required>
+            <input type="number" name="disco_sistema" class="formbold-form-input" min="1">
           </div>
           <div>
             <label class="formbold-form-label">Disco de datos (GB)</label>
-            <input type="number" name="disco_datos" class="formbold-form-input" min="0" required>
+            <input type="number" name="disco_datos" class="formbold-form-input" min="0">
           </div>
         </div>
         <div>
@@ -267,11 +268,11 @@
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
-            <input type="text" name="firma_solicitante" class="formbold-form-input" required>
+            <input type="text" name="firma_solicitante" class="formbold-form-input">
           </div>
           <div>
             <label class="formbold-form-label">Cargo</label>
-            <input type="text" name="cargo_solicitante" class="formbold-form-input" required>
+            <input type="text" name="cargo_solicitante" class="formbold-form-input">
           </div>
         </div>
         <div class="formbold-input-flex">

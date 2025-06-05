@@ -34,7 +34,7 @@ def crear_solicitud():
         """, (usuario_id, tipo, fecha, "pendiente", observaciones))
         conn.commit()
         conn.close()
-        return redirect(url_for("enviado"))
+        return redirect(url_for("solicitud_enviada"))
 
     return render_template("formulario_crear.html")
 
@@ -177,6 +177,7 @@ def dashboard_admin():
 @app.route("/enviado")
 def enviado():
     return render_template("enviado.html")
+
 
 
 
