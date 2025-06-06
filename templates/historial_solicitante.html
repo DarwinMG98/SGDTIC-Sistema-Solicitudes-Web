@@ -8,36 +8,47 @@
 <body>
     <div class="container-historial">
         <a href="{{ url_for('logout') }}" class="btn-cerrar-sesion">
-            <img src="{{ url_for('static', filename='img/logout.png') }}" alt="Cerrar sesión" class="icono-salir">
-            Cerrar Sesion
+                    Cerrar Sesion        
         </a>
         <h2 class="titulo-historial">Historial de Solicitudes:</h2>
         <div class="cuadro-historial">
-            <table>
-                <tr>
-                    <th>N°</th>
-                    <th>Tipo de Solicitud</th>
-                    <th>Fecha</th>
-                    <th>Estado</th>
-                    <th>Acción</th>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>Ingresar Servidor</td>
-                    <td>22/5/2025</td>
-                    <td>
-                        <span class="estado pendiente"></span>
-                    </td>
-                    <td></td>
-                </tr>
-                <!-- Aquí se pueden agregar más filas dinámicamente -->
-            </table>
-            <div class="leyenda">
+        <table>
+            <tr>
+                <th>N°</th>
+                <th>Tipo de Solicitud</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+            {% for solicitud in solicitudes %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ solicitud[1] }}</td>
+                <td>{{ solicitud[2] }}</td>
+                <td>
+                    <span class="estado 
+                        {% if solicitud[3] == 'pendiente' %}pendiente
+                        {% elif solicitud[3] == 'aprobado' %}aprobado
+                        {% elif solicitud[3] == 'rechazado' %}rechazado
+                        {% endif %}">
+                    </span>
+                </td>
+                <td>
+                    <!-- Acciones futuras -->
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="leyenda">
+            
                 <div><span class="estado pendiente"></span> Pendiente</div>
                 <div><span class="estado aprobado"></span> Aprobado</div>
                 <div><span class="estado rechazado"></span> Rechazado</div>
-            </div>
         </div>
+
+        </div>
+
         <a href="{{ url_for('dashboard_solicitante') }}" class="btn-volver">
             <img src="{{ url_for('static', filename='img/volver.png') }}" alt="Volver">
         </a>

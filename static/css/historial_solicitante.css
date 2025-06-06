@@ -1,0 +1,209 @@
+body {
+    background: #36539e;
+    font-family: 'Inter', Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    width: 100vw;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.container-historial {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Centra el cuadro de historial vertical y horizontal */
+
+.cuadro-historial {
+    background: #e5e5e5;
+    width: 700px;
+    max-width: 90vw;
+    margin: 0 auto;
+    padding: 35px 35px 45px 35px;
+    border-radius: 6px;
+    box-shadow: 0 0 12px #2222;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+/* Titulo fijo arriba */
+.titulo-historial {
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 400;
+    position: absolute;
+    left: 280px;
+    top: 100px;
+}
+
+/* Botón de volver SIEMPRE abajo a la izquierda */
+.btn-volver {
+    position: fixed; /* Cambia de absolute a fixed */
+    left: 55px;
+    bottom: 38px;
+    display: block;
+    z-index: 10;
+}
+
+.btn-volver img {
+    width: 75px;
+    height: 70px;
+}
+
+/* Leyenda siempre centrada vertical junto al cuadro */
+.leyenda {
+    background: #253054;
+    color: #fff;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 1rem;
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    min-width: 100px;
+    box-shadow: 0 0 10px #2222;
+    z-index: 10;
+}
+
+.leyenda div {
+    margin-bottom: 12px;
+    display:contents;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Responsivo: si la pantalla es muy pequeña, ajusta el cuadro */
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    font-size: 1.1rem;
+    color: #222;
+}
+
+th, td {
+    text-align: left;
+    padding: 6px 14px;
+}
+
+th {
+    font-weight: 500;
+}
+
+.estado {
+    display: inline-block;
+    width: 20px;
+    height: 16px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.pendiente {
+    background: #ffffa4;
+    border: 1px solid #ccc972;
+}
+
+.aprobado {
+    background: #0afc49;
+    border: 1px solid #06b130;
+}
+
+.rechazado {
+    background: #ff3333;
+    border: 1px solid #a70000;
+}
+
+.btn-cerrar-sesion {
+    position: absolute;
+    top: 20px;
+    right: 60px;
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    background: #00d6ef;
+    color: #fff;
+    text-decoration: none;
+    padding: 0.10rem 1rem;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 0 0 5px #2222;
+    gap: 10px;
+    z-index: 20;
+    transition: background 0.2s;
+}
+
+
+.btn-cerrar-sesion:hover {
+    background: #01b9cb;
+    color: #fff;
+}
+
+.icono-salir {
+    width: 42px;
+    height: 42px;
+}
+
+@media (max-width: 900px) {
+    .cuadro-historial {
+        width: 99vw;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 210px;
+        padding: 18px 2vw 60px 2vw;
+        box-sizing: border-box;
+    }
+    .leyenda {
+        position: static !important; /* Quita la posición absoluta */
+        margin: 24px auto 0 auto;
+        min-width: 0;
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        padding: 14px 10px;
+        box-shadow: none;
+    }
+    .leyenda div {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+        gap: 7px;
+    }
+    .btn-cerrar-sesion {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 7px;
+        z-index: 30;
+    }
+    .icono-salir {
+        width: 26px;
+        height: 26px;
+    }
+    .btn-volver {
+        left: 10px;
+        bottom: 10px;
+    }
+    table {
+        font-size: 0.93rem;
+    }
+    th, td {
+        padding: 4px 7px;
+    }
+    .titulo-historial {
+        position: static !important;
+        text-align: center;
+        display: block;
+        margin: 12px auto 20px auto;
+        font-size: 1rem;
+    }
+}
+

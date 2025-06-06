@@ -156,10 +156,20 @@ def dashboard_solicitante():
 
 @app.route('/historial_solicitante')
 def historial():
-    # Solo para evitar el error, luego lo implementas bien
-    return "<h2>En construcción... Aquí irá tu historial de solicitudes.</h2>"
-
-
+    usuario_id = session['usuario_id']  # Asegúrate que el id está en la sesión al iniciar sesión
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT id, tipo, fecha_solicitud, estado
+        FROM solicitudes
+        WHERE usuario_id = %s
+        ORDER BY fecha_solicitud DESC
+    """, (usuario_id,))
+    solicitudes = cursor.fetchall()
+    conn.close()
+    return render_template('historial_solicitante.html', solicitudes=solicitudes)
+    
+ 
 # Iniciar servidor
 if __name__ == '__main__':
     app.run(debug=True)
@@ -169,7 +179,7 @@ if __name__ == '__main__':
 def dashboard_admin():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, tipo, fecha, estado FROM solicitudes ORDER BY fecha DESC")
+    cursor.execute("SELECT id, tipo, fecha_solicitud, estado FROM solicitudes ORDER BY fecha DESC")
     solicitudes = cursor.fetchall()
     conn.close()
     return render_template('dashboard_admin.html', solicitudes=solicitudes)
@@ -177,6 +187,41 @@ def dashboard_admin():
 @app.route("/enviado")
 def enviado():
     return render_template("enviado.html")
+
+
+@app.route('/revisar_solicitud/<int:id>', methods=['GET', 'POST'])
+def revisar_solicitud(id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
+    solicitud = cursor.fetchone()
+    conn.close()
+
+    # Si el admin hace POST (aprobar/rechazar), manejar la lógica aquí
+    if request.method == 'POST':
+        accion = request.form['accion']
+        if accion == 'aprobar':
+            # Aquí podrías guardar la firma o el archivo correspondiente
+            # Actualiza el estado a aprobado
+            # (agrega lógica de firma si tienes)
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE solicitudes SET estado='aprobado' WHERE id=%s", (id,))
+            conn.commit()
+            conn.close()
+            # Redirige de nuevo al dashboard admin
+            return redirect(url_for('dashboard_admin'))
+        elif accion == 'rechazar':
+            observacion = request.form['observacion']
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("UPDATE solicitudes SET estado='rechazado', observacion=%s WHERE id=%s", (observacion, id))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('dashboard_admin'))
+    
+    return render_template('revisar_solicitud.html', solicitud=solicitud)
+
 
 
 

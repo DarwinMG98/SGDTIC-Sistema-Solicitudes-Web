@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Revisión de Solicitud - {{ solicitud.tipo }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/revisar_solicitud.css') }}">
+</head>
+<body>
+    <div class="revisar-wrapper">
+        <h1>Revisión de Solicitud - {{ solicitud.tipo }}</h1>
+        <div class="revisar-formulario-box">
+            <!-- Aquí muestras todos los campos relevantes -->
+            <p><b>Nombre solicitante:</b> {{ solicitud.nombre_solicitante }}</p>
+            <p><b>Correo:</b> {{ solicitud.correo }}</p>
+            <p><b>Unidad/Dirección:</b> {{ solicitud.unidad }}</p>
+            <p><b>Tipo de Solicitud:</b> {{ solicitud.tipo }}</p>
+            <p><b>Fecha de Solicitud:</b> {{ solicitud.fecha_solicitud }}</p>
+            <p><b>Motivo:</b> {{ solicitud.motivo }}</p>
+            <p><b>Archivos adjuntos:</b>
+                {% if solicitud.archivo1 %}
+                    <a href="{{ url_for('descargar_archivo', filename=solicitud.archivo1) }}" target="_blank">Ver archivo 1</a>
+                {% endif %}
+                {% if solicitud.archivo2 %}
+                    <a href="{{ url_for('descargar_archivo', filename=solicitud.archivo2) }}" target="_blank">Ver archivo 2</a>
+                {% endif %}
+                <!-- Repite para los adjuntos necesarios -->
+            </p>
+            <!-- Agrega aquí el resto de campos relevantes -->
+        </div>
+
+        <form method="POST" class="revisar-acciones">
+            <button type="submit" name="accion" value="aprobar" class="btn-aprobar">Aprobar</button>
+            <button type="button" onclick="mostrarObservacion()" class="btn-rechazar">Rechazar</button>
+        </form>
+
+        <!-- Modal para observación de rechazo -->
+        <div id="modalObservacion" class="modal-observacion">
+            <form method="POST">
+                <label for="observacion">Observación de rechazo:</label>
+                <textarea name="observacion" required></textarea>
+                <button type="submit" name="accion" value="rechazar">Enviar</button>
+                <button type="button" onclick="cerrarObservacion()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        function mostrarObservacion() {
+            document.getElementById('modalObservacion').style.display = 'block';
+        }
+        function cerrarObservacion() {
+            document.getElementById('modalObservacion').style.display = 'none';
+        }
+        // Oculta el modal al inicio
+        document.getElementById('modalObservacion').style.display = 'none';
+    </script>
+</body>
+</html>

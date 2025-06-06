@@ -107,12 +107,12 @@ document.addEventListener('DOMContentLoaded', function () {
       }
   })
 
-function toggleSOVersion() {
-  const so = document.getElementById('soSelect').value;
-  document.getElementById('windowsVersion').style.display = so === 'Windows Server' ? 'block' : 'none';
-  document.getElementById('linuxVersion').style.display = so === 'Linux' ? 'block' : 'none';
-  document.getElementById('otroSO').style.display = so === 'Otro' ? 'block' : 'none';
-}
+  function toggleSOVersion() {
+    const so = document.getElementById('soSelect').value;
+    document.getElementById('windowsVersion').style.display = so === 'Windows Server' ? 'block' : 'none';
+    document.getElementById('linuxVersion').style.display = so === 'Linux' ? 'block' : 'none';
+    document.getElementById('otroSO').style.display = so === 'Otro' ? 'block' : 'none';
+  }
 
 
 

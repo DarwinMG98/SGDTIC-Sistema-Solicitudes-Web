@@ -29,43 +29,39 @@
     <div class="contenedor-tabla">
       <h3 class="subtitulo-tabla">Historial de solicitudes</h3>
       <table>
-        <thead>
-          <tr>
-            <th>N°</th>
-            <th>Tipo de Solicitud</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for solicitud in solicitudes %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ solicitud[2] }}</td>
-            <td>{{ solicitud[3].strftime('%d/%m/%Y') }}</td>
-            <td>
-              {% if solicitud[4] == 'pendiente' %}
-              <span class="estado pendiente"></span>
-              {% elif solicitud[4] == 'aprobado' %}
-              <span class="estado aprobado"></span>
-              {% elif solicitud[4] == 'rechazado' %}
-              <span class="estado rechazado"></span>
-              {% endif %}
-            </td>
-            <td>
-              {% if solicitud[4] == 'pendiente' %}
-              <a href="/revisar/{{ solicitud[0] }}">
-                <button class="btn-revisar">Revisar</button>
-              </a>
-              {% else %}
-              {{ solicitud[4].capitalize() }}
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
+        <tr>
+          <th>N°</th>
+          <th>Tipo de Solicitud</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
+        {% for solicitud in solicitudes %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ solicitud.tipo }}</td>
+          <td>{{ solicitud.fecha }}</td>
+          <td>
+            <span class="estado 
+              {% if solicitud.estado == 'pendiente' %}pendiente
+              {% elif solicitud.estado == 'aprobado' %}aprobado
+              {% elif solicitud.estado == 'rechazado' %}rechazado
+              {% endif %}">
+            </span>
+          </td>
+          <td>
+            {% if solicitud.estado == 'pendiente' %}
+              <a href="{{ url_for('revisar_solicitud', id=solicitud.id) }}" class="btn-revisar">Revisar</a>
+            {% elif solicitud.estado == 'aprobado' %}
+              Aprobado
+            {% elif solicitud.estado == 'rechazado' %}
+              Rechazado
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
       </table>
+
     </div>
   </div>
 
