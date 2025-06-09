@@ -51,6 +51,7 @@ def get_connection():
         user='root',
         password='2636587',
         database='sistema_solicitudes'
+
     )
 
 # Página de inicio
@@ -93,7 +94,14 @@ def verificar_login_admin():
 # Dashboard del administrador
 @app.route('/dashboard_admin')
 def dashboard_admin():
-    return render_template('dashboard_admin.html')
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, tipo, fecha_solicitud, estado FROM solicitudes ORDER BY fecha_solicitud DESC")
+    solicitudes = cursor.fetchall()
+    conn.close()
+    print("SOLICITUDES DASHBOARD ADMIN", solicitudes)
+    return render_template('dashboard_admin.html', solicitudes=solicitudes)
+
 
 @app.route('/logout')
 def logout():
@@ -174,15 +182,6 @@ def historial():
 if __name__ == '__main__':
     app.run(debug=True)
 
-
-@app.route('/dashboard_admin')
-def dashboard_admin():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, tipo, fecha_solicitud, estado FROM solicitudes ORDER BY fecha DESC")
-    solicitudes = cursor.fetchall()
-    conn.close()
-    return render_template('dashboard_admin.html', solicitudes=solicitudes)
 
 @app.route("/enviado")
 def enviado():

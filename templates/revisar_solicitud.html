@@ -2,30 +2,21 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Revisión de Solicitud - {{ solicitud.tipo }}</title>
+    <title>Revisión de Solicitud - {{ solicitud[2] }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/revisar_solicitud.css') }}">
 </head>
 <body>
     <div class="revisar-wrapper">
-        <h1>Revisión de Solicitud - {{ solicitud.tipo }}</h1>
+        <h1>Revisión de Solicitud - {{ solicitud[2] }}</h1>
         <div class="revisar-formulario-box">
-            <!-- Aquí muestras todos los campos relevantes -->
-            <p><b>Nombre solicitante:</b> {{ solicitud.nombre_solicitante }}</p>
-            <p><b>Correo:</b> {{ solicitud.correo }}</p>
-            <p><b>Unidad/Dirección:</b> {{ solicitud.unidad }}</p>
-            <p><b>Tipo de Solicitud:</b> {{ solicitud.tipo }}</p>
-            <p><b>Fecha de Solicitud:</b> {{ solicitud.fecha_solicitud }}</p>
-            <p><b>Motivo:</b> {{ solicitud.motivo }}</p>
-            <p><b>Archivos adjuntos:</b>
-                {% if solicitud.archivo1 %}
-                    <a href="{{ url_for('descargar_archivo', filename=solicitud.archivo1) }}" target="_blank">Ver archivo 1</a>
-                {% endif %}
-                {% if solicitud.archivo2 %}
-                    <a href="{{ url_for('descargar_archivo', filename=solicitud.archivo2) }}" target="_blank">Ver archivo 2</a>
-                {% endif %}
-                <!-- Repite para los adjuntos necesarios -->
-            </p>
-            <!-- Agrega aquí el resto de campos relevantes -->
+            <!-- Campos principales -->
+            <p><b>ID Solicitud:</b> {{ solicitud[0] }}</p>
+            <p><b>ID Solicitante:</b> {{ solicitud[1] }}</p>
+            <p><b>Tipo de Solicitud:</b> {{ solicitud[2] }}</p>
+            <p><b>Fecha de Solicitud:</b> {{ solicitud[3] }}</p>
+            <p><b>Estado:</b> {{ solicitud[4] }}</p>
+            <p><b>Observaciones:</b> {{ solicitud[5] }}</p>
+            <!-- Puedes agregar más campos aquí según el orden de tu tabla -->
         </div>
 
         <form method="POST" class="revisar-acciones">
@@ -50,7 +41,6 @@
         function cerrarObservacion() {
             document.getElementById('modalObservacion').style.display = 'none';
         }
-        // Oculta el modal al inicio
         document.getElementById('modalObservacion').style.display = 'none';
     </script>
 </body>

@@ -7,7 +7,7 @@
 </head>
 <body class="fondo-azul">
 
-  <!-- Logo arriba izquierda -->
+  
   <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" class="decoracion-izquierda" />
 
   <!-- Iconos superiores derecha -->
@@ -39,22 +39,22 @@
         {% for solicitud in solicitudes %}
         <tr>
           <td>{{ loop.index }}</td>
-          <td>{{ solicitud.tipo }}</td>
-          <td>{{ solicitud.fecha }}</td>
+          <td>{{ solicitud[1] }}</td>
+          <td>{{ solicitud[2] }}</td>
           <td>
             <span class="estado 
-              {% if solicitud.estado == 'pendiente' %}pendiente
-              {% elif solicitud.estado == 'aprobado' %}aprobado
-              {% elif solicitud.estado == 'rechazado' %}rechazado
+              {% if solicitud[3] == 'pendiente' %}pendiente
+              {% elif solicitud[3] == 'aprobado' %}aprobado
+              {% elif solicitud[3] == 'rechazado' %}rechazado
               {% endif %}">
             </span>
           </td>
           <td>
-            {% if solicitud.estado == 'pendiente' %}
-              <a href="{{ url_for('revisar_solicitud', id=solicitud.id) }}" class="btn-revisar">Revisar</a>
-            {% elif solicitud.estado == 'aprobado' %}
+            {% if solicitud[3] == 'pendiente' %}
+              <a href="{{ url_for('revisar_solicitud', id=solicitud[0]) }}" class="btn-revisar">Revisar</a>
+            {% elif solicitud[3] == 'aprobado' %}
               Aprobado
-            {% elif solicitud.estado == 'rechazado' %}
+            {% elif solicitud[3] == 'rechazado' %}
               Rechazado
             {% endif %}
           </td>
