@@ -32,6 +32,56 @@ def crear_solicitud():
             INSERT INTO solicitudes (usuario_id, tipo, fecha_solicitud, estado, observaciones)
             VALUES (%s, %s, %s, %s, %s)
         """, (usuario_id, tipo, fecha, "pendiente", observaciones))
+        solicitud_id = cursor.lastrowid
+
+        nombre_completo = request.form['nombre_completo']
+        unidad = request.form['unidad']
+        correo = request.form['correo']
+        telefono = request.form['telefono']
+        responsable_tecnico = request.form['responsable_tecnico']
+        origen_solicitud = ', '.join(request.form.getlist('origen[]'))
+        anteproyecto = request.form['anteproyecto']
+        motivo = request.form['motivo']
+        tipo_servidor = ', '.join(request.form.getlist('tipo_servidor[]'))
+        sistema_operativo = request.form['sistema_operativo']
+        version_so = (
+            request.form.get('version_windows', '') or
+            request.form.get('version_linux', '') or
+            request.form.get('so_otro', '')
+        )
+        vcpu = request.form['vcpu']
+        ram = request.form['ram']
+        disco_sistema = request.form['disco_sistema']
+        disco_datos = request.form['disco_datos']
+        vida_util = request.form['vida_util']
+        justificacion_recursos = request.form['justificacion_recursos']
+        accesos = request.form['accesos']
+        responsable_aplicacion = request.form['responsable_aplicacion']
+        unidad_responsable = request.form['unidad_responsable']
+        contacto_soporte = request.form['contacto_soporte']
+        observaciones_adicionales = request.form['observaciones']   # puede ser otro campo
+        firma_solicitante = request.form['firma_solicitante']
+        cargo_solicitante = request.form['cargo_solicitante']
+        firma_jefe = request.form['firma_jefe']
+        cargo_jefe = request.form['cargo_jefe']
+
+        cursor.execute("""
+            INSERT INTO solicitud_detalle (
+                solicitud_id, fecha, nombre_completo, unidad, correo, telefono, responsable_tecnico,
+                origen_solicitud, anteproyecto, motivo, tipo_servidor, sistema_operativo, version_so,
+                vcpu, ram, disco_sistema, disco_datos, vida_util, justificacion_recursos, accesos,
+                responsable_aplicacion, unidad_responsable, contacto_soporte, observaciones_adicionales,
+                firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            solicitud_id, fecha, nombre_completo, unidad, correo, telefono, responsable_tecnico,
+            origen_solicitud, anteproyecto, motivo, tipo_servidor, sistema_operativo, version_so,
+            vcpu, ram, disco_sistema, disco_datos, vida_util, justificacion_recursos, accesos,
+            responsable_aplicacion, unidad_responsable, contacto_soporte, observaciones_adicionales,
+            firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
+        ))
+
         conn.commit()
         conn.close()
         return redirect(url_for("solicitud_enviada"))
@@ -118,12 +168,12 @@ def login_solicitante():
         conn = get_connection()
         cursor = conn.cursor()
 
-        # Verificar si ya existe el solicitante
+        
         cursor.execute("SELECT * FROM solicitantes WHERE nombre=%s AND apellido=%s AND correo=%s", 
                        (nombre, apellido, correo))
         solicitante = cursor.fetchone()
 
-        # Si no existe, lo insertamos
+        
         if not solicitante:
             cursor.execute("INSERT INTO solicitantes (nombre, apellido, correo) VALUES (%s, %s, %s)", 
                            (nombre, apellido, correo))
@@ -134,7 +184,7 @@ def login_solicitante():
 
         conn.close()
 
-        # Si existe o se creó, iniciamos sesión
+        
         if solicitante:
             session['usuario_id'] = solicitante[0]
             session['nombre'] = solicitante[1]
@@ -154,7 +204,7 @@ def dashboard_solicitante():
     usuario = cursor.fetchone()
     conn.close()
 
-    # Asegura que los valores no sean None
+   
     nombre = usuario[0] if usuario[0] else ""
     apellido = usuario[1] if usuario[1] else ""
 
@@ -164,7 +214,7 @@ def dashboard_solicitante():
 
 @app.route('/historial_solicitante')
 def historial():
-    usuario_id = session['usuario_id']  # Asegúrate que el id está en la sesión al iniciar sesión
+    usuario_id = session['usuario_id'] 
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -177,11 +227,6 @@ def historial():
     conn.close()
     return render_template('historial_solicitante.html', solicitudes=solicitudes)
     
- 
-# Iniciar servidor
-if __name__ == '__main__':
-    app.run(debug=True)
-
 
 @app.route("/enviado")
 def enviado():
@@ -194,15 +239,17 @@ def revisar_solicitud(id):
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
     solicitud = cursor.fetchone()
+
+    cursor.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
+    detalle = cursor.fetchone()
+
+
     conn.close()
 
-    # Si el admin hace POST (aprobar/rechazar), manejar la lógica aquí
     if request.method == 'POST':
         accion = request.form['accion']
         if accion == 'aprobar':
-            # Aquí podrías guardar la firma o el archivo correspondiente
-            # Actualiza el estado a aprobado
-            # (agrega lógica de firma si tienes)
+
             conn = get_connection()
             cursor = conn.cursor()
             cursor.execute("UPDATE solicitudes SET estado='aprobado' WHERE id=%s", (id,))
@@ -219,8 +266,15 @@ def revisar_solicitud(id):
             conn.close()
             return redirect(url_for('dashboard_admin'))
     
-    return render_template('revisar_solicitud.html', solicitud=solicitud)
+    return render_template(
+        'revisar_solicitud.html',
+        solicitud=solicitud,
+        detalle=detalle
+     )
 
+# Iniciar servidor
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 

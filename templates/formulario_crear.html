@@ -154,7 +154,7 @@
           <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
           <ul id="fileList" style="margin-top: 0.7rem;"></ul>
           <small>Máximo 5 MB por archivo.</small>
-          <!-- IMPORTANTE: este input oculto para el envío real -->
+          
           <input type="hidden" id="archivosHidden" name="archivosHidden">
         </div>
         <div class="formbold-btn-group">
@@ -306,7 +306,7 @@
   </div>
 </div>
 <script>
-  // ========== MULTIPASO ==========
+
   let currentStep = 1;
   function showStep(n) {
     document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
@@ -330,16 +330,11 @@
     }
   }
   document.getElementById('crearServidorForm').addEventListener('submit', function(e){
-    //e.preventDefault();
-    // Aquí puedes validar si todo está bien, luego mostrar paso 6:
-    //showStep(6);
-    // Si quieres enviar realmente, puedes hacer un fetch/ajax o quitar el preventDefault
+
   });
-  // Mostrar el primer paso al cargar
+
   showStep(1);
 
-  // ========== ARCHIVOS MÚLTIPLES ==========
-  // Espera que el DOM esté listo
   document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.getElementById('fileInput');
     const fileList = document.getElementById('fileList');

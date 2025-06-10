@@ -2,37 +2,280 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Revisión de Solicitud - {{ solicitud[2] }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/revisar_solicitud.css') }}">
+    <title>Revisión de Solicitud - {{ solicitud.tipo }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+    <!-- Puedes agregar tu propio CSS para la revisión si quieres un toque especial -->
+    <style>
+    .formbold-main-wrapper {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        background: #4058a2;
+        padding-top: 2rem;
+    }
+    .formbold-form-wrapper {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 24px #0001;
+        padding: 2.5rem 2.5rem;
+        max-width: 850px;
+        min-width: 600px;
+        width: 100%;
+        margin: 2rem auto;
+    }
+    .formbold-section-title {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #5557b6;
+        font-size: 1.2rem;
+    }
+    .formbold-label-row {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .formbold-label-col {
+        flex: 1;
+    }
+    .formbold-form-label {
+        font-weight: bold;
+        color: #293885;
+        font-size: 1rem;
+    }
+    .formbold-form-value {
+        background: #f5f6fa;
+        border-radius: 6px;
+        padding: 0.4rem 1rem;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.2rem;
+        border: 1px solid #e5e7eb;
+        font-size: 1rem;
+        color: #303030;
+    }
+    input[type="text"] {
+        padding: 0.4rem 1rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        width: 100%;
+    }
+    .formbold-btn {
+        padding: 0.7rem 2.2rem;
+        background: #756cfb;
+        color: #fff;
+        border-radius: 8px;
+        border: none;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-right: 0.8rem;
+        margin-top: 1.5rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .formbold-btn:hover {
+        background: #4058a2;
+    }
+    .formbold-btn-secondary {
+        background: #e0e7ef;
+        color: #6366f1;
+    }
+    @media (max-width: 800px) {
+        .formbold-form-wrapper { max-width: 99vw; min-width: unset; }
+        .formbold-label-row { flex-direction: column; gap: 0; }
+    }
+
+    </style>
 </head>
 <body>
-    <div class="revisar-wrapper">
-        <h1>Revisión de Solicitud - {{ solicitud[2] }}</h1>
-        <div class="revisar-formulario-box">
-            <!-- Campos principales -->
-            <p><b>ID Solicitud:</b> {{ solicitud[0] }}</p>
-            <p><b>ID Solicitante:</b> {{ solicitud[1] }}</p>
-            <p><b>Tipo de Solicitud:</b> {{ solicitud[2] }}</p>
-            <p><b>Fecha de Solicitud:</b> {{ solicitud[3] }}</p>
-            <p><b>Estado:</b> {{ solicitud[4] }}</p>
-            <p><b>Observaciones:</b> {{ solicitud[5] }}</p>
-            <!-- Puedes agregar más campos aquí según el orden de tu tabla -->
+    <div class="formbold-main-wrapper">
+      <div class="formbold-form-wrapper">
+        <h1>Revisión de Solicitud - {{ solicitud.tipo|capitalize }}</h1>
+        
+        <!-- Paso 1: Solicitante -->
+        <div class="formbold-section-title">1. Información del solicitante</div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Fecha de la Solicitud</label>
+            <div class="formbold-form-value">{{ detalle.fecha }}</div>
+          </div>
         </div>
-
-        <form method="POST" class="revisar-acciones">
-            <button type="submit" name="accion" value="aprobar" class="btn-aprobar">Aprobar</button>
-            <button type="button" onclick="mostrarObservacion()" class="btn-rechazar">Rechazar</button>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Nombre completo</label>
+            <div class="formbold-form-value">{{ detalle.nombre_completo }}</div>
+          </div>
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Unidad/Dirección solicitante</label>
+            <div class="formbold-form-value">{{ detalle.unidad }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Correo institucional</label>
+            <div class="formbold-form-value">{{ detalle.correo }}</div>
+          </div>
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Teléfono de contacto</label>
+            <div class="formbold-form-value">{{ detalle.telefono }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Responsable técnico (si aplica)</label>
+            <div class="formbold-form-value">{{ detalle.responsable_tecnico }}</div>
+          </div>
+        </div>
+        
+        <!-- Paso 2: Justificación -->
+        <div class="formbold-section-title">2. Justificación y respaldo</div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Origen de la solicitud</label>
+            <div class="formbold-form-value">{{ detalle.origen_solicitud }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Número o nombre del anteproyecto</label>
+            <div class="formbold-form-value">{{ detalle.anteproyecto }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
+            <div class="formbold-form-value">{{ detalle.motivo }}</div>
+          </div>
+        </div>
+        
+        <!-- Paso 3: Técnico -->
+        <div class="formbold-section-title">3. Técnico</div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Tipo de servidor requerido</label>
+            <div class="formbold-form-value">{{ detalle.tipo_servidor }}</div>
+          </div>
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Sistema Operativo requerido</label>
+            <div class="formbold-form-value">{{ detalle.sistema_operativo }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Versión SO</label>
+            <div class="formbold-form-value">{{ detalle.version_so }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">vCPU</label>
+            <div class="formbold-form-value">{{ detalle.vcpu }}</div>
+          </div>
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Memoria RAM (GB)</label>
+            <div class="formbold-form-value">{{ detalle.ram }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Disco sistema (GB)</label>
+            <div class="formbold-form-value">{{ detalle.disco_sistema }}</div>
+          </div>
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Disco datos (GB)</label>
+            <div class="formbold-form-value">{{ detalle.disco_datos }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Tiempo estimado de vida útil</label>
+            <div class="formbold-form-value">{{ detalle.vida_util }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Justificación detallada de los recursos solicitados</label>
+            <div class="formbold-form-value">{{ detalle.justificacion_recursos }}</div>
+          </div>
+        </div>
+        
+        <!-- Paso 4: Accesos y responsables -->
+        <div class="formbold-section-title">4. Accesos y responsables</div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Grupos o usuarios que accederán al servidor</label>
+            <div class="formbold-form-value">{{ detalle.accesos }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Nombre responsable de la aplicación</label>
+            <div class="formbold-form-value">{{ detalle.responsable_aplicacion }}</div>
+          </div>
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Unidad responsable de la aplicación</label>
+            <div class="formbold-form-value">{{ detalle.unidad_responsable }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Correo/contacto para soporte</label>
+            <div class="formbold-form-value">{{ detalle.contacto_soporte }}</div>
+          </div>
+        </div>
+        <div class="formbold-label-row">
+          <div class="formbold-label-col">
+            <label class="formbold-form-label">Observaciones adicionales</label>
+            <div class="formbold-form-value">{{ detalle.observaciones_adicionales }}</div>
+          </div>
+        </div>
+        
+        <!-- Paso 5: Firmas -->
+        <div class="formbold-section-title">5. Firmas y envío</div>
+        <div class="formbold-label-row">
+        <div class="formbold-label-col">
+            <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
+            <div class="formbold-form-value">{{ detalle.firma_solicitante }}</div>
+        </div>
+        <div class="formbold-label-col">
+            <label class="formbold-form-label">Cargo</label>
+            <div class="formbold-form-value">{{ detalle.cargo_solicitante }}</div>
+        </div>
+        </div>
+        <form method="POST">
+        <div class="formbold-label-row">
+            <div class="formbold-label-col">
+            <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
+            <input type="text" name="firma_jefe" value="{{ detalle.firma_jefe or '' }}" required>
+            </div>
+            <div class="formbold-label-col">
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" name="cargo_jefe" value="{{ detalle.cargo_jefe or '' }}" required>
+            </div>
+        </div>
+        <button type="submit" name="accion" value="aprobar" class="formbold-btn" style="margin-top:1.5rem;">Aprobar</button>
+        <button type="button" onclick="mostrarObservacion()" class="formbold-btn formbold-btn-secondary" style="margin-top:1.5rem;">Rechazar</button>
         </form>
 
+        
+
+          </div>
+        </form>
+        
         <!-- Modal para observación de rechazo -->
         <div id="modalObservacion" class="modal-observacion">
-            <form method="POST">
-                <label for="observacion">Observación de rechazo:</label>
-                <textarea name="observacion" required></textarea>
-                <button type="submit" name="accion" value="rechazar">Enviar</button>
-                <button type="button" onclick="cerrarObservacion()">Cancelar</button>
-            </form>
+          <form method="POST">
+            <label for="observacion">Observación de rechazo:</label>
+            <textarea name="observacion" required></textarea>
+            <button type="submit" name="accion" value="rechazar">Enviar</button>
+            <button type="button" onclick="cerrarObservacion()">Cancelar</button>
+          </form>
         </div>
+        
+      </div>
     </div>
     <script>
         function mostrarObservacion() {
