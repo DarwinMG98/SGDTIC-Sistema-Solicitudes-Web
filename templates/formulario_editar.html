@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Solicitud</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+</head>
+<body>
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+    <h1>Editar Solicitud</h1>
+
+    {% if observacion %}
+      <div style="background:#ffe5e5; border:1px solid #ee6666; color:#c00000; padding:12px; border-radius:8px; margin-bottom:18px; font-weight:bold;">
+        Observación del administrador: {{ observacion }}
+      </div>
+    {% endif %}
+
+    <form method="POST">
+      <!-- Paso 1 -->
+      <div class="formbold-section-title">1. Información del solicitante</div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Nombre completo</label>
+          <input type="text" name="nombre_completo" value="{{ detalle.nombre_completo }}" required>
+        </div>
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Unidad/Dirección solicitante</label>
+          <input type="text" name="unidad" value="{{ detalle.unidad }}" required>
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Correo institucional</label>
+          <input type="text" name="correo" value="{{ detalle.correo }}" required>
+        </div>
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Teléfono de contacto</label>
+          <input type="text" name="telefono" value="{{ detalle.telefono }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Responsable técnico (si aplica)</label>
+          <input type="text" name="responsable_tecnico" value="{{ detalle.responsable_tecnico }}">
+        </div>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="formbold-section-title">2. Justificación y respaldo</div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Origen de la solicitud</label>
+          <input type="text" name="origen_solicitud" value="{{ detalle.origen_solicitud }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Número o nombre del anteproyecto</label>
+          <input type="text" name="anteproyecto" value="{{ detalle.anteproyecto }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
+          <input type="text" name="motivo" value="{{ detalle.motivo }}">
+        </div>
+      </div>
+
+      <!-- Paso 3: Técnico -->
+      <div class="formbold-section-title">3. Técnico</div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Tipo de servidor requerido</label>
+          <input type="text" name="tipo_servidor" value="{{ detalle.tipo_servidor }}">
+        </div>
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Sistema Operativo requerido</label>
+          <input type="text" name="sistema_operativo" value="{{ detalle.sistema_operativo }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Versión SO</label>
+          <input type="text" name="version_so" value="{{ detalle.version_so }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">vCPU</label>
+          <input type="text" name="vcpu" value="{{ detalle.vcpu }}">
+        </div>
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Memoria RAM (GB)</label>
+          <input type="text" name="ram" value="{{ detalle.ram }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Disco sistema (GB)</label>
+          <input type="text" name="disco_sistema" value="{{ detalle.disco_sistema }}">
+        </div>
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Disco datos (GB)</label>
+          <input type="text" name="disco_datos" value="{{ detalle.disco_datos }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Tiempo estimado de vida útil</label>
+          <input type="text" name="vida_util" value="{{ detalle.vida_util }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Justificación detallada de los recursos solicitados</label>
+          <input type="text" name="justificacion_recursos" value="{{ detalle.justificacion_recursos }}">
+        </div>
+      </div>
+
+      <!-- Paso 4: Accesos y responsables -->
+      <div class="formbold-section-title">4. Accesos y responsables</div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Grupos o usuarios que accederán al servidor</label>
+          <input type="text" name="accesos" value="{{ detalle.accesos }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Nombre responsable de la aplicación</label>
+          <input type="text" name="responsable_aplicacion" value="{{ detalle.responsable_aplicacion }}">
+        </div>
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Unidad responsable de la aplicación</label>
+          <input type="text" name="unidad_responsable" value="{{ detalle.unidad_responsable }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Correo/contacto para soporte</label>
+          <input type="text" name="contacto_soporte" value="{{ detalle.contacto_soporte }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Observaciones adicionales</label>
+          <input type="text" name="observaciones_adicionales" value="{{ detalle.observaciones_adicionales }}">
+        </div>
+      </div>
+
+      <!-- Paso 5: Firmas -->
+      <div class="formbold-section-title">5. Firmas y envío</div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
+          <input type="text" name="firma_solicitante" value="{{ detalle.firma_solicitante }}">
+        </div>
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Cargo</label>
+          <input type="text" name="cargo_solicitante" value="{{ detalle.cargo_solicitante }}">
+        </div>
+      </div>
+      <div class="formbold-label-row">
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
+          <input type="text" name="firma_jefe" value="{{ detalle.firma_jefe }}">
+        </div>
+        <div class="formbold-label-col">
+          <label class="formbold-form-label">Cargo</label>
+          <input type="text" name="cargo_jefe" value="{{ detalle.cargo_jefe }}">
+        </div>
+      </div>
+      <button type="submit" class="formbold-btn">Guardar Cambios</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
+

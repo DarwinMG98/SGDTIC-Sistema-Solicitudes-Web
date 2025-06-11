@@ -34,11 +34,15 @@
                     </span>
                 </td>
                 <td>
-                    <!-- Acciones futuras -->
+                    {% if solicitud[3] == 'rechazado' %}
+                        <button type="button" onclick="mostrarObservacion('{{ solicitud[4] }}')">Observación</button>
+                        <a href="{{ url_for('editar_solicitud', id=solicitud[0]) }}">Editar</a>
+                    {% endif %}                    
                 </td>
             </tr>
             {% endfor %}
         </table>
+
 
         <div class="leyenda">
             
@@ -52,6 +56,27 @@
         <a href="{{ url_for('dashboard_solicitante') }}" class="btn-volver">
             <img src="{{ url_for('static', filename='img/volver.png') }}" alt="Volver">
         </a>
+
     </div>
+
+    <div id="modalObservacion" class="modal-observacion" style="display:none;">
+        <div class="modal-contenido">
+            <h3>Observación del Administrador</h3>
+            <p id="textoObservacion"></p>
+            <button onclick="cerrarObservacion()">Cerrar</button>
+        </div>
+    </div>
+
+<script>
+    function mostrarObservacion(texto) {
+    document.getElementById('modalObservacion').style.display = 'flex';
+    document.getElementById('textoObservacion').textContent = texto;
+    }
+    function cerrarObservacion() {
+    document.getElementById('modalObservacion').style.display = 'none';
+    }
+</script>
+   
+
 </body>
 </html>

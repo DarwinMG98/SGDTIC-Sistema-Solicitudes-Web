@@ -236,7 +236,7 @@ def enviado():
 @app.route('/revisar_solicitud/<int:id>', methods=['GET', 'POST'])
 def revisar_solicitud(id):
     conn = get_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
     cursor.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
     solicitud = cursor.fetchone()
 
@@ -245,6 +245,8 @@ def revisar_solicitud(id):
 
 
     conn.close()
+
+    print(detalle)
 
     if request.method == 'POST':
         accion = request.form['accion']
@@ -261,7 +263,7 @@ def revisar_solicitud(id):
             observacion = request.form['observacion']
             conn = get_connection()
             cursor = conn.cursor()
-            cursor.execute("UPDATE solicitudes SET estado='rechazado', observacion=%s WHERE id=%s", (observacion, id))
+            cursor.execute("UPDATE solicitudes SET estado='rechazado', observaciones=%s WHERE id=%s", (observacion, id))
             conn.commit()
             conn.close()
             return redirect(url_for('dashboard_admin'))
@@ -271,6 +273,76 @@ def revisar_solicitud(id):
         solicitud=solicitud,
         detalle=detalle
      )
+
+@app.route('/editar_solicitud/<int:id>', methods=['GET', 'POST'])
+def editar_solicitud(id):
+    conn = get_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    # Trae datos de la solicitud y la observación
+    cursor.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
+    solicitud = cursor.fetchone()
+
+    cursor.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
+    detalle = cursor.fetchone()
+
+    if request.method == "POST":
+        # Actualiza los datos editados
+        nombre_completo = request.form['nombre_completo']
+        unidad = request.form['unidad']
+        correo = request.form['correo']
+        telefono = request.form['telefono']
+        responsable_tecnico = request.form['responsable_tecnico']
+        # ... repite para TODOS los campos (igual que en crear)
+        # ejemplo para campos técnicos:
+        origen_solicitud = request.form['origen_solicitud']
+        anteproyecto = request.form['anteproyecto']
+        motivo = request.form['motivo']
+        tipo_servidor = request.form['tipo_servidor']
+        sistema_operativo = request.form['sistema_operativo']
+        version_so = request.form['version_so']
+        vcpu = request.form['vcpu']
+        ram = request.form['ram']
+        disco_sistema = request.form['disco_sistema']
+        disco_datos = request.form['disco_datos']
+        vida_util = request.form['vida_util']
+        justificacion_recursos = request.form['justificacion_recursos']
+        accesos = request.form['accesos']
+        responsable_aplicacion = request.form['responsable_aplicacion']
+        unidad_responsable = request.form['unidad_responsable']
+        contacto_soporte = request.form['contacto_soporte']
+        observaciones_adicionales = request.form['observaciones_adicionales']
+        firma_solicitante = request.form['firma_solicitante']
+        cargo_solicitante = request.form['cargo_solicitante']
+        firma_jefe = request.form['firma_jefe']
+        cargo_jefe = request.form['cargo_jefe']
+
+        # Actualiza la tabla de detalle
+        cursor.execute("""
+            UPDATE solicitud_detalle SET
+                nombre_completo=%s, unidad=%s, correo=%s, telefono=%s, responsable_tecnico=%s,
+                origen_solicitud=%s, anteproyecto=%s, motivo=%s, tipo_servidor=%s, sistema_operativo=%s, version_so=%s,
+                vcpu=%s, ram=%s, disco_sistema=%s, disco_datos=%s, vida_util=%s, justificacion_recursos=%s,
+                accesos=%s, responsable_aplicacion=%s, unidad_responsable=%s, contacto_soporte=%s, observaciones_adicionales=%s,
+                firma_solicitante=%s, cargo_solicitante=%s, firma_jefe=%s, cargo_jefe=%s
+            WHERE solicitud_id=%s
+        """, (
+            nombre_completo, unidad, correo, telefono, responsable_tecnico, origen_solicitud, anteproyecto, motivo,
+            tipo_servidor, sistema_operativo, version_so, vcpu, ram, disco_sistema, disco_datos, vida_util, justificacion_recursos,
+            accesos, responsable_aplicacion, unidad_responsable, contacto_soporte, observaciones_adicionales,
+            firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe, id
+        ))
+        # Pone la solicitud en pendiente otra vez
+        cursor.execute("UPDATE solicitudes SET estado='pendiente' WHERE id=%s", (id,))
+        conn.commit()
+        conn.close()
+        return redirect(url_for("historial"))
+
+    conn.close()
+    # Renderiza el formulario con los datos actuales y la observación
+    return render_template("formulario_editar.html", detalle=detalle, observacion=solicitud['observaciones'])
+
+
 
 # Iniciar servidor
 if __name__ == '__main__':
