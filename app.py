@@ -109,7 +109,7 @@ def get_connection():
 def inicio():
     return render_template("inicio.html")
 
-# Ruta de prueba para ver usuarios
+
 @app.route('/usuarios')
 def usuarios():
     conn = get_connection()
@@ -119,12 +119,12 @@ def usuarios():
     conn.close()
     return '<br>'.join([f"{u[1]} ({u[4]})" for u in usuarios])
 
-# Página de login para administrador
+
 @app.route('/login_admin')
 def login_admin():
     return render_template('login_admin.html')
 
-# Verificar login del administrador
+
 @app.route('/verificar_login_admin', methods=['POST'])
 def verificar_login_admin():
     usuario = request.form['usuario']
@@ -141,7 +141,7 @@ def verificar_login_admin():
     else:
         return "Credenciales incorrectas o no es administrador"
 
-# Dashboard del administrador
+
 @app.route('/dashboard_admin')
 def dashboard_admin():
     conn = get_connection()
@@ -257,7 +257,7 @@ def revisar_solicitud(id):
             cursor.execute("UPDATE solicitudes SET estado='aprobado' WHERE id=%s", (id,))
             conn.commit()
             conn.close()
-            # Redirige de nuevo al dashboard admin
+
             return redirect(url_for('dashboard_admin'))
         elif accion == 'rechazar':
             observacion = request.form['observacion']
@@ -279,7 +279,7 @@ def editar_solicitud(id):
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # Trae datos de la solicitud y la observación
+
     cursor.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
     solicitud = cursor.fetchone()
 
@@ -287,14 +287,13 @@ def editar_solicitud(id):
     detalle = cursor.fetchone()
 
     if request.method == "POST":
-        # Actualiza los datos editados
+
         nombre_completo = request.form['nombre_completo']
         unidad = request.form['unidad']
         correo = request.form['correo']
         telefono = request.form['telefono']
         responsable_tecnico = request.form['responsable_tecnico']
-        # ... repite para TODOS los campos (igual que en crear)
-        # ejemplo para campos técnicos:
+
         origen_solicitud = request.form['origen_solicitud']
         anteproyecto = request.form['anteproyecto']
         motivo = request.form['motivo']
@@ -317,7 +316,6 @@ def editar_solicitud(id):
         firma_jefe = request.form['firma_jefe']
         cargo_jefe = request.form['cargo_jefe']
 
-        # Actualiza la tabla de detalle
         cursor.execute("""
             UPDATE solicitud_detalle SET
                 nombre_completo=%s, unidad=%s, correo=%s, telefono=%s, responsable_tecnico=%s,
@@ -332,14 +330,14 @@ def editar_solicitud(id):
             accesos, responsable_aplicacion, unidad_responsable, contacto_soporte, observaciones_adicionales,
             firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe, id
         ))
-        # Pone la solicitud en pendiente otra vez
+
         cursor.execute("UPDATE solicitudes SET estado='pendiente' WHERE id=%s", (id,))
         conn.commit()
         conn.close()
         return redirect(url_for("historial"))
 
     conn.close()
-    # Renderiza el formulario con los datos actuales y la observación
+
     return render_template("formulario_editar.html", detalle=detalle, observacion=solicitud['observaciones'])
 
 

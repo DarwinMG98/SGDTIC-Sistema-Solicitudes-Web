@@ -1,180 +1,373 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Editar Solicitud</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <meta charset="UTF-8" />
+  <title>Editar Solicitud Creación Servidor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <style>
+    body {
+      background: #f5f6fa;
+    }
+    .formbold-main-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 0;
+      background: #f5f6fa;
+    }
+    .formbold-form-wrapper {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 24px #0001;
+      padding: 2rem 2.5rem;
+      max-width: 650px;
+      width: 100%;
+      margin: auto;
+    }
+    .formbold-form-step { display: none; }
+    .formbold-form-step.active { display: block; animation: fadeIn .4s;}
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px);}
+      to { opacity: 1; transform: none;}
+    }
+    .formbold-btn { margin-top: 1.5rem;}
+    .formbold-btn-secondary {
+      margin-left: 1rem;
+      background: #e0e7ef;
+      color: #6366f1;
+      border: none;
+    }
+    .formbold-step-menu { margin-bottom: 2rem;}
+    .exito-mensaje { text-align: center; padding: 3rem 0 2rem;}
+    .icon-check {
+      margin: 0 auto 1rem; background: #4ade80;
+      width: 54px; height: 54px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.3rem; color: #fff;
+    }
+    .observacion-admin {
+      background:#ffe5e5; border:1px solid #ee6666; color:#c00000;
+      padding:12px; border-radius:8px; margin-bottom:18px; font-weight:bold;
+    }
+  </style>
 </head>
 <body>
+<div class="bg-logo-superior">
+  <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" alt="Logo Municipio" height="150">
+</div>
+
 <div class="formbold-main-wrapper">
   <div class="formbold-form-wrapper">
-    <h1>Editar Solicitud</h1>
-
     {% if observacion %}
-      <div style="background:#ffe5e5; border:1px solid #ee6666; color:#c00000; padding:12px; border-radius:8px; margin-bottom:18px; font-weight:bold;">
+      <div class="observacion-admin">
         Observación del administrador: {{ observacion }}
       </div>
     {% endif %}
-
-    <form method="POST">
-      <!-- Paso 1 -->
-      <div class="formbold-section-title">1. Información del solicitante</div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
+    <form id="editarServidorForm" method="POST" action="" enctype="multipart/form-data" autocomplete="off">
+    <div class="formbold-step-menu">
+      <div class="step-indicator">
+        <span class="formbold-step-circle active">1</span>
+        <span class="formbold-step-label">Solicitante</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle">2</span>
+        <span class="formbold-step-label">Justificación</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle">3</span>
+        <span class="formbold-step-label">Técnico</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle">4</span>
+        <span class="formbold-step-label">Accesos</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle">5</span>
+        <span class="formbold-step-label">Firmas</span>
+      </div>
+    </div>
+    <!-- Paso 1 -->
+    <div class="formbold-form-step active" id="step-1">
+      <h2>Información del solicitante</h2><br>
+      <input type="hidden" name="tipo" value="{{ detalle.tipo }}">
+      <div class="formbold-input-flex">
+        <div>
+          <label class="formbold-form-label">Fecha de la Solicitud</label>
+          <input type="date" name="fecha" class="formbold-form-input"
+           value="{{ detalle.fecha|default('') }}">
+        </div>
+      </div>
+      <div class="formbold-input-flex">
+        <div>
           <label class="formbold-form-label">Nombre completo</label>
-          <input type="text" name="nombre_completo" value="{{ detalle.nombre_completo }}" required>
+          <input type="text" name="nombre_completo" class="formbold-form-input"
+           value="{{ detalle.nombre_completo|default('') }}">
         </div>
-        <div class="formbold-label-col">
+        <div>
           <label class="formbold-form-label">Unidad/Dirección solicitante</label>
-          <input type="text" name="unidad" value="{{ detalle.unidad }}" required>
+          <input type="text" name="unidad" class="formbold-form-input"
+           value="{{ detalle.unidad|default('') }}">
         </div>
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
+      <div class="formbold-input-flex">
+        <div>
           <label class="formbold-form-label">Correo institucional</label>
-          <input type="text" name="correo" value="{{ detalle.correo }}" required>
+          <input type="text" name="correo" class="formbold-form-input"
+           value="{{ detalle.correo|default('') }}">
         </div>
-        <div class="formbold-label-col">
+        <div>
           <label class="formbold-form-label">Teléfono de contacto</label>
-          <input type="text" name="telefono" value="{{ detalle.telefono }}">
+          <input type="tel" name="telefono" class="formbold-form-input"
+           value="{{ detalle.telefono|default('') }}">
         </div>
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
+      <div class="formbold-input-flex">
+        <div>
           <label class="formbold-form-label">Responsable técnico (si aplica)</label>
-          <input type="text" name="responsable_tecnico" value="{{ detalle.responsable_tecnico }}">
+          <input type="text" name="responsable_tecnico" class="formbold-form-input"
+           value="{{ detalle.responsable_tecnico|default('') }}">
         </div>
       </div>
+      <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
+    </div>
 
-      <!-- Paso 2 -->
-      <div class="formbold-section-title">2. Justificación y respaldo</div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Origen de la solicitud</label>
-          <input type="text" name="origen_solicitud" value="{{ detalle.origen_solicitud }}">
-        </div>
+    <!-- Paso 2 -->
+    <div class="formbold-form-step" id="step-2">
+      <h2>Justificación y respaldo</h2><br>
+      <label class="formbold-form-label">Origen de la solicitud</label>
+      <div>
+        <label>
+          <input type="checkbox" name="origen[]" value="Correo institucional"
+          {% if detalle.origen_solicitud and 'Correo institucional' in detalle.origen_solicitud %}checked{% endif %}>
+          Correo institucional (adjuntar copia)
+        </label><br>
+        <label>
+          <input type="checkbox" name="origen[]" value="Anteproyecto aprobado"
+          {% if detalle.origen_solicitud and 'Anteproyecto aprobado' in detalle.origen_solicitud %}checked{% endif %}>
+          Anteproyecto aprobado
+        </label><br>
+        <label>
+          <input type="checkbox" name="origen[]" value="Otro"
+          {% if detalle.origen_solicitud and 'Otro' in detalle.origen_solicitud %}checked{% endif %}>
+          Otro
+        </label><br>
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Número o nombre del anteproyecto</label>
-          <input type="text" name="anteproyecto" value="{{ detalle.anteproyecto }}">
-        </div>
+      <div>
+        <label class="formbold-form-label">Número o nombre del anteproyecto (si aplica)</label>
+        <input type="text" name="anteproyecto" class="formbold-form-input"
+         value="{{ detalle.anteproyecto|default('') }}">
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
-          <input type="text" name="motivo" value="{{ detalle.motivo }}">
-        </div>
+      <div>
+        <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
+        <textarea name="motivo" rows="3" class="formbold-form-input">{{ detalle.motivo|default('') }}</textarea>
       </div>
+       
+      <div class="formbold-btn-group">
+        <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(2)">← Anterior</button>
+        <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(2)">Siguiente →</button>
+      </div>
+      <div style="clear:both"></div>
+    </div>
 
-      <!-- Paso 3: Técnico -->
-      <div class="formbold-section-title">3. Técnico</div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Tipo de servidor requerido</label>
-          <input type="text" name="tipo_servidor" value="{{ detalle.tipo_servidor }}">
+    <!-- Paso 3 -->
+    <div class="formbold-form-step" id="step-3">
+      <h2>Tipo de servidor y especificaciones técnicas</h2><br>
+      <label class="formbold-form-label">Tipo de servidor requerido</label>
+      <div>
+        <label>
+          <input type="checkbox" name="tipo_servidor[]" value="Producción"
+          {% if detalle.tipo_servidor and 'Producción' in detalle.tipo_servidor %}checked{% endif %}> Producción
+        </label><br>
+        <label>
+          <input type="checkbox" name="tipo_servidor[]" value="Desarrollo"
+          {% if detalle.tipo_servidor and 'Desarrollo' in detalle.tipo_servidor %}checked{% endif %}> Desarrollo
+        </label><br>
+        <label>
+          <input type="checkbox" name="tipo_servidor[]" value="Pruebas"
+          {% if detalle.tipo_servidor and 'Pruebas' in detalle.tipo_servidor %}checked{% endif %}> Pruebas
+        </label><br>
+        <label>
+          <input type="checkbox" name="tipo_servidor[]" value="Contingencia"
+          {% if detalle.tipo_servidor and 'Contingencia' in detalle.tipo_servidor %}checked{% endif %}> Contingencia
+        </label><br>
+        <label>
+          <input type="checkbox" name="tipo_servidor[]" value="Otro"
+          {% if detalle.tipo_servidor and 'Otro' in detalle.tipo_servidor %}checked{% endif %}> Otro
+        </label><br>
+      </div>
+      <div class="formbold-form-section">
+        <label class="formbold-form-label">Sistema operativo requerido</label>
+        <select id="soSelect" name="sistema_operativo" class="formbold-form-input" onchange="toggleSOVersion()">
+          <option value="">Seleccione</option>
+          <option value="Windows Server" {% if detalle.sistema_operativo == 'Windows Server' %}selected{% endif %}>Windows Server</option>
+          <option value="Linux" {% if detalle.sistema_operativo == 'Linux' %}selected{% endif %}>Alma Linux</option>
+          <option value="Otro" {% if detalle.sistema_operativo == 'Otro' %}selected{% endif %}>Otro</option>
+        </select>
+        <div id="windowsVersion" style="display:none; margin-top:.7rem;">
+          <label class="formbold-form-label">Versión (ej: 2022)</label>
+          <input type="text" name="version_windows" class="formbold-form-input"
+           value="{{ detalle.version_so if detalle.sistema_operativo == 'Windows Server' else '' }}">
         </div>
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Sistema Operativo requerido</label>
-          <input type="text" name="sistema_operativo" value="{{ detalle.sistema_operativo }}">
+        <div id="linuxVersion" style="display:none; margin-top:.7rem;">
+          <label class="formbold-form-label">Distribución y versión</label>
+          <input type="text" name="version_linux" class="formbold-form-input"
+           value="{{ detalle.version_so if detalle.sistema_operativo == 'Linux' else '' }}">
+        </div>
+        <div id="otroSO" style="display:none; margin-top:.7rem;">
+          <label class="formbold-form-label">Especifique</label>
+          <input type="text" name="so_otro" class="formbold-form-input"
+           value="{{ detalle.version_so if detalle.sistema_operativo == 'Otro' else '' }}">
         </div>
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Versión SO</label>
-          <input type="text" name="version_so" value="{{ detalle.version_so }}">
-        </div>
-      </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
+      <div class="formbold-input-flex">
+        <div>
           <label class="formbold-form-label">vCPU</label>
-          <input type="text" name="vcpu" value="{{ detalle.vcpu }}">
+          <input type="number" name="vcpu" class="formbold-form-input"
+           value="{{ detalle.vcpu|default('') }}">
         </div>
-        <div class="formbold-label-col">
+        <div>
           <label class="formbold-form-label">Memoria RAM (GB)</label>
-          <input type="text" name="ram" value="{{ detalle.ram }}">
+          <input type="number" name="ram" class="formbold-form-input"
+           value="{{ detalle.ram|default('') }}">
         </div>
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Disco sistema (GB)</label>
-          <input type="text" name="disco_sistema" value="{{ detalle.disco_sistema }}">
+      <div class="formbold-input-flex">
+        <div>
+          <label class="formbold-form-label">Disco de sistema (GB)</label>
+          <input type="number" name="disco_sistema" class="formbold-form-input"
+           value="{{ detalle.disco_sistema|default('') }}">
         </div>
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Disco datos (GB)</label>
-          <input type="text" name="disco_datos" value="{{ detalle.disco_datos }}">
-        </div>
-      </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Tiempo estimado de vida útil</label>
-          <input type="text" name="vida_util" value="{{ detalle.vida_util }}">
+        <div>
+          <label class="formbold-form-label">Disco de datos (GB)</label>
+          <input type="number" name="disco_datos" class="formbold-form-input"
+           value="{{ detalle.disco_datos|default('') }}">
         </div>
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Justificación detallada de los recursos solicitados</label>
-          <input type="text" name="justificacion_recursos" value="{{ detalle.justificacion_recursos }}">
-        </div>
+      <div>
+        <label class="formbold-form-label">Tiempo estimado de vida útil (meses/años)</label>
+        <input type="text" name="vida_util" class="formbold-form-input"
+         value="{{ detalle.vida_util|default('') }}">
       </div>
+      <div>
+        <label class="formbold-form-label">Justificación detallada de los recursos solicitados</label>
+        <textarea name="justificacion_recursos" rows="2" class="formbold-form-input">{{ detalle.justificacion_recursos|default('') }}</textarea>
+      </div>
+      <div class="formbold-btn-group">
+        <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(3)">← Anterior</button>
+        <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(3)">Siguiente →</button>
+      </div>
+      <div style="clear:both"></div>
+    </div>
 
-      <!-- Paso 4: Accesos y responsables -->
-      <div class="formbold-section-title">4. Accesos y responsables</div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Grupos o usuarios que accederán al servidor</label>
-          <input type="text" name="accesos" value="{{ detalle.accesos }}">
-        </div>
+    <!-- Paso 4 -->
+    <div class="formbold-form-step" id="step-4">
+      <h2>Accesos y responsables</h2><br>
+      <div>
+        <label class="formbold-form-label">Grupos o usuarios que accederán al servidor</label>
+        <textarea name="accesos" rows="2" class="formbold-form-input">{{ detalle.accesos|default('') }}</textarea>
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Nombre responsable de la aplicación</label>
-          <input type="text" name="responsable_aplicacion" value="{{ detalle.responsable_aplicacion }}">
-        </div>
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Unidad responsable de la aplicación</label>
-          <input type="text" name="unidad_responsable" value="{{ detalle.unidad_responsable }}">
-        </div>
+      <div>
+        <label class="formbold-form-label">Nombre responsable de la aplicación</label>
+        <input type="text" name="responsable_aplicacion" class="formbold-form-input"
+         value="{{ detalle.responsable_aplicacion|default('') }}">
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Correo/contacto para soporte</label>
-          <input type="text" name="contacto_soporte" value="{{ detalle.contacto_soporte }}">
-        </div>
+      <div>
+        <label class="formbold-form-label">Unidad responsable de la aplicación</label>
+        <input type="text" name="unidad_responsable" class="formbold-form-input"
+         value="{{ detalle.unidad_responsable|default('') }}">
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
-          <label class="formbold-form-label">Observaciones adicionales</label>
-          <input type="text" name="observaciones_adicionales" value="{{ detalle.observaciones_adicionales }}">
-        </div>
+      <div>
+        <label class="formbold-form-label">Correo/contacto para soporte</label>
+        <input type="text" name="contacto_soporte" class="formbold-form-input"
+         value="{{ detalle.contacto_soporte|default('') }}">
       </div>
+      <div>
+        <label class="formbold-form-label">Observaciones adicionales</label>
+        <textarea name="observaciones" rows="2" class="formbold-form-input">{{ detalle.observaciones_adicionales|default('') }}</textarea>
+      </div>
+      <div class="formbold-btn-group">
+        <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(4)">← Anterior</button>
+        <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(4)">Siguiente →</button>
+      </div>
+      <div style="clear:both"></div>
+    </div>
 
-      <!-- Paso 5: Firmas -->
-      <div class="formbold-section-title">5. Firmas y envío</div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
+    <!-- Paso 5 -->
+    <div class="formbold-form-step" id="step-5">
+      <h2>Firmas y envío</h2><br>
+      <div class="formbold-input-flex">
+        <div>
           <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
-          <input type="text" name="firma_solicitante" value="{{ detalle.firma_solicitante }}">
+          <input type="text" name="firma_solicitante" class="formbold-form-input"
+           value="{{ detalle.firma_solicitante|default('') }}">
         </div>
-        <div class="formbold-label-col">
+        <div>
           <label class="formbold-form-label">Cargo</label>
-          <input type="text" name="cargo_solicitante" value="{{ detalle.cargo_solicitante }}">
+          <input type="text" name="cargo_solicitante" class="formbold-form-input"
+           value="{{ detalle.cargo_solicitante|default('') }}">
         </div>
       </div>
-      <div class="formbold-label-row">
-        <div class="formbold-label-col">
+      <div class="formbold-input-flex">
+        <div>
           <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
-          <input type="text" name="firma_jefe" value="{{ detalle.firma_jefe }}">
+          <input type="text" name="firma_jefe" class="formbold-form-input"
+           value="{{ detalle.firma_jefe|default('') }}">
         </div>
-        <div class="formbold-label-col">
+        <div>
           <label class="formbold-form-label">Cargo</label>
-          <input type="text" name="cargo_jefe" value="{{ detalle.cargo_jefe }}">
+          <input type="text" name="cargo_jefe" class="formbold-form-input"
+           value="{{ detalle.cargo_jefe|default('') }}">
         </div>
       </div>
-      <button type="submit" class="formbold-btn">Guardar Cambios</button>
+      <div class="formbold-btn-group">
+        <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(5)">← Anterior</button>
+        <button type="submit" class="formbold-btn">Guardar Cambios</button>
+      </div>
+      <div style="clear:both"></div>
+    </div>
     </form>
   </div>
 </div>
+<script>
+  let currentStep = 1;
+  function showStep(n) {
+    document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+    let circles = document.querySelectorAll('.formbold-step-circle');
+    circles.forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+  }
+  function nextStep(n) {
+    if (n < 5) {
+      currentStep = n + 1;
+      showStep(currentStep);
+    }
+  }
+  function prevStep(n) {
+    if (n > 1) {
+      currentStep = n - 1;
+      showStep(currentStep);
+    }
+  }
+  showStep(1);
+
+  
+  function toggleSOVersion() {
+    const so = document.getElementById('soSelect').value;
+    document.getElementById('windowsVersion').style.display = so === 'Windows Server' ? 'block' : 'none';
+    document.getElementById('linuxVersion').style.display = so === 'Linux' ? 'block' : 'none';
+    document.getElementById('otroSO').style.display = so === 'Otro' ? 'block' : 'none';
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    toggleSOVersion();
+  });
+</script>
+<a href="{{ url_for('dashboard_solicitante') }}">
+  <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+</a>
 </body>
 </html>
-

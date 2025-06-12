@@ -7,10 +7,10 @@
 </head>
 <body class="fondo-azul dashboard-solicitante">
 
-  <!-- Logo -->
+
   <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" class="decoracion-izquierda">
 
-  <!-- Icono cerrar sesión -->
+
   <div class="iconos-superiores">
     <img src="{{ url_for('static', filename='img/logout.png') }}" class="icono" />
     <a href="{{ url_for('logout') }}">
@@ -18,10 +18,10 @@
     </a>
   </div>
 
-  <!-- Contenedor principal -->
+
   <div class="contenedor-dashboard-solicitante">
 
-  <!-- Bienvenida y texto de selección -->
+
   <div class="bloque-superior">
     <h2 class="titulo-dashboard">Bienvenido, {{ nombre }}</h2>
     <div class="icono-usuario">
@@ -31,7 +31,7 @@
   </div>
 
 
-    <!-- Opciones -->
+
     <div class="opciones-dashboard">
       <div class="opcion">
         <a href="/crear_solicitud?tipo=crear">
@@ -54,7 +54,7 @@
     </div>
   </div>
 
-  <!-- Botón volver -->
+
   <a href="{{ url_for('inicio') }}">
     <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
   </a>

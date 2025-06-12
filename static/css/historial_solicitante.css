@@ -32,7 +32,7 @@ body {
 }
 
 
-/* Titulo fijo arriba */
+
 .titulo-historial {
     color: #fff;
     font-size: 1.15rem;
@@ -42,9 +42,9 @@ body {
     top: 100px;
 }
 
-/* Botón de volver SIEMPRE abajo a la izquierda */
+
 .btn-volver {
-    position: fixed; /* Cambia de absolute a fixed */
+    position: fixed; 
     left: 55px;
     bottom: 38px;
     display: block;
@@ -56,7 +56,7 @@ body {
     height: 70px;
 }
 
-/* Leyenda siempre centrada vertical junto al cuadro */
+
 .leyenda {
     background: #253054;
     color: #fff;
@@ -78,7 +78,7 @@ body {
     gap: 20px;
 }
 
-/* Responsivo: si la pantalla es muy pequeña, ajusta el cuadro */
+
 
 table {
     width: 100%;
@@ -179,7 +179,7 @@ th {
         box-sizing: border-box;
     }
     .leyenda {
-        position: static !important; /* Quita la posición absoluta */
+        position: static !important;
         margin: 24px auto 0 auto;
         min-width: 0;
         display: flex;

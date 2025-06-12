@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const fileList = document.getElementById('fileList');
   let selectedFiles = [];
 
-  if (fileInput) { // Solo si existe el input
+  if (fileInput) { 
     fileInput.addEventListener('change', function(event) {
       const files = Array.from(fileInput.files);
       for (const f of files) {
