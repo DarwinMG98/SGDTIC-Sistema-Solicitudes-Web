@@ -1,8 +1,11 @@
 from flask import Flask, render_template,redirect, request, session, url_for, flash
+import pymysql.cursors
 from werkzeug.utils import secure_filename
+from flask import send_from_directory
 from datetime import datetime
 import os
 import pymysql
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta'
@@ -16,7 +19,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-from datetime import datetime
 
 @app.route("/crear_solicitud", methods=["GET", "POST"])
 def crear_solicitud():
@@ -59,7 +61,7 @@ def crear_solicitud():
         responsable_aplicacion = request.form['responsable_aplicacion']
         unidad_responsable = request.form['unidad_responsable']
         contacto_soporte = request.form['contacto_soporte']
-        observaciones_adicionales = request.form['observaciones']   # puede ser otro campo
+        observaciones_adicionales = request.form['observaciones']  
         firma_solicitante = request.form['firma_solicitante']
         cargo_solicitante = request.form['cargo_solicitante']
         firma_jefe = request.form['firma_jefe']
@@ -81,6 +83,28 @@ def crear_solicitud():
             responsable_aplicacion, unidad_responsable, contacto_soporte, observaciones_adicionales,
             firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
         ))
+
+              # ======= GUARDAR ARCHIVOS ADJUNTOS =======
+        archivos = request.files.getlist('documentos')
+
+        print("FILES RECIBIDOS:", request.files)
+        print("archivos:", archivos)
+        for archivo in archivos:
+            print("archivo:", archivo.filename)
+
+        for archivo in archivos:
+            if archivo and allowed_file(archivo.filename):
+                filename = secure_filename(archivo.filename)
+                ruta = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                archivo.save(ruta)  # Guarda en /uploads/nombre.pdf
+
+                # Registrar en la tabla documentos_adjuntos
+                cursor.execute("""
+                    INSERT INTO documentos_adjuntos (solicitud_id, nombre_archivo, ruta_archivo)
+                    VALUES (%s, %s, %s)
+                """, (solicitud_id, filename, filename))  # Guardas solo el nombre, o la ruta relativa si prefieres
+
+
 
         conn.commit()
         conn.close()
@@ -242,8 +266,9 @@ def revisar_solicitud(id):
 
     cursor.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
     detalle = cursor.fetchone()
-
-
+    cursor.execute("SELECT * FROM documentos_adjuntos WHERE solicitud_id = %s", (id,))
+    documentos = cursor.fetchall()
+    
     conn.close()
 
     print(detalle)
@@ -271,7 +296,8 @@ def revisar_solicitud(id):
     return render_template(
         'revisar_solicitud.html',
         solicitud=solicitud,
-        detalle=detalle
+        detalle=detalle,
+        documentos=documentos
      )
 
 @app.route('/editar_solicitud/<int:id>', methods=['GET', 'POST'])
@@ -340,6 +366,11 @@ def editar_solicitud(id):
 
     return render_template("formulario_editar.html", detalle=detalle, observacion=solicitud['observaciones'])
 
+
+
+@app.route('/uploads/<filename>')
+def descargar_archivo(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 # Iniciar servidor

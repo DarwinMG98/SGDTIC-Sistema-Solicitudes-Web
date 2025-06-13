@@ -95,7 +95,6 @@
       <div class="formbold-form-wrapper">
         <h1>Revisión de Solicitud - {{ solicitud.tipo|capitalize }}</h1>
         
-
         <div class="formbold-section-title">1. Información del solicitante</div>
         <div class="formbold-label-row">
           <div class="formbold-label-col">
@@ -150,6 +149,22 @@
             <div class="formbold-form-value">{{ detalle.motivo }}</div>
           </div>
         </div>
+
+        <h3>Documentos Adjuntos</h3>
+        {% if documentos %}
+            <ul>
+            {% for doc in documentos %}
+                  <li>
+                    <a href="{{ url_for('descargar_archivo', filename=doc['ruta_archivo']) }}" target="_blank">
+                        {{ doc['nombre_archivo'] }}
+                    </a>
+                  </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No hay documentos adjuntos.</p>
+        {% endif %}
+
         
         <!-- Paso 3: Técnico -->
         <div class="formbold-section-title">3. Técnico</div>

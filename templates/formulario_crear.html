@@ -69,8 +69,8 @@
     <form id="crearServidorForm" method="POST" action="{{ url_for('crear_solicitud') }}" enctype="multipart/form-data" autocomplete="off">
 
       <!-- Barra de progreso -->
-
-    <div class="formbold-step-menu">
+    
+     <div class="formbold-step-menu">
       <div class="step-indicator">
         <span class="formbold-step-circle {% if paso == 1 %}active{% endif %}">1</span>
         <span class="formbold-step-label">Solicitante</span>
@@ -151,7 +151,7 @@
         </div>
         <div class="formbold-form-section" style="margin-bottom: 1.2rem;">
           <label class="formbold-form-label">Adjuntar documentación de respaldo</label>
-          <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
+          <input type="file" id="fileInput" name="documentos" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
           <ul id="fileList" style="margin-top: 0.7rem;"></ul>
           <small>Máximo 5 MB por archivo.</small>
           
@@ -163,6 +163,21 @@
         </div>
         <div style="clear:both"></div>
       </div>
+      <h3>Documentos Adjuntos</h3>
+      {% if documentos %}
+          <ul>
+              {% for doc in documentos %}
+                  <li>
+                      <a href="{{ url_for('descargar_archivo', ruta=doc['ruta_archivo']) }}" target="_blank">
+                          {{ doc['nombre_archivo'] }}
+                      </a>
+                  </li>
+              {% endfor %}
+          </ul>
+      {% else %}
+          <p>No hay documentos adjuntos.</p>
+      {% endif %}
+
 
       <!-- Paso 3 -->
       <div class="formbold-form-step" id="step-3">
@@ -353,7 +368,7 @@
           }
         }
         renderFileList();
-        updateFileInput();
+        //updateFileInput();
         fileInput.value = '';
       });
     }
@@ -378,12 +393,12 @@
       });
     }
 
-    function updateFileInput() {
-      if (!fileInput) return;
-      const dataTransfer = new DataTransfer();
-      selectedFiles.forEach(f => dataTransfer.items.add(f));
-      fileInput.files = dataTransfer.files;
-    }
+    // function updateFileInput() {
+      //if (!fileInput) return;
+      //const dataTransfer = new DataTransfer();
+      //selectedFiles.forEach(f => dataTransfer.items.add(f));
+      //fileInput.files = dataTransfer.files;
+    //}
   });
 
   // ========== SISTEMA OPERATIVO VERSIÓN ==========
