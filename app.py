@@ -6,6 +6,8 @@ from datetime import datetime
 import os
 import pymysql
 from datetime import datetime
+import uuid
+import time
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta'
@@ -94,17 +96,17 @@ def crear_solicitud():
 
         for archivo in archivos:
             if archivo and allowed_file(archivo.filename):
-                filename = secure_filename(archivo.filename)
-                ruta = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                archivo.save(ruta)  # Guarda en /uploads/nombre.pdf
+                ext = archivo.filename.rsplit('.', 1)[-1].lower()
+                nombre_unico = f"{solicitud_id}_{int(time.time())}_{uuid.uuid4().hex}.{ext}"
+                nombre_unico = secure_filename(nombre_unico)
+                ruta = os.path.join(app.config['UPLOAD_FOLDER'], nombre_unico)
+                archivo.save(ruta)  # Guarda en /uploads/nombre_unico.pdf
 
                 # Registrar en la tabla documentos_adjuntos
                 cursor.execute("""
                     INSERT INTO documentos_adjuntos (solicitud_id, nombre_archivo, ruta_archivo)
                     VALUES (%s, %s, %s)
-                """, (solicitud_id, filename, filename))  # Guardas solo el nombre, o la ruta relativa si prefieres
-
-
+                """, (solicitud_id, archivo.filename, nombre_unico))  # Guardas el nombre original, y el nombre físico real
 
         conn.commit()
         conn.close()
@@ -242,7 +244,7 @@ def historial():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT id, tipo, fecha_solicitud, estado
+        SELECT id, tipo, fecha_solicitud, estado, observaciones
         FROM solicitudes
         WHERE usuario_id = %s
         ORDER BY fecha_solicitud DESC
@@ -284,6 +286,7 @@ def revisar_solicitud(id):
             conn.close()
 
             return redirect(url_for('dashboard_admin'))
+        
         elif accion == 'rechazar':
             observacion = request.form['observacion']
             conn = get_connection()
@@ -305,42 +308,45 @@ def editar_solicitud(id):
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-
     cursor.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
     solicitud = cursor.fetchone()
-
     cursor.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
     detalle = cursor.fetchone()
+    cursor.execute("SELEC * FROM documentos_adjuntos WHERE solicitud_id=%s", (id,))
+    documentos = cursor.fetchall()
 
     if request.method == "POST":
-
-        nombre_completo = request.form['nombre_completo']
-        unidad = request.form['unidad']
-        correo = request.form['correo']
-        telefono = request.form['telefono']
-        responsable_tecnico = request.form['responsable_tecnico']
-
-        origen_solicitud = request.form['origen_solicitud']
-        anteproyecto = request.form['anteproyecto']
-        motivo = request.form['motivo']
-        tipo_servidor = request.form['tipo_servidor']
-        sistema_operativo = request.form['sistema_operativo']
-        version_so = request.form['version_so']
-        vcpu = request.form['vcpu']
-        ram = request.form['ram']
-        disco_sistema = request.form['disco_sistema']
-        disco_datos = request.form['disco_datos']
-        vida_util = request.form['vida_util']
-        justificacion_recursos = request.form['justificacion_recursos']
-        accesos = request.form['accesos']
-        responsable_aplicacion = request.form['responsable_aplicacion']
-        unidad_responsable = request.form['unidad_responsable']
-        contacto_soporte = request.form['contacto_soporte']
-        observaciones_adicionales = request.form['observaciones_adicionales']
-        firma_solicitante = request.form['firma_solicitante']
-        cargo_solicitante = request.form['cargo_solicitante']
-        firma_jefe = request.form['firma_jefe']
-        cargo_jefe = request.form['cargo_jefe']
+        
+        nombre_completo = request.form.get('nombre_completo', '')
+        unidad = request.form.get('unidad', '')
+        correo = request.form.get('correo', '')
+        telefono = request.form.get('telefono', '')
+        responsable_tecnico = request.form.get('responsable_tecnico', '')
+        origen_solicitud = ', '.join(request.form.getlist('origen[]'))
+        anteproyecto = request.form.get('anteproyecto', '')
+        motivo = request.form.get('motivo', '')
+        tipo_servidor = ', '.join(request.form.getlist('tipo_servidor[]'))
+        sistema_operativo = request.form.get('sistema_operativo', '')
+        version_so = (
+            request.form.get('version_windows', '') or
+            request.form.get('version_linux', '') or
+            request.form.get('so_otro', '')
+        )
+        vcpu = request.form.get('vcpu', '')
+        ram = request.form.get('ram', '')
+        disco_sistema = request.form.get('disco_sistema', '')
+        disco_datos = request.form.get('disco_datos', '')
+        vida_util = request.form.get('vida_util', '')
+        justificacion_recursos = request.form.get('justificacion_recursos', '')
+        accesos = request.form.get('accesos', '')
+        responsable_aplicacion = request.form.get('responsable_aplicacion', '')
+        unidad_responsable = request.form.get('unidad_responsable', '')
+        contacto_soporte = request.form.get('contacto_soporte', '')
+        observaciones_adicionales = request.form.get('observaciones', '')
+        firma_solicitante = request.form.get('firma_solicitante', '')
+        cargo_solicitante = request.form.get('cargo_solicitante', '')
+        firma_jefe = request.form.get('firma_jefe', '')
+        cargo_jefe = request.form.get('cargo_jefe', '')
 
         cursor.execute("""
             UPDATE solicitud_detalle SET
@@ -361,10 +367,11 @@ def editar_solicitud(id):
         conn.commit()
         conn.close()
         return redirect(url_for("historial"))
+    # --- hasta aquí ---
 
     conn.close()
-
     return render_template("formulario_editar.html", detalle=detalle, observacion=solicitud['observaciones'])
+
 
 
 

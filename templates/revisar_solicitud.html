@@ -3,92 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Revisión de Solicitud - {{ solicitud.tipo }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
-    
-    <style>
-    .formbold-main-wrapper {
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        background: #4058a2;
-        padding-top: 2rem;
-    }
-    .formbold-form-wrapper {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 6px 24px #0001;
-        padding: 2.5rem 2.5rem;
-        max-width: 850px;
-        min-width: 600px;
-        width: 100%;
-        margin: 2rem auto;
-    }
-    .formbold-section-title {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        color: #5557b6;
-        font-size: 1.2rem;
-    }
-    .formbold-label-row {
-        display: flex;
-        gap: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    .formbold-label-col {
-        flex: 1;
-    }
-    .formbold-form-label {
-        font-weight: bold;
-        color: #293885;
-        font-size: 1rem;
-    }
-    .formbold-form-value {
-        background: #f5f6fa;
-        border-radius: 6px;
-        padding: 0.4rem 1rem;
-        min-height: 32px;
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.2rem;
-        border: 1px solid #e5e7eb;
-        font-size: 1rem;
-        color: #303030;
-    }
-    input[type="text"] {
-        padding: 0.4rem 1rem;
-        font-size: 1rem;
-        border-radius: 6px;
-        border: 1px solid #e5e7eb;
-        background: #fff;
-        width: 100%;
-    }
-    .formbold-btn {
-        padding: 0.7rem 2.2rem;
-        background: #756cfb;
-        color: #fff;
-        border-radius: 8px;
-        border: none;
-        font-weight: 700;
-        font-size: 1rem;
-        margin-right: 0.8rem;
-        margin-top: 1.5rem;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-    .formbold-btn:hover {
-        background: #4058a2;
-    }
-    .formbold-btn-secondary {
-        background: #e0e7ef;
-        color: #6366f1;
-    }
-    @media (max-width: 800px) {
-        .formbold-form-wrapper { max-width: 99vw; min-width: unset; }
-        .formbold-label-row { flex-direction: column; gap: 0; }
-    }
-
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/revisar_solicitud.css') }}">
 </head>
 <body>
     <div class="formbold-main-wrapper">
@@ -272,34 +187,39 @@
             </div>
         </div>
         <button type="submit" name="accion" value="aprobar" class="formbold-btn" style="margin-top:1.5rem;">Aprobar</button>
-        <button type="button" onclick="mostrarObservacion()" class="formbold-btn formbold-btn-secondary" style="margin-top:1.5rem;">Rechazar</button>
-        </form>
-
-        
+        <button type="button" onclick="abrirObservacion()" class="formbold-btn formbold-btn-secondary" style="margin-top:1.5rem;">Rechazar</button>
+        </form>      
 
           </div>
-        </form>
-        
+        </form> 
+       
+      </div>
 
-        <div id="modalObservacion" class="modal-observacion">
-          <form method="POST">
-            <label for="observacion">Observación de rechazo:</label>
-            <textarea name="observacion" required></textarea>
-            <button type="submit" name="accion" value="rechazar">Enviar</button>
-            <button type="button" onclick="cerrarObservacion()">Cancelar</button>
-          </form>
-        </div>
-        
+    </div>
+
+        <!-- Modal para escribir observación -->
+    <div id="modalObservacion" class="modal" style="display: none;">
+      <div class="modal-contenido">
+        <h3>Observación de Rechazo</h3>
+        <form method="POST">
+          <textarea name="observacion" rows="5" required placeholder="Escriba el motivo del rechazo..."></textarea>
+          <div class="botones-observacion">
+            <button type="submit" name="accion" value="rechazar" class="btn-enviar">Enviar</button>
+            <button type="button" onclick="cerrarObservacion()" class="btn-cancelar">Cancelar</button>
+          </div>
+        </form>
       </div>
     </div>
+
     <script>
-        function mostrarObservacion() {
-            document.getElementById('modalObservacion').style.display = 'block';
-        }
-        function cerrarObservacion() {
-            document.getElementById('modalObservacion').style.display = 'none';
-        }
-        document.getElementById('modalObservacion').style.display = 'none';
+      function abrirObservacion() {
+        document.getElementById("modalObservacion").style.display = "flex";
+      }
+
+      function cerrarObservacion() {
+        document.getElementById("modalObservacion").style.display = "none";
+      }
     </script>
+
 </body>
 </html>

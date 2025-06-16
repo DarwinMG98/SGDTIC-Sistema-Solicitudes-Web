@@ -33,12 +33,14 @@
                         {% endif %}">
                     </span>
                 </td>
+                
                 <td>
                     {% if solicitud[3] == 'rechazado' %}
-                        <button type="button" onclick="mostrarObservacion('{{ solicitud[4] }}')">Observación</button>
+                        <button type="button" onclick="mostrarObservacion(`{{ solicitud[4]|e }}`)">Observación</button>
                         <a href="{{ url_for('editar_solicitud', id=solicitud[0]) }}">Editar</a>
                     {% endif %}                    
                 </td>
+
             </tr>
             {% endfor %}
         </table>
@@ -71,6 +73,8 @@
     function mostrarObservacion(texto) {
     document.getElementById('modalObservacion').style.display = 'flex';
     document.getElementById('textoObservacion').textContent = texto;
+    console.log('Observación:', texto);
+
     }
     function cerrarObservacion() {
     document.getElementById('modalObservacion').style.display = 'none';

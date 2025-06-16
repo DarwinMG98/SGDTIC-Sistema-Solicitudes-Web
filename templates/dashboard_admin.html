@@ -49,12 +49,15 @@
             </span>
           </td>
           <td>
-            {% if solicitud[3] == 'pendiente' %}
+            {% if solicitud[3] == 'pendiente' and solicitud[4] %}
+              <span class="badge badge-correccion">Corregida</span>
+              <a href="{{ url_for('revisar_solicitud', id=solicitud[0]) }}" class="btn-revisar">Revisar</a>
+            {% elif solicitud[3] == 'pendiente' %}
               <a href="{{ url_for('revisar_solicitud', id=solicitud[0]) }}" class="btn-revisar">Revisar</a>
             {% elif solicitud[3] == 'aprobado' %}
-              Aprobado
+              <span class="badge badge-aprobado">Aprobado</span>
             {% elif solicitud[3] == 'rechazado' %}
-              Rechazado
+              <span class="badge badge-rechazado">Rechazado</span>
             {% endif %}
           </td>
         </tr>

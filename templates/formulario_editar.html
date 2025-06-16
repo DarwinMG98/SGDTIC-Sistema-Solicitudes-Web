@@ -162,7 +162,31 @@
         <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
         <textarea name="motivo" rows="3" class="formbold-form-input">{{ detalle.motivo|default('') }}</textarea>
       </div>
-       
+
+            <!-- Adjuntar nuevos archivos -->
+      <div>
+        <label class="formbold-form-label">Adjuntar documentación de respaldo</label>
+        <input type="file" id="fileInput" name="documentos" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
+        
+        <ul id="fileList" style="margin-top: 0.7rem;"></ul>
+        <small>Máximo 5 MB por archivo.</small>
+        
+        {% if documentos and documentos|length > 0 %}
+          <ul id="adjuntos-ya-subidos">
+            <strong>Documentos ya subidos:</strong>
+            {% for doc in documentos %}
+              <li>
+                <a href="{{ url_for('descargar_archivo', filename=doc['ruta_archivo']) }}" target="_blank">
+                  {{ doc['nombre_archivo'] }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p id="adjuntos-ya-subidos"><em>No hay documentos adjuntos.</em></p>
+        {% endif %}
+      </div>
+    
       <div class="formbold-btn-group">
         <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(2)">← Anterior</button>
         <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(2)">Siguiente →</button>
@@ -329,7 +353,9 @@
     </form>
   </div>
 </div>
+
 <script>
+
   let currentStep = 1;
   function showStep(n) {
     document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
@@ -362,9 +388,24 @@
     document.getElementById('otroSO').style.display = so === 'Otro' ? 'block' : 'none';
   }
   
-  document.addEventListener('DOMContentLoaded', function() {
-    toggleSOVersion();
-  });
+    document.addEventListener('DOMContentLoaded', function () {
+      const fileInput = document.getElementById('fileInput');
+      const fileList = document.getElementById('fileList');
+
+      if (fileInput && fileList) {
+        fileInput.addEventListener('change', function(event) {
+          fileList.innerHTML = '';
+          const files = Array.from(fileInput.files);
+          files.forEach(function(file) {
+            const li = document.createElement('li');
+            li.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            fileList.appendChild(li);
+          });
+        });
+      }
+    });
+
+
 </script>
 <a href="{{ url_for('dashboard_solicitante') }}">
   <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
