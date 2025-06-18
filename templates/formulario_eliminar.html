@@ -1,0 +1,259 @@
+ <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Solicitud Eliminación Servidor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <style>
+    
+    body { background: #f5f6fa; }
+    .formbold-main-wrapper {
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 2rem 0; background: #f5f6fa;
+    }
+    .formbold-form-wrapper {
+      background: #fff; border-radius: 12px; box-shadow: 0 6px 24px #0001;
+      padding: 2rem 2.5rem; max-width: 650px; width: 100%; margin: auto;
+    }
+    .formbold-form-step { display: none; }
+    .formbold-form-step.active { display: block; animation: fadeIn .4s;}
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: none;}}
+    .formbold-btn { margin-top: 1.5rem;}
+    .formbold-btn-secondary {
+      margin-left: 1rem; background: #e0e7ef; color: #6366f1; border: none;
+    }
+    .formbold-step-menu { margin-bottom: 2rem;}
+    .exito-mensaje { text-align: center; padding: 3rem 0 2rem;}
+    .icon-check { margin: 0 auto 1rem; background: #4ade80;
+      width: 54px; height: 54px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.3rem; color: #fff;
+    }
+  </style>
+</head>
+<body>
+<div class="bg-logo-superior">
+  <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" alt="Logo Municipio" height="150">
+</div>
+
+    <div class="formbold-main-wrapper">
+    <div class="formbold-form-wrapper">
+        <form id="eliminarServidorForm" method="POST" action="{{ url_for('crear_eliminacion') }}" enctype="multipart/form-data" autocomplete="off">
+            
+        <!-- Barra de progreso -->
+    <div class="formbold-step-menu">
+    <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 1 %}active{% endif %}">1</span>
+        <span class="formbold-step-label">Solicitante</span>
+    </div>
+    <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 2 %}active{% endif %}">2</span>
+        <span class="formbold-step-label">Datos</span>
+    </div>
+    <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 3 %}active{% endif %}">3</span>
+        <span class="formbold-step-label">Validaciones</span>
+    </div>
+    <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 4 %}active{% endif %}">4</span>
+        <span class="formbold-step-label">Motivo</span>
+    </div>
+    <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 5 %}active{% endif %}">5</span>
+        <span class="formbold-step-label">Observaciones</span>
+    </div>
+    <div class="step-indicator">
+        <span class="formbold-step-circle {% if paso == 6 %}active{% endif %}">6</span>
+        <span class="formbold-step-label">Firmas</span>
+    </div>
+    </div>
+      <!-- Paso 1 -->
+      <div class="formbold-form-step active" id="step-1">
+        <input type="hidden" name="tipo" value="eliminar">
+        <h2>Información del Solicitante</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre completo</label>
+            <input type="text" name="nombre_completo" class="formbold-form-input">
+          </div>
+          <div>
+            <label class="formbold-form-label">Unidad/Dirección solicitante</label>
+            <input type="text" name="unidad" class="formbold-form-input">
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Correo institucional</label>
+            <input type="text" name="correo" class="formbold-form-input">
+          </div>
+          <div>
+            <label class="formbold-form-label">Teléfono de contacto</label>
+            <input type="tel" name="telefono" class="formbold-form-input">
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Responsable técnico (si aplica)</label>
+            <input type="text" name="responsable_tecnico" class="formbold-form-input">
+          </div>
+        </div>
+        <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
+      </div>
+      <!-- Paso 2 -->
+      <div class="formbold-form-step" id="step-2">
+        <h2>Datos del Servidor a Eliminar</h2><br>
+        <div>
+          <label class="formbold-form-label">Nombre del servidor</label>
+          <input type="text" name="nombre_servidor" class="formbold-form-input">
+        </div>
+        <div>
+          <label class="formbold-form-label">Dirección IP</label>
+          <input type="text" name="ip_servidor" class="formbold-form-input">
+        </div>
+        <div>
+          <label class="formbold-form-label">Sistema operativo</label>
+          <input type="text" name="sistema_operativo" class="formbold-form-input">
+        </div>
+        <div>
+          <label class="formbold-form-label">Rol de servidor</label><br>
+          <label><input type="checkbox" name="rol_servidor[]" value="Producción"> Producción</label><br>
+          <label><input type="checkbox" name="rol_servidor[]" value="Desarrollo"> Desarrollo</label><br>
+          <label><input type="checkbox" name="rol_servidor[]" value="Pruebas"> Pruebas</label><br>
+          <label><input type="checkbox" name="rol_servidor[]" value="Contingencia"> Contingencia</label><br>
+          <label><input type="checkbox" name="rol_servidor[]" value="Otro"> Otro</label><br><br>
+        </div>
+
+        <div>
+          <label class="formbold-form-label">Fecha de creación del servidor</label><br>
+          <input type="date" name="fecha_creacion_servidor" class="formbold-form-input"><br>
+        </div>
+        <div>
+          <label class="formbold-form-label">Motivo de la eliminación</label>
+          <textarea name="motivo_eliminacion" rows="2" class="formbold-form-input"></textarea>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(2)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(2)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="formbold-form-step" id="step-3">
+        <h2>Validaciones Previas</h2><br>
+        <label><input type="checkbox" name="validaciones[]" value="respaldo"> Se ha realizado respaldo del servidor</label><br>
+        <label><input type="checkbox" name="validaciones[]" value="no_requerido"> El servidor ya no es requerido por la unidad solicitante</label><br>
+        <label><input type="checkbox" name="validaciones[]" value="verificado"> Se ha verificado que no está siendo utilizado por otros sistemas o usuarios</label><br>
+        <label><input type="checkbox" name="validaciones[]" value="comunicado"> Se ha comunicado la baja a las áreas técnicas correspondientes</label><br>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(3)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(3)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="formbold-form-step" id="step-4">
+        <h2>Motivo de la Eliminación</h2><br>
+        <label><input type="checkbox" name="motivo_check[]" value="migracion"> Migración a nueva infraestructura</label><br>
+        <label><input type="checkbox" name="motivo_check[]" value="obsolescencia"> Obsolescencia / Fin de vida útil</label><br>
+        <label><input type="checkbox" name="motivo_check[]" value="falta_uso"> Falta de uso / Baja demanda</label><br>
+        <label><input type="checkbox" name="motivo_check[]" value="reubicacion"> Reubicación de recursos</label><br>
+        <label><input type="checkbox" name="motivo_check[]" value="otro" id="otroMotivoCheck" onchange="toggleOtroMotivo()"> Otros</label>
+        <input type="text" name="motivo_otro" id="inputOtroMotivo" class="formbold-form-input" placeholder="Especifique" style="display:none; margin-top: 0.5rem;">
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(4)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(4)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 5 -->
+      <div class="formbold-form-step" id="step-5">
+        <h2>Observaciones Adicionales</h2>
+        <textarea name="observaciones_adicionales" rows="3" class="formbold-form-input"></textarea>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(5)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(5)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 6 -->
+      <div class="formbold-form-step" id="step-6">
+        <h2>Firmas y Envío</h2>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
+            <input type="text" name="firma_solicitante" class="formbold-form-input">
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" name="cargo_solicitante" class="formbold-form-input">
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
+            <input type="text" name="firma_jefe" class="formbold-form-input">
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" name="cargo_jefe" class="formbold-form-input">
+          </div>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(6)">← Anterior</button>
+          <button type="submit" class="formbold-btn">Enviar solicitud</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+let currentStep = 1;
+function showStep(n) {
+  document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
+    el.classList.toggle('active', i === n - 1);
+  });
+  let circles = document.querySelectorAll('.formbold-step-circle');
+  circles.forEach((el, i) => {
+    el.classList.toggle('active', i === n - 1);
+  });
+}
+function nextStep(n) { if (n < 6) { currentStep = n + 1; showStep(currentStep); } }
+function prevStep(n) { if (n > 1) { currentStep = n - 1; showStep(currentStep); } }
+showStep(1);
+
+// Mostrar input "Otro" solo si se selecciona el check "Otros"
+function toggleOtroMotivo() {
+  let otroCheck = document.getElementById("otroMotivoCheck");
+  let inputOtro = document.getElementById("inputOtroMotivo");
+  inputOtro.style.display = otroCheck.checked ? "block" : "none";
+}
+
+// Vista previa de archivos seleccionados
+document.addEventListener('DOMContentLoaded', function () {
+  const fileInput = document.getElementById('fileInput');
+  const fileList = document.getElementById('fileList');
+  if (fileInput && fileList) {
+    fileInput.addEventListener('change', function(event) {
+      fileList.innerHTML = '';
+      const files = Array.from(fileInput.files);
+      files.forEach(function(file) {
+        const li = document.createElement('li');
+        li.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        fileList.appendChild(li);
+      });
+    });
+  }
+});
+</script>
+
+<a href="{{ url_for('dashboard_solicitante') }}">
+  <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+</a>
+</body>
+</html>

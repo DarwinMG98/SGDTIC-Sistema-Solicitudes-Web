@@ -163,21 +163,6 @@
         </div>
         <div style="clear:both"></div>
       </div>
-      <h3>Documentos Adjuntos</h3>
-      {% if documentos %}
-          <ul>
-              {% for doc in documentos %}
-                  <li>
-                      <a href="{{ url_for('descargar_archivo', ruta=doc['ruta_archivo']) }}" target="_blank">
-                          {{ doc['nombre_archivo'] }}
-                      </a>
-                  </li>
-              {% endfor %}
-          </ul>
-      {% else %}
-          <p>No hay documentos adjuntos.</p>
-      {% endif %}
-
 
       <!-- Paso 3 -->
       <div class="formbold-form-step" id="step-3">
@@ -409,7 +394,6 @@
     document.getElementById('otroSO').style.display = so === 'Otro' ? 'block' : 'none';
   }
 </script>
-
 
   <a href="{{ url_for('dashboard_solicitante') }}">
     <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">

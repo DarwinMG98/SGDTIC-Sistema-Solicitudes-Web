@@ -30,8 +30,6 @@
     <h3 class="subtitulo-dashboard">Escoja su solicitud que desea:</h3>
   </div>
 
-
-
     <div class="opciones-dashboard">
       <div class="opcion">
         <a href="/crear_solicitud?tipo=crear">
@@ -40,7 +38,7 @@
         </a>
       </div>
       <div class="opcion">
-        <a href="/crear_solicitud?tipo=eliminar">
+        <a href="/crear_eliminacion?tipo=eliminar">
           <img src="{{ url_for('static', filename='img/eliminar.png') }}" class="icono-opcion" />
           <p class="texto-opcion">Eliminar Servidor</p>
         </a>
@@ -53,7 +51,6 @@
       </div>
     </div>
   </div>
-
 
   <a href="{{ url_for('inicio') }}">
     <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">

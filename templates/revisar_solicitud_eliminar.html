@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Revisión Solicitud Eliminación Servidor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <style>
+    body { background: #f5f6fa; }
+    .formbold-main-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem 0; background: #f5f6fa; }
+    .formbold-form-wrapper { background: #fff; border-radius: 12px; box-shadow: 0 6px 24px #0001; padding: 2rem 2.5rem; max-width: 650px; width: 100%; margin: auto; }
+    .formbold-form-step { display: none; }
+    .formbold-form-step.active { display: block; animation: fadeIn .4s;}
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: none;} }
+    .formbold-btn { margin-top: 1.5rem;}
+    .formbold-btn-secondary { margin-left: 1rem; background: #e0e7ef; color: #6366f1; border: none; }
+    .formbold-step-menu { margin-bottom: 2rem;}
+    .formbold-step-circle.active { background: #6366f1; color: #fff; }
+    .formbold-step-circle { border-radius:50%; border: 2px solid #6366f1; width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; margin-right:6px; font-weight:bold; }
+    .formbold-step-label { font-weight:bold; font-size:1.1rem; }
+    .formbold-btn-group { margin-top:1.5rem;}
+    .formbold-input-flex { display:flex; gap: 1.5rem; flex-wrap:wrap;}
+    .formbold-input-flex > div { flex:1 1 200px; }
+  </style>
+</head>
+<body>
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+    <form id="revisarEliminarForm" method="POST" action="" autocomplete="off">
+      <!-- Barra de pasos -->
+      <div class="formbold-step-menu">
+        <div class="step-indicator"><span class="formbold-step-circle active">1</span><span class="formbold-step-label">Solicitante</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">2</span><span class="formbold-step-label">Datos</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">3</span><span class="formbold-step-label">Validaciones</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">4</span><span class="formbold-step-label">Motivo</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">5</span><span class="formbold-step-label">Observaciones</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">6</span><span class="formbold-step-label">Firmas</span></div>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="formbold-form-step active" id="step-1">
+        <h2>Información del Solicitante</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre completo</label>
+            <input type="text" value="{{ detalle.nombre_completo }}" class="formbold-form-input" readonly>
+          </div>
+          <div>
+            <label class="formbold-form-label">Unidad/Dirección solicitante</label>
+            <input type="text" value="{{ detalle.unidad }}" class="formbold-form-input" readonly>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Correo institucional</label>
+            <input type="text" value="{{ detalle.correo }}" class="formbold-form-input" readonly>
+          </div>
+          <div>
+            <label class="formbold-form-label">Teléfono de contacto</label>
+            <input type="tel" value="{{ detalle.telefono }}" class="formbold-form-input" readonly>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Responsable técnico (si aplica)</label>
+            <input type="text" value="{{ detalle.responsable_tecnico }}" class="formbold-form-input" readonly>
+          </div>
+        </div>
+        <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="formbold-form-step" id="step-2">
+        <h2>Datos del Servidor a Eliminar</h2><br>
+        <div>
+          <label class="formbold-form-label">Nombre del servidor</label>
+          <input type="text" value="{{ detalle.nombre_servidor }}" class="formbold-form-input" readonly>
+        </div>
+        <div>
+          <label class="formbold-form-label">Dirección IP</label>
+          <input type="text" value="{{ detalle.ip_servidor }}" class="formbold-form-input" readonly>
+        </div>
+        <div>
+          <label class="formbold-form-label">Sistema operativo</label>
+          <input type="text" value="{{ detalle.sistema_operativo }}" class="formbold-form-input" readonly>
+        </div>
+        <div>
+          <label class="formbold-form-label">Rol de servidor</label><br>
+          {% for rol in ['Producción',
+          'Desarrollo', 
+          'Pruebas', 
+          'Contingencia', 
+          'Otro'] 
+          %}
+            <label style="margin-right:16px;">
+              <input type="checkbox" {% if detalle.rol_servidor and rol in detalle.rol_servidor %}checked{% endif %} disabled> {{ rol }}
+            </label>
+          {% endfor %}
+        </div>
+        <div>
+          <label class="formbold-form-label">Fecha de creación del servidor</label>
+          <input type="text" value="{{ detalle.fecha_creacion_servidor }}" class="formbold-form-input" readonly>
+        </div>
+        <div>
+          <label class="formbold-form-label">Motivo de la eliminación</label>
+          <textarea rows="2" class="formbold-form-input" readonly>{{ detalle.motivo_eliminacion }}</textarea>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(2)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(2)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="formbold-form-step" id="step-3">
+        <h2>Validaciones Previas</h2><br>
+        {% for val, label in [
+            ('respaldo', 'Se ha realizado respaldo del servidor'),
+            ('no_requerido', 'El servidor ya no es requerido por la unidad solicitante'),
+            ('verificado', 'Se ha verificado que no está siendo utilizado por otros sistemas o usuarios'),
+            ('comunicado', 'Se ha comunicado la baja a las áreas técnicas correspondientes')
+        ] %}
+          <label><input type="checkbox" {% if detalle.validaciones and val in detalle.validaciones %}checked{% endif %} disabled> {{ label }}</label><br>
+        {% endfor %}
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(3)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(3)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="formbold-form-step" id="step-4">
+        <h2>Motivo de la Eliminación</h2><br>
+        {% for val, label in [
+          ('migracion', 'Migración a nueva infraestructura'),
+          ('obsolescencia', 'Obsolescencia / Fin de vida útil'),
+          ('falta_uso', 'Falta de uso / Baja demanda'),
+          ('reubicacion', 'Reubicación de recursos'),
+          ('otro', 'Otros')
+        ] %}
+          <label>
+            <input type="checkbox" {% if detalle.motivo_check and val in detalle.motivo_check %}checked{% endif %} disabled> {{ label }}
+          </label><br>
+        {% endfor %}
+        {% if detalle.motivo_otro %}
+          <input type="text" value="{{ detalle.motivo_otro }}" class="formbold-form-input" readonly style="margin-top: 0.5rem;">
+        {% endif %}
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(4)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(4)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 5 -->
+      <div class="formbold-form-step" id="step-5">
+        <h2>Observaciones Adicionales</h2>
+        <textarea rows="3" class="formbold-form-input" readonly>{{ detalle.observaciones_adicionales }}</textarea>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(5)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(5)">Siguiente →</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+
+      <!-- Paso 6 (Firmas y botones de acción) -->
+      <div class="formbold-form-step" id="step-6">
+        <h2>Firmas y Envío</h2>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
+            <input type="text" value="{{ detalle.firma_solicitante }}" class="formbold-form-input" readonly>
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" value="{{ detalle.cargo_solicitante }}" class="formbold-form-input" readonly>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
+            <input type="text" name="firma_jefe" class="formbold-form-input" required>
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" name="cargo_jefe" class="formbold-form-input" required>
+          </div>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(6)">← Anterior</button>
+          <button type="submit" name="accion" value="aprobar" class="formbold-btn">Aprobar</button>
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="abrirObservacion()" style="margin-left: 1rem;">Rechazar</button>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para observación de rechazo -->
+<div id="modalObservacion" class="modal" style="display: none;">
+  <div class="modal-contenido">
+    <h3>Observación de Rechazo</h3>
+    <form method="POST">
+      <textarea name="observacion" rows="5" required placeholder="Escriba el motivo del rechazo..."></textarea>
+      <div class="botones-observacion">
+        <button type="submit" name="accion" value="rechazar" class="btn-enviar">Enviar</button>
+        <button type="button" onclick="cerrarObservacion()" class="btn-cancelar">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+<style>
+  .modal { position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(44, 62, 80, 0.35); display: flex; align-items: center; justify-content: center; }
+  .modal-contenido { background: #fff; border-radius: 16px; padding: 2rem 2.2rem 1.2rem 2.2rem; box-shadow: 0 6px 32px #0003; max-width: 480px; width: 98%; min-width: 320px;}
+  .modal-contenido h3 { font-size: 1.4rem; text-align: center; margin-bottom: 1.1rem; color: #2a314a; font-weight: bold;}
+  .modal-contenido textarea { width: 100%; resize: none; border-radius: 8px; border: 1px solid #ccc; padding: 1rem; font-size: 1rem; margin-bottom: 1.5rem; background: #f8fafb;}
+  .botones-observacion { display: flex; justify-content: flex-end; gap: 1rem;}
+  .btn-enviar { background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: .5rem 1.7rem; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background 0.2s;}
+  .btn-enviar:hover { background: #dc2626; }
+  .btn-cancelar { background: #f3f4f6; color: #4b5563; border: none; border-radius: 8px; padding: .5rem 1.7rem; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background 0.2s;}
+  .btn-cancelar:hover { background: #e5e7eb;}
+</style>
+<script>
+  let currentStep = 1;
+  function showStep(n) {
+    document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+    let circles = document.querySelectorAll('.formbold-step-circle');
+    circles.forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+  }
+  function nextStep(n) { if (n < 6) { currentStep = n + 1; showStep(currentStep); } }
+  function prevStep(n) { if (n > 1) { currentStep = n - 1; showStep(currentStep); } }
+  showStep(1);
+
+  function abrirObservacion() {
+    document.getElementById("modalObservacion").style.display = "flex";
+  }
+  function cerrarObservacion() {
+    document.getElementById("modalObservacion").style.display = "none";
+  }
+</script>
+</body>
+</html>

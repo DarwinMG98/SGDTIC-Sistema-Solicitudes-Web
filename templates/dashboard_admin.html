@@ -8,7 +8,7 @@
 <body class="fondo-azul">
 
   
-  <img src="{{ url_for('static', filename='img/logo_municipio3.png') }}" class="decoracion-izquierda" />
+  <img src="{{ url_for('static', filename=logo_path) }}" class="decoracion-izquierda">
 
   <!-- Iconos superiores derecha -->
   <div class="iconos-superiores">
@@ -19,12 +19,10 @@
     </a>
   </div>
 
-
   <div class="contenedor-dashboard">
 
     <h1 class="titulo-bienvenida">Bienvenido, Administrador</h1>
 
-    
     <div class="contenedor-tabla">
       <h3 class="subtitulo-tabla">Historial de solicitudes</h3>
       <table>
@@ -66,7 +64,6 @@
 
     </div>
   </div>
-
 
   <a href="{{ url_for('inicio') }}">
     <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">

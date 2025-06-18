@@ -163,7 +163,6 @@
         <textarea name="motivo" rows="3" class="formbold-form-input">{{ detalle.motivo|default('') }}</textarea>
       </div>
 
-            <!-- Adjuntar nuevos archivos -->
       <div>
         <label class="formbold-form-label">Adjuntar documentación de respaldo</label>
         <input type="file" id="fileInput" name="documentos" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
@@ -171,7 +170,7 @@
         <ul id="fileList" style="margin-top: 0.7rem;"></ul>
         <small>Máximo 5 MB por archivo.</small>
         
-        {% if documentos and documentos|length > 0 %}
+        {% if documentos and documentos|length > 0 %} 
           <ul id="adjuntos-ya-subidos">
             <strong>Documentos ya subidos:</strong>
             {% for doc in documentos %}

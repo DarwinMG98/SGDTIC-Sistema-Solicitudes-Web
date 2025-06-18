@@ -12,6 +12,13 @@ import time
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta'
 
+def to_int(valor):
+    """Convierte valor a int si no está vacío, si no, retorna None"""
+    try:
+        return int(valor)
+    except (ValueError, TypeError):
+        return None
+
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf', 'docx', 'png', 'jpg', 'jpeg'}
@@ -29,6 +36,10 @@ def crear_solicitud():
         observaciones = request.form.get('observaciones')
         usuario_id = session.get('usuario_id')
         fecha = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        vcpu = to_int(request.form.get('vcpu', ''))
+        ram = to_int(request.form.get('ram', ''))
+        disco_sistema = to_int(request.form.get('disco_sistema', ''))
+        disco_datos = to_int(request.form.get('disco_datos', ''))
 
         conn = get_connection()
         cursor = conn.cursor()
@@ -53,10 +64,6 @@ def crear_solicitud():
             request.form.get('version_linux', '') or
             request.form.get('so_otro', '')
         )
-        vcpu = request.form['vcpu']
-        ram = request.form['ram']
-        disco_sistema = request.form['disco_sistema']
-        disco_datos = request.form['disco_datos']
         vida_util = request.form['vida_util']
         justificacion_recursos = request.form['justificacion_recursos']
         accesos = request.form['accesos']
@@ -129,6 +136,19 @@ def get_connection():
         database='sistema_solicitudes'
 
     )
+
+def obtener_logo():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT valor FROM configuracion WHERE clave = 'logo_municipio'")
+    result = cursor.fetchone()
+    conn.close()
+    
+    return result[0] if result else 'img/logo_municipio3.png'
+    
+@app.context_processor
+def inject_logo():
+    return dict(logo_path=obtener_logo())
 
 # Página de inicio
 @app.route('/')
@@ -273,20 +293,15 @@ def revisar_solicitud(id):
     
     conn.close()
 
-    print(detalle)
-
     if request.method == 'POST':
         accion = request.form['accion']
         if accion == 'aprobar':
-
             conn = get_connection()
             cursor = conn.cursor()
             cursor.execute("UPDATE solicitudes SET estado='aprobado' WHERE id=%s", (id,))
             conn.commit()
             conn.close()
-
             return redirect(url_for('dashboard_admin'))
-        
         elif accion == 'rechazar':
             observacion = request.form['observacion']
             conn = get_connection()
@@ -295,13 +310,22 @@ def revisar_solicitud(id):
             conn.commit()
             conn.close()
             return redirect(url_for('dashboard_admin'))
-    
-    return render_template(
-        'revisar_solicitud.html',
-        solicitud=solicitud,
-        detalle=detalle,
-        documentos=documentos
-     )
+
+    # == CAMBIO AQUÍ ==
+    if solicitud['tipo'] == 'eliminar':
+        return render_template(
+            'revisar_solicitud_eliminar.html',
+            solicitud=solicitud,
+            detalle=detalle,
+            documentos=documentos
+        )
+    else:
+        return render_template(
+            'revisar_solicitud.html',
+            solicitud=solicitud,
+            detalle=detalle,
+            documentos=documentos
+        )
 
 @app.route('/editar_solicitud/<int:id>', methods=['GET', 'POST'])
 def editar_solicitud(id):
@@ -312,7 +336,7 @@ def editar_solicitud(id):
     solicitud = cursor.fetchone()
     cursor.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
     detalle = cursor.fetchone()
-    cursor.execute("SELEC * FROM documentos_adjuntos WHERE solicitud_id=%s", (id,))
+    cursor.execute("SELECT * FROM documentos_adjuntos WHERE solicitud_id=%s", (id,))
     documentos = cursor.fetchall()
 
     if request.method == "POST":
@@ -332,10 +356,6 @@ def editar_solicitud(id):
             request.form.get('version_linux', '') or
             request.form.get('so_otro', '')
         )
-        vcpu = request.form.get('vcpu', '')
-        ram = request.form.get('ram', '')
-        disco_sistema = request.form.get('disco_sistema', '')
-        disco_datos = request.form.get('disco_datos', '')
         vida_util = request.form.get('vida_util', '')
         justificacion_recursos = request.form.get('justificacion_recursos', '')
         accesos = request.form.get('accesos', '')
@@ -347,6 +367,16 @@ def editar_solicitud(id):
         cargo_solicitante = request.form.get('cargo_solicitante', '')
         firma_jefe = request.form.get('firma_jefe', '')
         cargo_jefe = request.form.get('cargo_jefe', '')
+        vcpu = to_int(request.form.get('vcpu', ''))
+        ram = to_int(request.form.get('ram', ''))
+        disco_sistema = to_int(request.form.get('disco_sistema', ''))
+        disco_datos = to_int(request.form.get('disco_datos', ''))
+
+        vcpu = to_int(request.form.get('vcpu', ''))
+        ram = to_int(request.form.get('ram', ''))
+        disco_sistema = to_int(request.form.get('disco_sistema', ''))
+        disco_datos = to_int(request.form.get('disco_datos', ''))
+
 
         cursor.execute("""
             UPDATE solicitud_detalle SET
@@ -364,29 +394,120 @@ def editar_solicitud(id):
         ))
 
         cursor.execute("UPDATE solicitudes SET estado='pendiente' WHERE id=%s", (id,))
+
+                # ===== GUARDAR ARCHIVOS ADJUNTOS NUEVOS =====
+        archivos = request.files.getlist('documentos')
+        for archivo in archivos:
+            if archivo and archivo.filename and allowed_file(archivo.filename):
+                filename = secure_filename(archivo.filename)
+                ruta = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                archivo.save(ruta)
+                cursor.execute("""
+                    INSERT INTO documentos_adjuntos (solicitud_id, nombre_archivo, ruta_archivo)
+                    VALUES (%s, %s, %s)
+                """, (id, filename, filename))
+
         conn.commit()
         conn.close()
         return redirect(url_for("historial"))
-    # --- hasta aquí ---
+
 
     conn.close()
-    return render_template("formulario_editar.html", detalle=detalle, observacion=solicitud['observaciones'])
 
-
+    if solicitud['tipo'] == 'crear':
+        return render_template("formulario_editar.html", detalle=detalle, documentos=documentos, observacion=solicitud['observaciones'])
+    elif solicitud['tipo'] == 'eliminar':
+        return render_template("formulario_editar_eliminar.html", detalle=detalle, documentos=documentos, observacion=solicitud['observaciones'])
 
 
 @app.route('/uploads/<filename>')
 def descargar_archivo(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/crear_eliminacion', methods=['GET', 'POST'])
+def crear_eliminacion():
+    if request.method == "POST":
+        tipo = "eliminar"
+        usuario_id = session.get('usuario_id')
+        fecha = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # ----- Paso 1 -----
+        nombre_completo = request.form['nombre_completo']
+        unidad = request.form['unidad']
+        correo = request.form['correo']
+        telefono = request.form['telefono']
+        responsable_tecnico = request.form.get('responsable_tecnico', '')
+
+        # ----- Paso 2 -----
+        nombre_servidor = request.form.get('nombre_servidor', '')
+        ip_servidor = request.form.get('ip_servidor', '')
+        sistema_operativo = request.form.get('sistema_operativo', '')
+        rol_servidor = ', '.join(request.form.getlist('rol_servidor[]'))
+        fecha_creacion_servidor = request.form.get('fecha_creacion_servidor', '')
+        motivo_eliminacion = request.form.get('motivo_eliminacion', '')
+
+        # ----- Paso 3 -----
+        validaciones = ', '.join(request.form.getlist('validaciones[]'))
+
+        # ----- Paso 4 -----
+        motivo_check = ', '.join(request.form.getlist('motivo_check[]'))
+        motivo_otro = request.form.get('motivo_otro', '')
+
+        # ----- Paso 5 -----
+        observaciones_adicionales = request.form.get('observaciones_adicionales', '')
+
+        # ----- Paso 6 -----
+        firma_solicitante = request.form.get('firma_solicitante', '')
+        cargo_solicitante = request.form.get('cargo_solicitante', '')
+        firma_jefe = request.form.get('firma_jefe', '')
+        cargo_jefe = request.form.get('cargo_jefe', '')
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        
+        cursor.execute("""
+            INSERT INTO solicitudes (usuario_id, tipo, fecha_solicitud, estado)
+            VALUES (%s, %s, %s, %s)
+        """, (usuario_id, tipo, fecha, "pendiente"))
+        solicitud_id = cursor.lastrowid
+
+        
+        cursor.execute("""
+            INSERT INTO solicitud_detalle (
+                solicitud_id, fecha, nombre_completo, unidad, correo, telefono, responsable_tecnico,
+                nombre_servidor, ip_servidor, sistema_operativo, rol_servidor, fecha_creacion_servidor,
+                motivo_eliminacion, validaciones, motivo_check, motivo_otro,
+                observaciones_adicionales, firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            solicitud_id, fecha, nombre_completo, unidad, correo, telefono, responsable_tecnico,
+            nombre_servidor, ip_servidor, sistema_operativo, rol_servidor, fecha_creacion_servidor,
+            motivo_eliminacion, validaciones, motivo_check, motivo_otro,
+            observaciones_adicionales, firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
+        ))
+
+        
+        archivos = request.files.getlist('documentos')
+        for archivo in archivos:
+            if archivo and archivo.filename and allowed_file(archivo.filename):
+                filename = secure_filename(archivo.filename)
+                ruta = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                archivo.save(ruta)
+                cursor.execute("""
+                    INSERT INTO documentos_adjuntos (solicitud_id, nombre_archivo, ruta_archivo)
+                    VALUES (%s, %s, %s)
+                """, (solicitud_id, filename, filename))
+
+        conn.commit()
+        conn.close()
+        return redirect(url_for("solicitud_enviada"))
+
+    return render_template("formulario_eliminar.html")
+
 
 # Iniciar servidor
 if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
-
-
-
+    app.run(debug=True, host="0.0.0.0", port=8000)
 
