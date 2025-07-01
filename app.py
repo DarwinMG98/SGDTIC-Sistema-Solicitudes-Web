@@ -31,24 +31,40 @@ def allowed_file(filename):
 
 @app.route("/crear_solicitud", methods=["GET", "POST"])
 def crear_solicitud():
+    # 1. Verificar sesión y usuario válido
+    if 'usuario_id' not in session:
+        flash("Debes iniciar sesión como solicitante.")
+        return redirect(url_for("login_solicitante"))
+
+    usuario_id = session.get('usuario_id')
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM usuarios WHERE id=%s", (usuario_id,))
+    user = cursor.fetchone()
+    if not user:
+        conn.close()
+        flash("El usuario actual no existe. Inicia sesión de nuevo.")
+        return redirect(url_for("login_solicitante"))
+
     if request.method == "POST":
+        # DATOS PRINCIPALES
         tipo = request.form.get('tipo')
         observaciones = request.form.get('observaciones')
-        usuario_id = session.get('usuario_id')
         fecha = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         vcpu = to_int(request.form.get('vcpu', ''))
         ram = to_int(request.form.get('ram', ''))
         disco_sistema = to_int(request.form.get('disco_sistema', ''))
         disco_datos = to_int(request.form.get('disco_datos', ''))
 
-        conn = get_connection()
-        cursor = conn.cursor()
+        # INSERTAR EN solicitudes
         cursor.execute("""
             INSERT INTO solicitudes (usuario_id, tipo, fecha_solicitud, estado, observaciones)
             VALUES (%s, %s, %s, %s, %s)
         """, (usuario_id, tipo, fecha, "pendiente", observaciones))
         solicitud_id = cursor.lastrowid
 
+        # DATOS DETALLADOS
         nombre_completo = request.form['nombre_completo']
         unidad = request.form['unidad']
         correo = request.form['correo']
@@ -70,12 +86,13 @@ def crear_solicitud():
         responsable_aplicacion = request.form['responsable_aplicacion']
         unidad_responsable = request.form['unidad_responsable']
         contacto_soporte = request.form['contacto_soporte']
-        observaciones_adicionales = request.form['observaciones']  
+        observaciones_adicionales = request.form['observaciones']
         firma_solicitante = request.form['firma_solicitante']
         cargo_solicitante = request.form['cargo_solicitante']
         firma_jefe = request.form['firma_jefe']
         cargo_jefe = request.form['cargo_jefe']
 
+        # INSERTAR EN solicitud_detalle
         cursor.execute("""
             INSERT INTO solicitud_detalle (
                 solicitud_id, fecha, nombre_completo, unidad, correo, telefono, responsable_tecnico,
@@ -93,32 +110,26 @@ def crear_solicitud():
             firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
         ))
 
-              # ======= GUARDAR ARCHIVOS ADJUNTOS =======
+        # GUARDAR ARCHIVOS ADJUNTOS
         archivos = request.files.getlist('documentos')
-
-        print("FILES RECIBIDOS:", request.files)
-        print("archivos:", archivos)
-        for archivo in archivos:
-            print("archivo:", archivo.filename)
-
         for archivo in archivos:
             if archivo and allowed_file(archivo.filename):
                 ext = archivo.filename.rsplit('.', 1)[-1].lower()
                 nombre_unico = f"{solicitud_id}_{int(time.time())}_{uuid.uuid4().hex}.{ext}"
                 nombre_unico = secure_filename(nombre_unico)
                 ruta = os.path.join(app.config['UPLOAD_FOLDER'], nombre_unico)
-                archivo.save(ruta)  # Guarda en /uploads/nombre_unico.pdf
-
-                # Registrar en la tabla documentos_adjuntos
+                archivo.save(ruta)
                 cursor.execute("""
                     INSERT INTO documentos_adjuntos (solicitud_id, nombre_archivo, ruta_archivo)
                     VALUES (%s, %s, %s)
-                """, (solicitud_id, archivo.filename, nombre_unico))  # Guardas el nombre original, y el nombre físico real
+                """, (solicitud_id, archivo.filename, nombre_unico))
 
         conn.commit()
         conn.close()
+        flash("¡Solicitud enviada correctamente!")
         return redirect(url_for("solicitud_enviada"))
 
+    conn.close()
     return render_template("formulario_crear.html")
 
 
@@ -150,7 +161,7 @@ def obtener_logo():
 def inject_logo():
     return dict(logo_path=obtener_logo())
 
-# Página de inicio
+
 @app.route('/')
 def inicio():
     return render_template("inicio.html")
@@ -214,29 +225,31 @@ def login_solicitante():
         conn = get_connection()
         cursor = conn.cursor()
 
-        
-        cursor.execute("SELECT * FROM solicitantes WHERE nombre=%s AND apellido=%s AND correo=%s", 
-                       (nombre, apellido, correo))
-        solicitante = cursor.fetchone()
+        # Buscar si el usuario ya existe por correo
+        cursor.execute("SELECT id FROM usuarios WHERE correo=%s", (correo,))
+        usuario = cursor.fetchone()
 
-        
-        if not solicitante:
-            cursor.execute("INSERT INTO solicitantes (nombre, apellido, correo) VALUES (%s, %s, %s)", 
-                           (nombre, apellido, correo))
+        if not usuario:
+            # Si no existe, lo creamos con contraseña NULL (o la que quieras)
+            cursor.execute("""
+                INSERT INTO usuarios (nombre, apellido, correo, rol, contraseña)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (nombre, apellido, correo, 'solicitante', None))
             conn.commit()
-            cursor.execute("SELECT * FROM solicitantes WHERE nombre=%s AND apellido=%s AND correo=%s", 
-                           (nombre, apellido, correo))
-            solicitante = cursor.fetchone()
+            # Buscar nuevamente para obtener el id
+            cursor.execute("SELECT id FROM usuarios WHERE correo=%s", (correo,))
+            usuario = cursor.fetchone()
 
         conn.close()
 
-        
-        if solicitante:
-            session['usuario_id'] = solicitante[0]
-            session['nombre'] = solicitante[1]
+        if usuario:
+            session['usuario_id'] = usuario[0]
+            session['nombre'] = nombre  # Puedes guardar más datos si necesitas
             return redirect(url_for('dashboard_solicitante'))
         else:
-            return "No se pudo iniciar sesión"
+            flash("No se pudo iniciar sesión, contacte al administrador.")
+            return render_template('login_solicitante.html')
+
     return render_template('login_solicitante.html')
 
 @app.route('/dashboard_solicitante')
@@ -311,7 +324,7 @@ def revisar_solicitud(id):
             conn.close()
             return redirect(url_for('dashboard_admin'))
 
-    # == CAMBIO AQUÍ ==
+    
     if solicitud['tipo'] == 'eliminar':
         return render_template(
             'revisar_solicitud_eliminar.html',
@@ -395,7 +408,6 @@ def editar_solicitud(id):
 
         cursor.execute("UPDATE solicitudes SET estado='pendiente' WHERE id=%s", (id,))
 
-                # ===== GUARDAR ARCHIVOS ADJUNTOS NUEVOS =====
         archivos = request.files.getlist('documentos')
         for archivo in archivos:
             if archivo and archivo.filename and allowed_file(archivo.filename):
@@ -410,7 +422,6 @@ def editar_solicitud(id):
         conn.commit()
         conn.close()
         return redirect(url_for("historial"))
-
 
     conn.close()
 

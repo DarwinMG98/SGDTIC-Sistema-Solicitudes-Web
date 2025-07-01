@@ -81,7 +81,7 @@
         <h2>Información del Solicitante</h2><br>
         <div class="formbold-input-flex">
           <div>
-            <label class="formbold-form-label">Nombre completo</label>
+            <label class="formbold-form-label">Nombre Completp</label>
             <input type="text" name="nombre_completo" class="formbold-form-input" value="{{ detalle.nombre_completo|default('') }}">
           </div>
           <div>
@@ -91,7 +91,7 @@
         </div>
         <div class="formbold-input-flex">
           <div>
-            <label class="formbold-form-label">Correo institucional</label>
+            <label class="formbold-form-label">Correo Institucional</label>
             <input type="text" name="correo" class="formbold-form-input" value="{{ detalle.correo|default('') }}">
           </div>
           <div>
@@ -123,7 +123,7 @@
           <input type="text" name="sistema_operativo" class="formbold-form-input" value="{{ detalle.sistema_operativo|default('') }}">
         </div>
         <div>
-          <label class="formbold-form-label">Rol de servidor</label><br><br>
+          <label class="formbold-form-label">Rol del servidor</label><br><br>
           <label><input type="checkbox" name="rol_servidor[]" value="Producción"
             {% if detalle.rol_servidor and 'Producción' in detalle.rol_servidor %}checked{% endif %}> Producción</label><br>
           <label><input type="checkbox" name="rol_servidor[]" value="Desarrollo"
@@ -136,7 +136,7 @@
             {% if detalle.rol_servidor and 'Otro' in detalle.rol_servidor %}checked{% endif %}> Otro</label><br><br>
         </div>
         <div>
-          <label class="formbold-form-label">Fecha de creación del servidor</label>
+          <label class="formbold-form-label">Fecha del creación del servidor</label>
           <input type="date" name="fecha_creacion_servidor" class="formbold-form-input" value="{{ detalle.fecha_creacion_servidor|default('') }}">
         </div>
         <div>
