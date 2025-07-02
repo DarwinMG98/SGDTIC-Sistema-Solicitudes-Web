@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>Revisión Solicitud Creación Servidor</title>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  
   <style>
     body { background: #f5f6fa; }
     .formbold-main-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem 0; background: #f5f6fa; }
@@ -24,6 +26,11 @@
   </style>
 </head>
 <body>
+
+<img src="{{ url_for('static', filename=logo_path) }}" class="decoracion-izquierda">
+
+
+
 <div class="formbold-main-wrapper">
   <div class="formbold-form-wrapper">
     <form id="revisarCreacionForm" method="POST" action="" autocomplete="off">

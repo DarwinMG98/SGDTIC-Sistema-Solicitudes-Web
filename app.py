@@ -9,6 +9,12 @@ from datetime import datetime
 import uuid
 import time
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+UPLOAD_FOLDER = 'static/img'
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta'
 
@@ -206,8 +212,10 @@ def dashboard_admin():
     cursor.execute("SELECT id, tipo, fecha_solicitud, estado FROM solicitudes ORDER BY fecha_solicitud DESC")
     solicitudes = cursor.fetchall()
     conn.close()
-    print("SOLICITUDES DASHBOARD ADMIN", solicitudes)
-    return render_template('dashboard_admin.html', solicitudes=solicitudes)
+
+    logo_path = obtener_logo()
+    return render_template('dashboard_admin.html', solicitudes=solicitudes, logo_path=logo_path)
+
 
 
 @app.route('/logout')
@@ -517,6 +525,26 @@ def crear_eliminacion():
 
     return render_template("formulario_eliminar.html")
 
+
+@app.route('/actualizar_logo', methods=['GET', 'POST'])
+def actualizar_logo():
+    if request.method == 'POST':
+        file = request.files['logo']
+        if file and allowed_file(file.filename):
+            ext = file.filename.rsplit('.', 1)[1].lower()
+            filename = f"logo_municipio.{ext}"  # Siempre el mismo nombre si quieres sobrescribir
+            file.save(os.path.join('static/img', filename))
+            # Actualizar la ruta en la base de datos:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE configuracion SET valor = %s WHERE clave = 'logo_municipio'
+            """, (f"img/{filename}",))
+            conn.commit()
+            conn.close()
+            flash('Logo actualizado correctamente.')
+            return redirect(url_for('dashboard_admin'))
+    return render_template('actualizar_logo.html')
 
 # Iniciar servidor
 if __name__ == '__main__':
