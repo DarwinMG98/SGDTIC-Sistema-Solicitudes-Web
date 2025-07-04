@@ -196,14 +196,14 @@ form button {
 
 /* Dashboard Admin*/
 
-/* Contenedor central */
+
 .contenedor-dashboard {
   margin-top: 100px;
   text-align: left;
   padding: 0 80px;
 }
 
-/* Título */
+
 .titulo-bienvenida {
   font-size: 35px;
   color: white;
@@ -211,7 +211,7 @@ form button {
   margin-bottom: 40px;
 }
 
-/* Tabla */
+
 .contenedor-tabla {
   background-color: #e0e0e0;
   padding: 25px;
@@ -245,7 +245,7 @@ table th {
   color: black;
 }
 
-/* Estados */
+
 .estado {
   display: inline-block;
   width: 18px;
@@ -265,7 +265,7 @@ table th {
   background-color: #f44336;
 }
 
-/* Botón revisar */
+
 .btn-revisar {
   background-color: #b39ddb;
   border: none;
@@ -275,7 +275,7 @@ table th {
   cursor: pointer;
 }
 
-/* Logo superior */
+
 .logo-superior {
   position: absolute;
   top: 20px;
@@ -283,7 +283,7 @@ table th {
   width: 100px;
 }
 
-/* Iconos y cerrar sesión */
+
 .iconos-superiores {
   position: absolute;
   top: 30px;
@@ -308,7 +308,7 @@ table th {
   font-size: 14px;
 }
 
-/* Botón volver */
+
 .volver {
   position: absolute;
   bottom: 30px;
@@ -325,13 +325,13 @@ table th {
 /* login_solicitante*/
 
 
-/* Quitar subrayado de los enlaces en opciones del dashboard */
+
 .opcion a {
   text-decoration: none;
   color: white;
 }
 
-/* Estilo general del dashboard del solicitante */
+
 .dashboard-solicitante {
   display: flex;
   flex-direction: column;
@@ -340,14 +340,14 @@ table th {
   padding-top: 50px;
 }
 
-/* Contenedor principal */
+
 .contenedor-dashboard-solicitante {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Encabezado con bienvenida e ícono */
+
 .encabezado-solicitante {
   display: flex;
   justify-content: space-between;
@@ -357,44 +357,44 @@ table th {
   margin-bottom: 20px;
 }
 
-/* Título de bienvenida */
+
 .titulo-dashboard {
   font-size: 28px;
   font-weight: bold;
   color: white;
 }
 
-/* Ícono de usuario */
+
 .icono-usuario img {
   width: 80px;
 }
 
-/* Subtítulo */
+
 .subtitulo-dashboard {
   font-size: 18px;
   margin-bottom: 40px;
   color: white;
 }
 
-/* Opciones (crear, eliminar, historial) */
+
 .opciones-dashboard {
   display: flex;
   justify-content: center;
   gap: 100px;
 }
 
-/* Cada opción */
+
 .opcion {
   text-align: center;
 }
 
-/* Ícono de cada opción */
+
 .icono-opcion {
   width: 80px !important;
   height: auto !important;
 }
 
-/* Texto de cada opción */
+
 .texto-opcion {
   margin-top: 10px;
   font-weight: bold;

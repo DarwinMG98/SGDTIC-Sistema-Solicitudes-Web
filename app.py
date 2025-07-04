@@ -3,6 +3,7 @@ import pymysql.cursors
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
 from datetime import datetime
+from pymysql.err import IntegrityError
 import os
 import pymysql
 from datetime import datetime
@@ -216,8 +217,6 @@ def dashboard_admin():
     logo_path = obtener_logo()
     return render_template('dashboard_admin.html', solicitudes=solicitudes, logo_path=logo_path)
 
-
-
 @app.route('/logout')
 def logout():
     session.clear() 
@@ -238,13 +237,15 @@ def login_solicitante():
         usuario = cursor.fetchone()
 
         if not usuario:
-            # Si no existe, lo creamos con contraseña NULL (o la que quieras)
-            cursor.execute("""
-                INSERT INTO usuarios (nombre, apellido, correo, rol, contraseña)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (nombre, apellido, correo, 'solicitante', None))
-            conn.commit()
-            # Buscar nuevamente para obtener el id
+            try:
+                cursor.execute("""
+                    INSERT INTO usuarios (nombre, apellido, correo, rol, contraseña)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (nombre, apellido, correo, 'solicitante', None))
+                conn.commit()
+            except IntegrityError:
+                # Si falla por duplicado, vuelve a buscar
+                conn.rollback()
             cursor.execute("SELECT id FROM usuarios WHERE correo=%s", (correo,))
             usuario = cursor.fetchone()
 
@@ -252,7 +253,7 @@ def login_solicitante():
 
         if usuario:
             session['usuario_id'] = usuario[0]
-            session['nombre'] = nombre  # Puedes guardar más datos si necesitas
+            session['nombre'] = nombre
             return redirect(url_for('dashboard_solicitante'))
         else:
             flash("No se pudo iniciar sesión, contacte al administrador.")
@@ -267,17 +268,20 @@ def dashboard_solicitante():
 
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT nombre, apellido FROM solicitantes WHERE id = %s", (session['usuario_id'],))
+    cursor.execute("SELECT nombre, apellido FROM usuarios WHERE id = %s", (session['usuario_id'],))
     usuario = cursor.fetchone()
     conn.close()
 
-   
-    nombre = usuario[0] if usuario[0] else ""
-    apellido = usuario[1] if usuario[1] else ""
+    if usuario:
+        nombre = usuario[0] or ""
+        apellido = usuario[1] or ""
+    else:
+        nombre = ""
+        apellido = ""
 
     nombre_completo = f"{nombre} {apellido}".strip()
-
     return render_template('dashboard_solicitante.html', nombre=nombre_completo)
+
 
 @app.route('/historial_solicitante')
 def historial():

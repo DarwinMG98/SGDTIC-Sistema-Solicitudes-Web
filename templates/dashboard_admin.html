@@ -3,7 +3,7 @@
 <head>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <meta charset="UTF-8" />
-  <title>Dashboard Adminiatrador</title>
+  <title>Dashboard Administrador</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
 <body class="fondo-azul">
@@ -11,7 +11,7 @@
   
   <img src="{{ url_for('static', filename=logo_path) }}" class="decoracion-izquierda">
 
-<!-- Iconos superiores derecha -->
+
 <div class="iconos-superiores"
      style="position: absolute; top: 30px; right: 40px; display: flex; align-items: center; gap: 20px; z-index: 10;">
   <!-- Engranaje con menú desplegable -->
@@ -30,7 +30,7 @@
       </li>
     </ul>
   </div>
-  <!-- Logout y botón de cerrar sesión juntos -->
+
   <img src="{{ url_for('static', filename='img/logout.png') }}" class="icono-salida" />
   <a href="/logout">
     <button class="cerrar-sesion">Cerrar Sesión</button>
