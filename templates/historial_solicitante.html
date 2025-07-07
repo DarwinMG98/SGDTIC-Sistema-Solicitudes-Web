@@ -2,65 +2,143 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Historial de Solicitiudes</title>
+    <title>Historial de Solicitudes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/historial_solicitante.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <style>
+      body.fondo-azul { background: #38579A; }
+      .cuadro-historial { background: #e5e9f4 !important; }
+      table { background: transparent !important; }
+      th { background: #4058a2 !important; color: #fff !important; }
+      .btn-cerrar-sesion {
+        position: absolute; top: 30px; right: 30px;
+        background: #00BCD4; color: white; font-weight: bold;
+        padding: 8px 18px; border-radius: 8px; border: none;
+        text-decoration: none; z-index: 20;
+      }
+      .btn-cerrar-sesion:hover { background: #0191a6; }
+      .btn-volver {
+        position: fixed; left: 20px; bottom: 20px; z-index: 10;
+        border: none; background: transparent;
+      }
+      .btn-volver img { width: 55px; }
+      .modal-contenido button {
+        background: #4058a2; color: #fff; border: none; border-radius: 6px;
+        padding: 8px 24px; margin-top: 18px; cursor: pointer; font-weight: bold;
+      }
+      .tabla-responsive { overflow-x: auto; }
+      .decoracion-izquierda {
+        position: absolute; top: 20px; left: 20px;
+        width: 120px; z-index: 5;
+      }
+      /* Modal personalizado */
+      .modal-observacion {
+        position: fixed;
+        left: 0; top: 0;
+        width: 100vw; height: 100vh;
+        display: none;
+        align-items: center; justify-content: center;
+        background: rgba(30,40,60,0.48);
+        z-index: 9999;
+      }
+      .modal-observacion .modal-contenido {
+        background: #fff;
+        padding: 2rem 1.6rem 1.3rem 1.6rem;
+        border-radius: 12px;
+        box-shadow: 0 6px 30px #2337b3a8;
+        text-align: center;
+        min-width: 280px;
+        max-width: 90vw;
+      }
+      .modal-observacion h3 {
+        color: #26325b;
+        margin-bottom: 14px;
+        font-size: 1.25rem;
+      }
+      .modal-observacion p {
+        color: #252525;
+        font-size: 1.08rem;
+        margin-bottom: 1.2rem;
+      }
+      .modal-observacion button {
+        background: #4058a2;
+        color: #fff;
+        padding: 7px 24px;
+        border-radius: 7px;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .modal-observacion button:hover {
+        background: #2e3968;
+      }
+    </style>
 </head>
-<body>
+<body class="fondo-azul">
+
+    <img src="{{ url_for('static', filename=logo_path) }}" class="decoracion-izquierda">
+
+    <a href="{{ url_for('logout') }}" class="btn-cerrar-sesion">Cerrar Sesión</a>
+
     <div class="container-historial">
-        <a href="{{ url_for('logout') }}" class="btn-cerrar-sesion">
-                    Cerrar Sesion        
-        </a>
-        <h2 class="titulo-historial">Historial de Solicitudes:</h2>
+        <h2 class="titulo-historial">Historial de Solicitudes</h2>
         <div class="cuadro-historial">
-        <table>
-            <tr>
-                <th>N°</th>
-                <th>Tipo de Solicitud</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Acción</th>
-            </tr>
-            {% for solicitud in solicitudes %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ solicitud[1] }}</td>
-                <td>{{ solicitud[2] }}</td>
-                <td>
-                    <span class="estado 
-                        {% if solicitud[3] == 'pendiente' %}pendiente
-                        {% elif solicitud[3] == 'aprobado' %}aprobado
-                        {% elif solicitud[3] == 'rechazado' %}rechazado
-                        {% endif %}">
-                    </span>
-                </td>
-                
-                <td>
-                    {% if solicitud[3] == 'rechazado' %}
-                        <button type="button" onclick="mostrarObservacion(`{{ solicitud[4]|e }}`)">Observación</button>
-                        <a href="{{ url_for('editar_solicitud', id=solicitud[0]) }}">Editar</a>
-                    {% endif %}                    
-                </td>
-
-            </tr>
-            {% endfor %}
-        </table>
-
-        <div class="leyenda">
-            
+            <div class="tabla-responsive">
+                <table id="tablaSolicitudes">
+                    <thead>
+                        <tr>
+                            <th>N°</th>
+                            <th>Tipo de Solicitud</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for solicitud in solicitudes %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ solicitud[1] }}</td>
+                            <td>{{ solicitud[2] }}</td>
+                            <td>
+                                <span class="estado 
+                                    {% if solicitud[3] == 'pendiente' %}pendiente
+                                    {% elif solicitud[3] == 'aprobado' %}aprobado
+                                    {% elif solicitud[3] == 'rechazado' %}rechazado
+                                    {% endif %}">
+                                </span>
+                            </td>
+                            <td>
+                                {% if solicitud[3] == 'rechazado' %}
+                                    <button type="button"
+                                        onclick="mostrarObservacion(this)"
+                                        data-observacion="{{ solicitud[4]|escape }}"
+                                        class="btn btn-danger btn-sm">
+                                        Observación
+                                    </button>
+                                    <a href="{{ url_for('editar_solicitud', id=solicitud[0]) }}" class="btn btn-warning btn-sm">Editar</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="leyenda" style="margin-top:14px; display:flex; gap:18px; background:#222a; border-radius:9px; padding:8px 18px; color:white; font-size:16px; width:fit-content;">
                 <div><span class="estado pendiente"></span> Pendiente</div>
                 <div><span class="estado aprobado"></span> Aprobado</div>
                 <div><span class="estado rechazado"></span> Rechazado</div>
+            </div>
         </div>
-
-        </div>
-
         <a href="{{ url_for('dashboard_solicitante') }}" class="btn-volver">
             <img src="{{ url_for('static', filename='img/volver.png') }}" alt="Volver">
         </a>
-
     </div>
 
-    <div id="modalObservacion" class="modal-observacion" style="display:none;">
+    <!-- Modal Observación -->
+    <div id="modalObservacion" class="modal-observacion">
         <div class="modal-contenido">
             <h3>Observación del Administrador</h3>
             <p id="textoObservacion"></p>
@@ -68,17 +146,43 @@
         </div>
     </div>
 
-<script>
-    function mostrarObservacion(texto) {
-    document.getElementById('modalObservacion').style.display = 'flex';
-    document.getElementById('textoObservacion').textContent = texto;
-    console.log('Observación:', texto);
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+          $('#tablaSolicitudes').DataTable({
+            "language": {
+              "lengthMenu": "Mostrar _MENU_ resultados",
+              "zeroRecords": "No se encontraron resultados",
+              "info": "Mostrando _START_ a _END_ de _TOTAL_ resultados",
+              "infoEmpty": "Mostrando 0 a 0 de 0 resultados",
+              "infoFiltered": "(filtrado de _MAX_ resultados totales)",
+              "search": "Buscar:",
+              "paginate": {
+                  "first": "Primero",
+                  "last": "Último",
+                  "next": "›",
+                  "previous": "‹"
+              }
+            }
+          });
+        });
 
-    }
-    function cerrarObservacion() {
-    document.getElementById('modalObservacion').style.display = 'none';
-    }
-</script>
-   
+        function mostrarObservacion(btn) {
+          var texto = btn.getAttribute('data-observacion') || "Sin observación registrada.";
+          document.getElementById('modalObservacion').style.display = 'flex';
+          document.getElementById('textoObservacion').textContent = texto;
+        }
+        function cerrarObservacion() {
+          document.getElementById('modalObservacion').style.display = 'none';
+        }
+        // Cerrar con Escape o clic fuera del modal
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') cerrarObservacion();
+        });
+        document.getElementById('modalObservacion').addEventListener('click', function(e) {
+          if (e.target.id === 'modalObservacion') cerrarObservacion();
+        });
+    </script>
 </body>
 </html>

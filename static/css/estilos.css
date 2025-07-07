@@ -49,11 +49,13 @@ body {
 }
 
 h1 {
-    font-size: 80px;
+    font-size: 4vw; /* Escala con la pantalla */
+    max-width: 100%;
     font-weight: bold;
     margin-bottom: 10px;
     color: black;
-
+    line-height: 1.1;
+    word-break: break-word;
 }
 
 p {
@@ -82,7 +84,7 @@ p {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 150px;  /* Ajusta el tamaño */
+  width: 150px;
   height: auto;
   z-index: 10;
 }
@@ -195,7 +197,6 @@ form button {
 }
 
 /* Dashboard Admin*/
-
 
 .contenedor-dashboard {
   margin-top: 100px;
@@ -473,6 +474,421 @@ input, textarea, select {
 .btn-revisar:hover {
   background: #7b65b7;
   color: #fff;
+}
+
+  .cuadro-historial { background: #e5e9f4 !important; }
+  th { background: #4058a2 !important; color: #fff !important; }
+  .tabla-responsive { overflow-x: auto; }
+  .leyenda {
+    margin-top: 12px;
+    display: flex; gap: 18px; justify-content: left; align-items: center;
+    background: #222a; border-radius: 9px; padding: 8px 18px;
+    color: white; font-size: 16px;
+    width: fit-content;
+  }
+  .estado {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border-radius: 50%; margin-right: 6px;
+    border: 2px solid #2223;
+    background: #ffec70;
+    vertical-align: middle;
+  }
+  .pendiente { background: #ffec70 !important; }
+  .aprobado { background: #2be253 !important; }
+  .rechazado { background: #e84141 !important; }
+
+
+
+  /************** SOLO PARA dashboard_admin.html ****************/
+
+
+/* 1. Centrar y compactar el bloque principal del dashboard admin */
+  .centro-pagina-admin {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* Centra vertical */
+    align-items: center;       /* Centra horizontal */
+    padding: 0;
+    background: transparent;
+  }
+
+  /* 2. Bloque compacto, sombra y fondo */
+  .bloque-tabla-admin {
+    background: #e5e9f4;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px #2222;
+    max-width: 750px;       /* Compacto y centrado */
+    width: 100%;
+    min-width: 320px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 1.3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 4px solid #4058a2;
+  }
+
+  /* 3. Oculta el título de bienvenida exterior */
+  .titulo-bienvenida {
+    display: none !important;
+  }
+
+  /* 4. Título bonito, dentro del bloque */
+  .titulo-historial-admin {
+    color: #26325b;
+    font-weight: bold;
+    text-align: center;
+    font-size: 2.1rem;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 0 #fff8;
+  }
+
+  /* 5. Tabla responsiva */
+  .tabla-responsive-admin {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .tabla-admin {
+    width: 100%;
+    margin-bottom: 0;
+    background: transparent !important;
+  }
+
+  /* 6. Ajustes DataTables para fondo y textos */
+  .dataTables_wrapper label,
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_filter input,
+  .dataTables_wrapper .dataTables_length select,
+  .dataTables_wrapper .dataTables_paginate {
+    color: #222 !important;
+  }
+  .dataTables_wrapper .dataTables_filter input,
+  .dataTables_wrapper .dataTables_length select {
+    background: #fff !important;
+    color: #222 !important;
+    border: 1px solid #b0b7ca;
+  }
+  .dataTables_wrapper label,
+  .dataTables_wrapper .dataTables_info {
+    color: #222 !important;
+    font-weight: 500;
+  }
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter {
+    display: inline-block;
+    margin-bottom: 12px;
+    margin-right: 24px;
+    vertical-align: middle;
+  }
+  .dataTables_wrapper .dataTables_filter {
+    float: right;
+    margin-right: 8px;
+  }
+  .dataTables_wrapper .dataTables_paginate {
+    margin-top: 14px;
+    float: right;
+  }
+  .dataTables_wrapper .dataTables_info {
+    margin-top: 14px;
+    float: left;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: 7px;
+    background: #f3f3fa;
+    color: #222 !important;
+    margin: 0 2px;
+    padding: 4px 13px !important;
+    border: 1px solid #d0d0eb;
+  }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #4058a2 !important;
+    color: #fff !important;
+  }
+
+
+    .modal-observacion {
+    position: fixed;
+    left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(30,40,60,0.48);
+    z-index: 9999;
+  }
+  .modal-observacion .modal-contenido {
+    background: #fff;
+    padding: 2rem 1.6rem 1.3rem 1.6rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 30px #2337b3a8;
+    text-align: center;
+    min-width: 280px;
+    max-width: 90vw;
+  }
+  .modal-observacion h3 {
+    color: #26325b;
+    margin-bottom: 14px;
+    font-size: 1.25rem;
+  }
+  .modal-observacion p {
+    color: #252525;
+    font-size: 1.08rem;
+    margin-bottom: 1.2rem;
+  }
+  .modal-observacion button {
+    background: #4058a2;
+    color: #fff;
+    padding: 7px 24px;
+    border-radius: 7px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .modal-observacion button:hover {
+    background: #2e3968;
+  }
+
+
+/* 7. Responsive para todas las resoluciones */
+@media (max-width: 950px) {
+  .bloque-tabla-admin {
+    max-width: 99vw;
+    padding: 1.2rem 0.6rem 1.1rem 0.6rem;
+  }
+  .centro-pagina-admin {
+    padding-left: 3vw;
+    padding-right: 3vw;
+  }
+  .titulo-historial-admin {
+    font-size: 2rem;
+    margin-bottom: 14px;
+  }
+  .tabla-admin th, .tabla-admin td {
+    padding: 5px 2px;
+    font-size: 0.95rem;
+  }
+}
+@media (max-width: 700px) {
+  .titulo-historial-admin { font-size: 1.2rem; }
+}
+@media (max-width: 600px) {
+  .bloque-tabla-admin {
+    padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+    max-width: 99vw;
+  }
+  .titulo-historial-admin {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+}
+@media (max-width: 450px) {
+  .titulo-historial-admin {
+    font-size: 1rem;
+  }
+}
+
+
+/* Responsive solo para el bloque admin */
+@media (max-width: 950px) {
+  .bloque-tabla-admin {
+    max-width: 99vw;
+    padding: 1.2rem 0.6rem 1.1rem 0.6rem;
+  }
+  .centro-pagina-admin {
+    padding-left: 3vw;
+    padding-right: 3vw;
+  }
+
+  .titulo-historial-admin {
+    color: #26325b;
+    font-weight: bold;
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 0 #fff8;
+  }
+  .leyenda-estado-admin-box {
+    font-size: 0.95rem;
+    padding: 7px 7px;
+    gap: 10px;
+  }
+  .tabla-admin th, .tabla-admin td {
+    padding: 5px 2px;
+    font-size: 0.95rem;
+  }
+}
+@media (max-width: 700px) {
+  .titulo-bienvenida { font-size: 1.2rem; }
+  .titulo-historial-admin { font-size: 1rem; }
+}
+
+
+@media (max-width: 900px) {
+    .tabla-admin th, .tabla-admin td {
+        padding: 6px 3px;
+        font-size: 0.92em;
+    }
+    .tabla-admin th:nth-child(2),
+    .tabla-admin td:nth-child(2),
+    .tabla-admin th:nth-child(3),
+    .tabla-admin td:nth-child(3) {
+        min-width: 80px;
+    }
+    .btn-revisar, .btn-aprobado, .btn-rechazado {
+        min-width: 60px;
+        font-size: 0.95em;
+        padding: 2px 7px;
+    }
+}
+
+@media (max-width: 800px) {
+  h1 {
+    font-size: 36px !important;
+    word-break: break-word;
+  }
+  p {
+    font-size: 22px !important;
+  }
+  .opciones {
+    flex-direction: column;
+    gap: 35px;
+  }
+  .opcion img {
+    width: 120px !important;
+  }
+  .opcion button {
+    padding: 12px 10px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 500px) {
+  .contenedor {
+    padding-top: 20px;
+  }
+  h1 {
+    font-size: 23px !important;
+    word-break: break-word;
+  }
+  p {
+    font-size: 14px !important;
+  }
+  .opciones {
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    align-items: center;
+  }
+  .opcion img {
+    width: 80px !important;
+  }
+  .opcion button {
+    font-size: 12px;
+    padding: 8px 5px;
+    border-radius: 7px;
+  }
+}
+
+@media (max-width: 400px) {
+  h1 {
+    font-size: 15px !important;
+  }
+  .opcion img {
+    width: 60px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  h1 {
+    font-size: 7vw;
+    padding: 0 10px;
+  }
+  p {
+    font-size: 5vw;
+    padding: 0 10px;
+  }
+  .opcion img {
+    width: 80px !important;
+  }
+}
+
+@media (max-width: 430px) {
+  h1 {
+    font-size: 10vw;
+    padding: 0 2vw;
+  }
+  p {
+    font-size: 6vw;
+  }
+}
+
+/* Mobile y tablets: que no se desborde la tabla ni los textos */
+@media (max-width: 800px) {
+    .bloque-tabla-admin {
+        padding: 1rem 0.3rem;
+        max-width: 99vw;
+    }
+    .tabla-admin th, .tabla-admin td {
+        font-size: 0.95em;
+        padding: 6px 2px;
+    }
+    .titulo-historial-admin {
+        font-size: 1.3rem;
+    }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .bloque-tabla-admin {
+    max-width: 99vw;
+    padding: 1.2rem 0.6rem 1.1rem 0.6rem;
+  }
+
+  .centro-pagina-admin {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* Centra vertical */
+    align-items: center;       /* Centra horizontal */
+    padding: 0;
+    background: transparent;
+  }
+  .titulo-bienvenida {
+    font-size: 1.5rem;
+    margin-bottom: 22px;
+  }
+  .titulo-historial-admin {
+    font-size: 1.15rem;
+    margin-bottom: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .bloque-tabla-admin {
+    padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+    max-width: 99vw;
+  }
+  .titulo-bienvenida {
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+  }
+  .titulo-historial-admin {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 450px) {
+  .titulo-bienvenida, .titulo-historial-admin {
+    font-size: 1rem;
+  }
 }
 
 

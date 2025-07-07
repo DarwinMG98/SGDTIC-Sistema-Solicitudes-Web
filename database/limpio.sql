@@ -40,7 +40,7 @@ LOCK TABLES `configuracion` WRITE;
 /*!40000 ALTER TABLE `configuracion` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `configuracion` VALUES
-(1,'logo_municipio','img/logo_municipio3.png');
+(1,'logo_municipio','img/logo_municipio.png');
 /*!40000 ALTER TABLE `configuracion` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -60,7 +60,7 @@ CREATE TABLE `documentos_adjuntos` (
   PRIMARY KEY (`id`),
   KEY `solicitud_id` (`solicitud_id`),
   CONSTRAINT `documentos_adjuntos_ibfk_1` FOREIGN KEY (`solicitud_id`) REFERENCES `solicitudes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -87,7 +87,8 @@ INSERT INTO `documentos_adjuntos` VALUES
 (14,33,'DGIP_SAEw (1).pdf','33_1750195564_564e86f94783496e8e66b1f5a7f7bdc7.pdf'),
 (15,33,'InformePoryectoBimestre1.pdf','InformePoryectoBimestre1.pdf'),
 (16,41,'GADDMQ-SGDTIC-UA-2025-0329-M.pdf','41_1750279454_e9d5a6a9e88740feb54f366a29eed3b5.pdf'),
-(17,50,'FebreroDarwin.pdf','50_1751389881_9390b385e7614781808283a6fa3aa980.pdf');
+(17,50,'FebreroDarwin.pdf','50_1751389881_9390b385e7614781808283a6fa3aa980.pdf'),
+(18,51,'FebreroDarwin.docx','51_1751563384_457b5666eb8a4b5793e90473e373b925.docx');
 /*!40000 ALTER TABLE `documentos_adjuntos` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -206,7 +207,7 @@ CREATE TABLE `solicitud_detalle` (
   PRIMARY KEY (`id`),
   KEY `solicitud_id` (`solicitud_id`),
   CONSTRAINT `solicitud_detalle_ibfk_1` FOREIGN KEY (`solicitud_id`) REFERENCES `solicitudes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -227,7 +228,8 @@ INSERT INTO `solicitud_detalle` VALUES
 (17,38,'2025-06-18','darwin guachamin','pasante','darwinmario98_@hotmail.com','0984083414','no',NULL,NULL,NULL,NULL,'windows',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ewfwefewf','darwin guachamin','pasante','','','scqwc','172.25.254','Producci├│n','2025-06-18','ascfdqwf','respaldo, no_requerido','migracion, falta_uso',''),
 (18,41,'2025-06-18','Daniela','infraestrcu','danielamoran@quito.fov.das','0997985834','noi','Correo institucional','ddfaf','asdasdas','Producci├│n','Windows Server','2019',3,100,100,100,'12 ms','faife','centro de computo','Daniela moran','inafrestructura','daniela.moran@quito.gob.ec','ffdfsdf','danielamoran','operadoe it','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (19,49,'2025-07-01','Juan Godoy','Pasante','juangodoy@hotmail.com','0987456352','no',NULL,NULL,NULL,NULL,'Windows',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'wegwegwe','Juan Godoy','Pasante','','','asfas','172.258.235','Producción','2025-07-01','fwegwgwe','respaldo, no_requerido','migracion, obsolescencia',''),
-(20,50,'2025-07-01','Pedro Sanchez','Pasante','Pedrosanchez@hotmail.com','0987458745','no','Correo institucional, Anteproyecto aprobado','SGEGS','HRHJEWW','Producción, Desarrollo','Windows Server','2020',50,505,50,50,'2 AÑOS','AEGEWHJHW','WEGWE','WEHWHE','WEHWE','0984857532','QWEHWEHWH','Pedro Snachez','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+(20,50,'2025-07-01','Pedro Sanchez','Pasante','Pedrosanchez@hotmail.com','0987458745','no','Correo institucional, Anteproyecto aprobado','SGEGS','HRHJEWW','Producción, Desarrollo','Windows Server','2020',50,505,50,50,'2 AÑOS','AEGEWHJHW','WEGWE','WEHWHE','WEHWE','0984857532','QWEHWEHWH','Pedro Snachez','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(21,51,'2025-07-03','darwin guachamin','pasante','darwinmario98@gmail.com','0984083414','no','Correo institucional','fqwfh','wergweg','Producción, Desarrollo','Windows Server','2020',50,50,50,50,'4 años','gwegweg','wegwewe','hwerhweh','wegwegw','whwrhw','whgwewe','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `solicitud_detalle` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -249,7 +251,7 @@ CREATE TABLE `solicitudes` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   CONSTRAINT `solicitudes_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -270,7 +272,8 @@ INSERT INTO `solicitudes` VALUES
 (38,2,'eliminar','2025-06-18 15:21:35','pendiente',NULL),
 (41,1,'crear','2025-06-18 15:44:14','pendiente','ffdfsdf'),
 (49,4,'eliminar','2025-07-01 12:08:19','rechazado','falta observaciones'),
-(50,5,'crear','2025-07-01 12:11:21','aprobado','QWEHWEHWH');
+(50,5,'crear','2025-07-01 12:11:21','aprobado','QWEHWEHWH'),
+(51,6,'crear','2025-07-03 12:23:04','pendiente','whgwewe');
 /*!40000 ALTER TABLE `solicitudes` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -291,7 +294,7 @@ CREATE TABLE `usuarios` (
   `rol` enum('admin','solicitante') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `correo` (`correo`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -306,7 +309,15 @@ INSERT INTO `usuarios` VALUES
 (2,'Solicitante Prueba','Prueba','solicitante@correo.com','123456','solicitante'),
 (3,'Admin Ejemplo',NULL,'admin@ejemplo.com','1234','admin'),
 (4,'Juan ','Gody','juangodoy@hotmail.com',NULL,'solicitante'),
-(5,'Pedro','Sanchez','pedrosanchez_@hotmail.com',NULL,'solicitante');
+(5,'Pedro','Sanchez','pedrosanchez_@hotmail.com',NULL,'solicitante'),
+(6,'Darwin','Guachamin','darwinmario98_@hotmail.com',NULL,'solicitante'),
+(7,'Juan','Pérez','juan.perez@example.com',NULL,'solicitante'),
+(8,'Daniela','Moran','daniela.moran@quito.gob.ec',NULL,'solicitante'),
+(9,'Byron','Carpio','carpio.byron89@gmail.com',NULL,'solicitante'),
+(10,'Byron','Carpio','carpio.byron89@quito.gob.ec',NULL,'solicitante'),
+(11,'Mateo','Perez','mateo98@hotmail.com',NULL,'solicitante'),
+(12,'daniel','alvarez','daniel98@hotmail.com',NULL,'solicitante'),
+(13,'Pedro','Benitez','pedrobenites@hotmail.com',NULL,'solicitante');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -320,4 +331,4 @@ commit;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-07-01 16:16:29
+-- Dump completed on 2025-07-04 16:22:17

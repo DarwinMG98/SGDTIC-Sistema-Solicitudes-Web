@@ -1,85 +1,295 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <meta charset="UTF-8" />
   <title>Dashboard Administrador</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+  <style>
+    body.fondo-azul {
+      min-height: 100vh;
+      background: #38579A;
+      margin: 0;
+    }
+    .centro-pagina-admin {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .bloque-tabla-admin {
+      background: #e5e9f4;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #2222;
+      max-width: 700px;
+      width: 95vw;
+      margin: 0 auto;
+      padding: 2.2rem 2rem 1.4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 4px solid #4058a2;
+    }
+    .titulo-bienvenida {
+      color: #fff;
+      text-align: center;
+      font-size: 2.4rem;
+      margin-bottom: 2.2rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 10px #2337b3;
+    }
+    .titulo-historial-admin {
+      color: #26325b;
+      font-weight: bold;
+      text-align: center;
+      font-size: 2.1rem;
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 0 #fff8;
+    }
+    .leyenda-estado-admin-box {
+      margin-top: 10px;
+      display: flex;
+      gap: 18px;
+      background: #222a;
+      border-radius: 9px;
+      padding: 7px 20px;
+      color: white;
+      font-size: 15px;
+      width: fit-content;
+      align-self: flex-end;
+    }
+    .estado-admin {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      margin-right: 6px;
+      border: 2px solid #2223;
+      vertical-align: middle;
+    }
+    .pendiente-admin { background: #ffec70 !important; }
+    .aprobado-admin { background: #2be253 !important; }
+    .rechazado-admin { background: #e84141 !important; }
+    .tabla-responsive-admin {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: auto;
+      margin-bottom: 0;
+    }
+    .tabla-admin {
+      width: 100%;
+      margin-bottom: 0;
+      background: transparent !important;
+    }
+    .tabla-admin th, .tabla-admin td {
+      padding: 10px 18px;
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+      font-size: 1.08rem;
+    }
+    .tabla-admin th {
+      background: #4058a2 !important;
+      color: #fff !important;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .tabla-admin td {
+      background: #f8fafd !important;
+      color: #26325b;
+      font-size: 1rem;
+    }
+    .tabla-admin tr:last-child td {
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+    .btn-revisar, .btn-aprobado, .btn-rechazado {
+      min-width: 85px;
+      text-align: center;
+      display: inline-block;
+      margin: 2px 0;
+      font-size: 1em;
+    }
+    .btn-revisar {
+      background: #a38ee4;
+      color: #222;
+      border-radius: 8px;
+      font-weight: bold;
+      padding: 3px 16px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-revisar:hover { background: #825ae4; color: #fff; }
+    .btn-aprobado {
+      background: #b2ffd8;
+      color: #13a447;
+      border-radius: 8px;
+      font-weight: bold;
+      padding: 3px 16px;
+      display: inline-block;
+      border: none;
+    }
+    .btn-rechazado {
+      background: #ffb2b2;
+      color: #d02929;
+      border-radius: 8px;
+      font-weight: bold;
+      padding: 3px 16px;
+      display: inline-block;
+      border: none;
+    }
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+      display: inline-block;
+      margin-bottom: 12px;
+      margin-right: 24px;
+      vertical-align: middle;
+    }
+    .dataTables_wrapper .dataTables_filter {
+      float: right;
+      margin-right: 8px;
+    }
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+      border-radius: 6px;
+      border: 1px solid #b0b7ca;
+      padding: 3px 8px;
+      background: #f3f5fc;
+      font-size: 1em;
+      margin-left: 4px;
+    }
+    .dataTables_wrapper .dataTables_paginate {
+      margin-top: 14px;
+      float: right;
+    }
+    .dataTables_wrapper .dataTables_info {
+      margin-top: 14px;
+      float: left;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      border-radius: 7px;
+      background: #f3f3fa;
+      color: #222 !important;
+      margin: 0 2px;
+      padding: 4px 13px !important;
+      border: 1px solid #d0d0eb;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      background: #4058a2 !important;
+      color: #fff !important;
+    }
+    @media (max-width: 950px) {
+      .bloque-tabla-admin {
+        max-width: 99vw;
+        padding: 1.2rem 0.6rem 1.1rem 0.6rem;
+      }
+      .centro-pagina-admin {
+        padding-left: 3vw;
+        padding-right: 3vw;
+      }
+      .titulo-historial-admin {
+        font-size: 1.2rem;
+      }
+      .leyenda-estado-admin-box {
+        font-size: 0.95rem;
+        padding: 7px 7px;
+        gap: 10px;
+      }
+      .tabla-admin th, .tabla-admin td {
+        padding: 5px 2px;
+        font-size: 0.95rem;
+      }
+    }
+    @media (max-width: 700px) {
+      .titulo-bienvenida { font-size: 1.2rem; }
+      .titulo-historial-admin { font-size: 1rem; }
+    }
+  </style>
 </head>
 <body class="fondo-azul">
 
-  
   <img src="{{ url_for('static', filename=logo_path) }}" class="decoracion-izquierda">
 
-
-<div class="iconos-superiores"
-     style="position: absolute; top: 30px; right: 40px; display: flex; align-items: center; gap: 20px; z-index: 10;">
-  <!-- Engranaje con menú desplegable -->
-  <div class="dropdown" style="display:inline-block;">
-    <button class="btn btn-secondary dropdown-toggle"
-            type="button" data-bs-toggle="dropdown"
-            aria-expanded="false"
-            style="background: none; border: none; box-shadow: none;">
-      <img src="{{ url_for('static', filename='img/engranaje.png') }}" class="icono" />
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li>
-        <a class="dropdown-item" href="{{ url_for('actualizar_logo') }}">
-          Actualizar Logo
-        </a>
-      </li>
-    </ul>
+  <div class="iconos-superiores"
+    style="position: absolute; top: 30px; right: 40px; display: flex; align-items: center; gap: 20px; z-index: 10;">
+    <div class="dropdown" style="display:inline-block;">
+      <button class="btn btn-secondary dropdown-toggle"
+              type="button" data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style="background: none; border: none; box-shadow: none;">
+        <img src="{{ url_for('static', filename='img/engranaje.png') }}" class="icono" />
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+          <a class="dropdown-item" href="{{ url_for('actualizar_logo') }}">
+            Actualizar Logo
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item" href="{{ url_for('agregar_usuario') }}">
+            Agregar Usuario
+          </a>
+        </li>
+      </ul>
+    </div>
+    <img src="{{ url_for('static', filename='img/logout.png') }}" class="icono-salida" />
+    <a href="/logout">
+      <button class="cerrar-sesion">Cerrar Sesión</button>
+    </a>
   </div>
 
-  <img src="{{ url_for('static', filename='img/logout.png') }}" class="icono-salida" />
-  <a href="/logout">
-    <button class="cerrar-sesion">Cerrar Sesión</button>
-  </a>
-</div>
-
-  <div class="contenedor-dashboard">
-
+  <div class="centro-pagina-admin">
     <h1 class="titulo-bienvenida">Bienvenido, Administrador</h1>
-
-    <div class="contenedor-tabla">
-      <h3 class="subtitulo-tabla">Historial de Solicitudes</h3>
-      <table>
-        <tr>
-          <th>N°</th>
-          <th>Tipo de Solicitud</th>
-          <th>Fecha</th>
-          <th>Estado</th>
-          <th>Acción</th>
-        </tr>
-        {% for solicitud in solicitudes %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ solicitud[1] }}</td>
-          <td>{{ solicitud[2] }}</td>
-          <td>
-            <span class="estado 
-              {% if solicitud[3] == 'pendiente' %}pendiente
-              {% elif solicitud[3] == 'aprobado' %}aprobado
-              {% elif solicitud[3] == 'rechazado' %}rechazado
-              {% endif %}">
-            </span>
-          </td>
-          <td>
-            {% if solicitud[3] == 'pendiente' and solicitud[4] %}
-              <span class="badge badge-correccion">Corregida</span>
-              <a href="{{ url_for('revisar_solicitud', id=solicitud[0]) }}" class="btn-revisar">Revisar</a>
-            {% elif solicitud[3] == 'pendiente' %}
-              <a href="{{ url_for('revisar_solicitud', id=solicitud[0]) }}" class="btn-revisar">Revisar</a>
-            {% elif solicitud[3] == 'aprobado' %}
-              <span class="badge badge-aprobado">Aprobado</span>
-            {% elif solicitud[3] == 'rechazado' %}
-              <span class="badge badge-rechazado">Rechazado</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </table>
-
+    <div class="bloque-tabla-admin">
+      <h2 class="titulo-historial-admin">Historial de Solicitudes</h2>
+      <div class="tabla-responsive-admin">
+        <table class="tabla-admin" id="tablaSolicitudes">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Tipo de Solicitud</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for solicitud in solicitudes %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ solicitud[1] }}</td>
+              <td>{{ solicitud[2] }}</td>
+              <td>
+                <span class="estado-admin 
+                  {% if solicitud[3] == 'pendiente' %}pendiente-admin
+                  {% elif solicitud[3] == 'aprobado' %}aprobado-admin
+                  {% elif solicitud[3] == 'rechazado' %}rechazado-admin
+                  {% endif %}">
+                </span>
+              </td>
+              <td>
+                {% if solicitud[3] == 'pendiente' %}
+                  <a href="{{ url_for('revisar_solicitud', id=solicitud[0]) }}" class="btn-revisar">Revisar</a>
+                {% elif solicitud[3] == 'aprobado' %}
+                  <span class="btn-aprobado">Aprobado</span>
+                {% elif solicitud[3] == 'rechazado' %}
+                  <span class="btn-rechazado">Rechazado</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="leyenda-estado-admin-box">
+        <div><span class="estado-admin pendiente-admin"></span> Pendiente</div>
+        <div><span class="estado-admin aprobado-admin"></span> Aprobado</div>
+        <div><span class="estado-admin rechazado-admin"></span> Rechazado</div>
+      </div>
     </div>
   </div>
 
@@ -87,6 +297,29 @@
     <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
   </a>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap, jQuery y DataTables -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#tablaSolicitudes').DataTable({
+        "language": {
+          "lengthMenu": "Mostrar _MENU_ resultados",
+          "zeroRecords": "No se encontraron resultados",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ resultados",
+          "infoEmpty": "Mostrando 0 a 0 de 0 resultados",
+          "infoFiltered": "(filtrado de _MAX_ resultados totales)",
+          "search": "Buscar:",
+          "paginate": {
+              "first": "Primero",
+              "last": "Último",
+              "next": "›",
+              "previous": "‹"
+          }
+        }
+      });
+    });
+  </script>
 </body>
 </html>

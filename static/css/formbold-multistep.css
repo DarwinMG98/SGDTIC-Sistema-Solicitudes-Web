@@ -290,6 +290,77 @@
   z-index: 10;
 }
 
+/* --------- RESPONSIVE PARA FORMULARIO MULTIPASO --------- */
+@media (max-width: 850px) {
+  .formbold-main-wrapper {
+    padding: 12px;
+  }
+  .formbold-form-wrapper {
+    max-width: 95vw;
+    min-width: unset;
+    padding: 18px 8px;
+  }
+  .decoracion-izquierda {
+    width: 80px;
+    top: 12px;
+    left: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .formbold-main-wrapper {
+    padding: 5px !important;
+  }
+  .formbold-form-wrapper {
+    padding: 10px 2px !important;
+    max-width: 99vw;
+  }
+  .formbold-step-menu {
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+  }
+  .step-indicator {
+    min-width: 44px;
+  }
+  .formbold-step-label {
+    font-size: 0.83rem;
+  }
+  .formbold-form-label {
+    font-size: 0.9rem;
+  }
+  .formbold-form-input {
+    font-size: 15px;
+    padding: 9px 10px;
+  }
+  .decoracion-izquierda {
+    width: 48px;
+    top: 7px;
+    left: 7px;
+  }
+}
+
+@media (max-width: 420px) {
+  .formbold-form-wrapper {
+    padding: 2px !important;
+    max-width: 100vw;
+  }
+  .formbold-step-label,
+  .formbold-form-label {
+    font-size: 0.74rem;
+  }
+  .formbold-form-input {
+    font-size: 13px;
+    padding: 7px 6px;
+  }
+  .formbold-step-circle {
+    width: 22px;
+    height: 22px;
+    font-size: 0.85rem;
+  }
+  .decoracion-izquierda {
+    width: 32px;
+  }
+}
 
 
     

@@ -219,3 +219,75 @@ h1 {
   height: auto;
   z-index: 10;
 }
+
+@media (max-width: 900px) {
+    .formbold-form-wrapper {
+        max-width: 99vw;
+        min-width: unset;
+        padding: 1.2rem 0.3rem;
+    }
+    .revisar-formulario-box {
+        width: 98vw;
+        padding: 20px;
+        margin-bottom: 35px;
+        font-size: 1rem;
+    }
+    .revisar-acciones {
+        flex-direction: column;
+        gap: 16px;
+    }
+    .btn-aprobar, .btn-rechazar {
+        width: 100%;
+        padding: 15px 0;
+        font-size: 1.25rem;
+    }
+    .modal-contenido {
+        padding: 10px 2vw;
+        width: 98vw;
+        max-width: 99vw;
+    }
+    h1 {
+        font-size: 1.3rem;
+    }
+    .decoracion-izquierda {
+        width: 85px;
+        top: 8px;
+        left: 6px;
+    }
+}
+@media (max-width: 540px) {
+    .revisar-formulario-box {
+        width: 99vw;
+        padding: 10px 2vw;
+        font-size: 0.93rem;
+    }
+    .modal-contenido {
+        padding: 6px 1vw;
+        font-size: 0.9rem;
+    }
+    .btn-aprobar, .btn-rechazar {
+        font-size: 1.08rem;
+        padding: 11px 0;
+    }
+    .decoracion-izquierda {
+        width: 56px;
+        top: 5px;
+        left: 4px;
+    }
+}
+
+@media (max-width: 410px) {
+    .revisar-formulario-box {
+        font-size: 0.83rem;
+        padding: 3vw 1vw;
+    }
+    h1 {
+        font-size: 1.08rem;
+    }
+    .btn-aprobar, .btn-rechazar {
+        font-size: 0.93rem;
+    }
+    .decoracion-izquierda {
+        width: 36px;
+    }
+}

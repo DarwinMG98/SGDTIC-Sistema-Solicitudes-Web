@@ -550,6 +550,59 @@ def actualizar_logo():
             return redirect(url_for('dashboard_admin'))
     return render_template('actualizar_logo.html')
 
+@app.route('/agregar_usuario', methods=['GET', 'POST'])
+def agregar_usuario():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        correo = request.form['correo']
+        rol = request.form['rol']
+        password = request.form['password']
+        password_confirm = request.form['password_confirm']
+
+
+        # Verifica que las contraseñas coincidan
+        if password != password_confirm:
+            return render_template('agregar_usuario.html', error="Las contraseñas no coinciden.")
+
+        # Verifica longitud mínima, puedes poner otras reglas aquí
+        if len(password) < 4:
+            return render_template('agregar_usuario.html', error="La contraseña debe tener al menos 4 caracteres.")
+
+        # Obtener el usuario admin que está logueado
+        admin_id = session.get('usuario_id')
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT contraseña FROM usuarios WHERE id=%s AND rol='admin'", (admin_id,))
+        admin = cursor.fetchone()
+
+        # Verifica la contraseña (ajusta si usas hash)
+        #if not admin or str(admin[0]) != admin_password:
+            #conn.close()
+            #return render_template('agregar_usuario.html', error="Contraseña de administrador incorrecta.")
+
+        # Verifica correo duplicado
+        cursor.execute("SELECT id FROM usuarios WHERE correo=%s", (correo,))
+        usuario = cursor.fetchone()
+        if usuario:
+            conn.close()
+            return render_template('agregar_usuario.html', error="El correo ya está registrado.")
+
+        # Inserta nuevo usuario (puedes guardar la contraseña en texto o hasheada, aquí en texto plano para ejemplo)
+        cursor.execute("""
+            INSERT INTO usuarios (nombre, apellido, correo, rol, contraseña)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (nombre, apellido, correo, rol, password))
+        conn.commit()
+        conn.close()
+        return render_template('agregar_usuario.html', exito="Usuario agregado correctamente.")
+
+    return render_template('agregar_usuario.html')
+
+@app.context_processor
+def inject_logo():
+    return dict(logo_path=obtener_logo())
+
 # Iniciar servidor
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8000)
