@@ -46,7 +46,7 @@ def obtener_todos_los_usuarios():
     )
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id, nombre, apellido, correo, rol FROM usuarios WHERE rol = 'admin'")
+            cursor.execute("SELECT id, nombre, apellido, correo, rol, activo FROM usuarios WHERE rol = 'admin'")
             usuarios = cursor.fetchall()  # Obtienes una lista de diccionarios
     finally:
         conexion.close()
@@ -203,7 +203,7 @@ def usuarios():
     return '<br>'.join([f"{u[1]} ({u[4]})" for u in usuarios])
 
 
-@app.route('/login_admin')
+@app.route('/login_admin', methods=['GET'])
 def login_admin():
     return render_template('login_admin.html')
 
@@ -214,16 +214,23 @@ def verificar_login_admin():
     password = request.form['password']
 
     conn = get_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
     cursor.execute("SELECT * FROM usuarios WHERE correo=%s AND contraseña=%s AND rol='admin'", (usuario, password))
     admin = cursor.fetchone()
     conn.close()
 
-    if admin:
-        session['usuario_id'] = admin[0]
-        return redirect('/dashboard_admin')
-    else:
-        return "Credenciales incorrectas o no es administrador"
+    
+    if not admin:
+        flash('Credenciales incorrectas o no es administrador.')
+        return redirect(url_for('login_admin'))
+
+    
+    if 'activo' in admin and admin['activo'] == 0:
+        flash('Usuario deshabilitado. Contacta al administrador principal.')
+        return redirect(url_for('login_admin'))
+
+    session['usuario_id'] = admin['id']
+    return redirect(url_for('dashboard_admin'))
 
 
 @app.route('/dashboard_admin')
@@ -231,11 +238,13 @@ def dashboard_admin():
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     cursor.execute("""
-        SELECT s.id, s.tipo, s.fecha_solicitud, s.estado, u.nombre AS nombre_admin_revisor
+        SELECT s.id, s.tipo, s.fecha_solicitud, s.estado, 
+            CONCAT(u.nombre, ' ', u.apellido) AS nombre_admin_revisor
         FROM solicitudes s
         LEFT JOIN usuarios u ON s.id_admin_revisor = u.id
         ORDER BY s.fecha_solicitud DESC
     """)
+
     solicitudes = cursor.fetchall()
     conn.close()
 
@@ -325,7 +334,6 @@ def historial():
     conn.close()
     return render_template('historial_solicitante.html', solicitudes=solicitudes)
 
-    
 
 @app.route("/enviado")
 def enviado():
@@ -595,34 +603,29 @@ def agregar_usuario():
         password_confirm = request.form['password_confirm']
 
 
-        # Verifica que las contraseñas coincidan
+        
         if password != password_confirm:
             return render_template('agregar_usuario.html', error="Las contraseñas no coinciden.")
 
-        # Verifica longitud mínima, puedes poner otras reglas aquí
+        
         if len(password) < 4:
             return render_template('agregar_usuario.html', error="La contraseña debe tener al menos 4 caracteres.")
 
-        # Obtener el usuario admin que está logueado
+       
         admin_id = session.get('usuario_id')
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT contraseña FROM usuarios WHERE id=%s AND rol='admin'", (admin_id,))
         admin = cursor.fetchone()
 
-        # Verifica la contraseña (ajusta si usas hash)
-        #if not admin or str(admin[0]) != admin_password:
-            #conn.close()
-            #return render_template('agregar_usuario.html', error="Contraseña de administrador incorrecta.")
 
-        # Verifica correo duplicado
         cursor.execute("SELECT id FROM usuarios WHERE correo=%s", (correo,))
         usuario = cursor.fetchone()
         if usuario:
             conn.close()
             return render_template('agregar_usuario.html', error="El correo ya está registrado.")
 
-        # Inserta nuevo usuario (puedes guardar la contraseña en texto o hasheada, aquí en texto plano para ejemplo)
+
         cursor.execute("""
             INSERT INTO usuarios (nombre, apellido, correo, rol, contraseña)
             VALUES (%s, %s, %s, %s, %s)
@@ -640,8 +643,35 @@ def inject_logo():
 @app.route('/ver_usuarios')
 def ver_usuarios():
 
-    usuarios = obtener_todos_los_usuarios()  # Debes definir esto según tu BD
+    usuarios = obtener_todos_los_usuarios() 
     return render_template('ver_usuarios.html', usuarios=usuarios)
+
+@app.route('/eliminar_usuario/<int:id>')
+def eliminar_usuario(id):
+
+    if 'usuario_id' not in session:
+        return redirect(url_for('login_admin'))
+    
+    if id == session['usuario_id']:
+        flash("No puedes eliminarte a ti mismo.")
+        return redirect(url_for('ver_usuarios'))
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM usuarios WHERE id=%s AND rol='admin'", (id,))
+    conn.commit()
+    conn.close()
+    flash('Administrador eliminado correctamente.')
+    return redirect(url_for('ver_usuarios'))
+
+@app.route('/cambiar_estado_usuario/<int:id>/<int:nuevo_estado>')
+def cambiar_estado_usuario(id, nuevo_estado):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE usuarios SET activo = %s WHERE id = %s", (nuevo_estado, id))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('ver_usuarios'))
 
 
 # Iniciar servidor

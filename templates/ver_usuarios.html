@@ -20,7 +20,7 @@
         background: #e5e9f4;
         border-radius: 16px;
         box-shadow: 0 4px 24px #2222;
-        max-width: 900px;
+        max-width: 1150px;
         width: 98%;
         margin: 0 auto;
         padding: 2.5rem 2.5rem 2rem 2.5rem;
@@ -49,11 +49,11 @@
         box-shadow: 0 2px 8px #2337b333;
       }
       #tablaUsuarios th, #tablaUsuarios td {
-        padding: 15px 20px;
+        padding: 7px 10px;
         text-align: center;
         vertical-align: middle;
         white-space: nowrap;
-        font-size: 1.08rem;
+        font-size: 0.97rem;
       }
       #tablaUsuarios th {
         background: #4058a2 !important;
@@ -86,18 +86,40 @@
               <th>Apellido </th>
               <th>Correo</th>
               <th>Rol</th>
+              <th>Estado</th>
+              <th>Acción</th>
             </tr>
           </thead>
           <tbody>
-            {% for usuario in usuarios %}
-            <tr>
-                <td>{{ usuario.id }}</td>
-                <td>{{ usuario.nombre }}</td>
-                <td>{{ usuario.apellido }}</td>
-                <td>{{ usuario.correo }}</td>
-                <td>{{ usuario.rol }}</td>
-            </tr>
-            {% endfor %}
+          {% for usuario in usuarios %}
+          <tr>
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.apellido }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>{{ usuario.rol }}</td>
+            <td>
+              {% if usuario.activo %}
+                <span class="badge bg-success">Activo</span>
+              {% else %}
+                <span class="badge bg-secondary">Inactivo</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if usuario.activo %}
+                <button class="btn btn-warning btn-sm"
+                        onclick="cambiarEstadoUsuario({{ usuario.id }}, 0)">
+                  Deshabilitar
+                </button>
+              {% else %}
+                <button class="btn btn-success btn-sm"
+                        onclick="cambiarEstadoUsuario({{ usuario.id }}, 1)">
+                  Habilitar
+                </button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
           </tbody>
         </table>
       </div>
@@ -127,5 +149,24 @@
       });
     });
   </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function cambiarEstadoUsuario(id, nuevoEstado) {
+    let texto = nuevoEstado ? "habilitar" : "deshabilitar";
+    Swal.fire({
+      title: `¿Seguro que deseas ${texto} este administrador?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/cambiar_estado_usuario/' + id + '/' + nuevoEstado;
+      }
+    });
+  }
+</script>
 </body>
 </html>

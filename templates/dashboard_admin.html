@@ -173,6 +173,21 @@
     .aprobado-admin { background: #2be253 !important; }
     .rechazado-admin { background: #e84141 !important; }
 
+    .tabla-responsive-admin {
+  overflow-y: hidden !important;
+  max-height: none !important;
+    }
+
+    /* Quitar scroll vertical del body por si acaso */
+    body {
+      overflow-y: auto !important;
+    }
+
+    /* DataTables fuerza a veces el scroll en el contenedor wrapper, quítalo así: */
+    .dataTables_wrapper {
+      overflow-y: visible !important;
+    }
+
     @media (max-width: 1050px) {
       .bloque-tabla-admin {
         max-width: 99vw;

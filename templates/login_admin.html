@@ -25,6 +25,14 @@
         <button type="submit">Iniciar Sesion</button>
     </form>
 
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-warning" style="margin-top:20px; max-width:420px; margin-left:auto; margin-right:auto;">
+          {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+
     <a href="{{ url_for('inicio') }}"><img src="{{ url_for('static', filename='img/volver.png') }}" class="volver" /></a>
   </div>
 </body>

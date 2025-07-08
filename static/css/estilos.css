@@ -498,6 +498,19 @@ input, textarea, select {
   .aprobado { background: #2be253 !important; }
   .rechazado { background: #e84141 !important; }
 
+  .alert-warning {
+  background: #ffeeba;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  padding: 12px 22px;
+  border-radius: 8px;
+  margin: 14px auto;
+  max-width: 400px;
+  text-align: center;
+  font-weight: 500;
+}
+
+
 
 
   /************** SOLO PARA dashboard_admin.html ****************/
