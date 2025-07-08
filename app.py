@@ -36,6 +36,25 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def obtener_todos_los_usuarios():
+    conexion = pymysql.connect(
+        host='localhost',
+        user='root',
+        password='2636587',
+        database='sistema_solicitudes',
+        cursorclass=pymysql.cursors.DictCursor
+    )
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT id, nombre, apellido, correo, rol FROM usuarios WHERE rol = 'admin'")
+            usuarios = cursor.fetchall()  # Obtienes una lista de diccionarios
+    finally:
+        conexion.close()
+    return usuarios
+
+
+
+
 @app.route("/crear_solicitud", methods=["GET", "POST"])
 def crear_solicitud():
     # 1. Verificar sesión y usuario válido
@@ -201,6 +220,7 @@ def verificar_login_admin():
     conn.close()
 
     if admin:
+        session['usuario_id'] = admin[0]
         return redirect('/dashboard_admin')
     else:
         return "Credenciales incorrectas o no es administrador"
@@ -209,13 +229,19 @@ def verificar_login_admin():
 @app.route('/dashboard_admin')
 def dashboard_admin():
     conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, tipo, fecha_solicitud, estado FROM solicitudes ORDER BY fecha_solicitud DESC")
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cursor.execute("""
+        SELECT s.id, s.tipo, s.fecha_solicitud, s.estado, u.nombre AS nombre_admin_revisor
+        FROM solicitudes s
+        LEFT JOIN usuarios u ON s.id_admin_revisor = u.id
+        ORDER BY s.fecha_solicitud DESC
+    """)
     solicitudes = cursor.fetchall()
     conn.close()
 
     logo_path = obtener_logo()
     return render_template('dashboard_admin.html', solicitudes=solicitudes, logo_path=logo_path)
+
 
 @app.route('/logout')
 def logout():
@@ -287,16 +313,18 @@ def dashboard_solicitante():
 def historial():
     usuario_id = session['usuario_id'] 
     conn = get_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
     cursor.execute("""
-        SELECT id, tipo, fecha_solicitud, estado, observaciones
-        FROM solicitudes
-        WHERE usuario_id = %s
-        ORDER BY fecha_solicitud DESC
+        SELECT s.id, s.tipo, s.fecha_solicitud, s.estado, s.observaciones, u.nombre AS nombre_admin_revisor
+        FROM solicitudes s
+        LEFT JOIN usuarios u ON s.id_admin_revisor = u.id
+        WHERE s.usuario_id = %s
+        ORDER BY s.fecha_solicitud DESC
     """, (usuario_id,))
     solicitudes = cursor.fetchall()
     conn.close()
     return render_template('historial_solicitante.html', solicitudes=solicitudes)
+
     
 
 @app.route("/enviado")
@@ -320,20 +348,26 @@ def revisar_solicitud(id):
 
     if request.method == 'POST':
         accion = request.form['accion']
+        id_admin = session.get('usuario_id')
+        print('ID del admin revisor:', id_admin)
         if accion == 'aprobar':
-            conn = get_connection()
-            cursor = conn.cursor()
-            cursor.execute("UPDATE solicitudes SET estado='aprobado' WHERE id=%s", (id,))
-            conn.commit()
-            conn.close()
+            with get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "UPDATE solicitudes SET estado='aprobado', id_admin_revisor=%s WHERE id=%s",
+                        (id_admin, id)
+                    )
+                    conn.commit()
             return redirect(url_for('dashboard_admin'))
         elif accion == 'rechazar':
             observacion = request.form['observacion']
-            conn = get_connection()
-            cursor = conn.cursor()
-            cursor.execute("UPDATE solicitudes SET estado='rechazado', observaciones=%s WHERE id=%s", (observacion, id))
-            conn.commit()
-            conn.close()
+            with get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "UPDATE solicitudes SET estado='rechazado', observaciones=%s, id_admin_revisor=%s WHERE id=%s",
+                        (observacion, id_admin, id)
+                    )
+                    conn.commit()
             return redirect(url_for('dashboard_admin'))
 
     
@@ -602,6 +636,13 @@ def agregar_usuario():
 @app.context_processor
 def inject_logo():
     return dict(logo_path=obtener_logo())
+
+@app.route('/ver_usuarios')
+def ver_usuarios():
+
+    usuarios = obtener_todos_los_usuarios()  # Debes definir esto según tu BD
+    return render_template('ver_usuarios.html', usuarios=usuarios)
+
 
 # Iniciar servidor
 if __name__ == '__main__':

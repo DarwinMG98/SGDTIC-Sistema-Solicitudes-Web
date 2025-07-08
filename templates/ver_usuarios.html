@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Usuarios</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <style>
+      body { background: #38579A; min-height: 100vh; margin: 0; }
+      .centrar-contenido {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-top: 30px;
+        padding-bottom: 30px;
+      }
+      .cuadro-usuarios {
+        background: #e5e9f4;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px #2222;
+        max-width: 900px;
+        width: 98%;
+        margin: 0 auto;
+        padding: 2.5rem 2.5rem 2rem 2.5rem;
+        border: 4px solid #4058a2;
+      }
+      .titulo-usuarios {
+        color: #26325b;
+        font-weight: bold;
+        text-align: center;
+        font-size: 2.1rem;
+        margin-bottom: 28px;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 0 #fff8;
+      }
+      .tabla-responsive {
+        width: 100%;
+        overflow-x: auto;
+        margin-bottom: 24px;
+      }
+      #tablaUsuarios {
+        width: 100%;
+        margin-bottom: 0;
+        background: transparent !important;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px #2337b333;
+      }
+      #tablaUsuarios th, #tablaUsuarios td {
+        padding: 15px 20px;
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+        font-size: 1.08rem;
+      }
+      #tablaUsuarios th {
+        background: #4058a2 !important;
+        color: #fff !important;
+        font-weight: bold;
+        font-size: 1.1rem;
+        border-bottom: 2px solid #283672;
+      }
+      #tablaUsuarios td {
+        background: #f8fafd !important;
+        color: #26325b;
+        font-size: 1rem;
+        border-bottom: 1px solid #e0e4ef;
+      }
+      #tablaUsuarios tr:last-child td {
+        border-bottom: none;
+      }
+    </style>
+</head>
+<body>
+  <div class="centrar-contenido">
+    <div class="cuadro-usuarios">
+      <h2 class="titulo-usuarios">Usuarios del Sistema</h2>
+      <div class="tabla-responsive">
+        <table id="tablaUsuarios">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Apellido </th>
+              <th>Correo</th>
+              <th>Rol</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.id }}</td>
+                <td>{{ usuario.nombre }}</td>
+                <td>{{ usuario.apellido }}</td>
+                <td>{{ usuario.correo }}</td>
+                <td>{{ usuario.rol }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#tablaUsuarios').DataTable({
+        "pageLength": 5,
+        "lengthChange": true,
+        "language": {
+          "lengthMenu": "Mostrar _MENU_ resultados",
+          "zeroRecords": "No se encontraron usuarios",
+          "info": "Mostrando _START_ a _END_ de _TOTAL_ usuarios",
+          "infoEmpty": "Mostrando 0 a 0 de 0 usuarios",
+          "infoFiltered": "(filtrado de _MAX_ usuarios totales)",
+          "search": "Buscar:",
+          "paginate": {
+              "first": "Primero",
+              "last": "Último",
+              "next": "›",
+              "previous": "‹"
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

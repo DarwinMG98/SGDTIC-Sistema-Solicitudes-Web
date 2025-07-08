@@ -7,10 +7,90 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <style>
-      body.fondo-azul { background: #38579A; }
-      .cuadro-historial { background: #e5e9f4 !important; }
-      table { background: transparent !important; }
-      th { background: #4058a2 !important; color: #fff !important; }
+      body.fondo-azul {
+        background: #38579A;
+        min-height: 100vh;
+        margin: 0;
+      }
+      .centrar-contenido {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-top: 30px;
+        padding-bottom: 30px;
+      }
+      .cuadro-historial {
+        background: #e5e9f4;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px #2222;
+        max-width: 1000px;
+        width: 98%;
+        margin: 0 auto;
+        padding: 2.5rem 2.5rem 2rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        border: 4px solid #4058a2;
+      }
+      .titulo-historial {
+        color: #26325b;
+        font-weight: bold;
+        text-align: center;
+        font-size: 2.1rem;
+        margin-bottom: 28px;
+        letter-spacing: 0.5px;
+        text-shadow: 0 1px 0 #fff8;
+      }
+      .tabla-responsive {
+        width: 100%;
+        overflow-x: auto;
+        margin-bottom: 24px;
+      }
+      #tablaSolicitudes {
+        width: 100%;
+        margin-bottom: 0;
+        background: transparent !important;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px #2337b333;
+      }
+      #tablaSolicitudes th, #tablaSolicitudes td {
+        padding: 15px 20px;
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+        font-size: 1.08rem;
+      }
+      #tablaSolicitudes th {
+        background: #4058a2 !important;
+        color: #fff !important;
+        font-weight: bold;
+        font-size: 1.1rem;
+        border-bottom: 2px solid #283672;
+      }
+      #tablaSolicitudes td {
+        background: #f8fafd !important;
+        color: #26325b;
+        font-size: 1rem;
+        border-bottom: 1px solid #e0e4ef;
+      }
+      #tablaSolicitudes tr:last-child td {
+        border-bottom: none;
+      }
+      .estado {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 7px;
+        border: 2px solid #2223;
+        vertical-align: middle;
+      }
+      .pendiente { background: #ffec70 !important; }
+      .aprobado { background: #2be253 !important; }
+      .rechazado { background: #e84141 !important; }
       .btn-cerrar-sesion {
         position: absolute; top: 30px; right: 30px;
         background: #00BCD4; color: white; font-weight: bold;
@@ -23,15 +103,6 @@
         border: none; background: transparent;
       }
       .btn-volver img { width: 55px; }
-      .modal-contenido button {
-        background: #4058a2; color: #fff; border: none; border-radius: 6px;
-        padding: 8px 24px; margin-top: 18px; cursor: pointer; font-weight: bold;
-      }
-      .tabla-responsive { overflow-x: auto; }
-      .decoracion-izquierda {
-        position: absolute; top: 20px; left: 20px;
-        width: 120px; z-index: 5;
-      }
       /* Modal personalizado */
       .modal-observacion {
         position: fixed;
@@ -74,6 +145,26 @@
       .modal-observacion button:hover {
         background: #2e3968;
       }
+      @media (max-width: 1050px) {
+        .cuadro-historial {
+          max-width: 99vw;
+          padding: 1.2rem 0.6rem 1.1rem 0.6rem;
+        }
+        #tablaSolicitudes th, #tablaSolicitudes td {
+          padding: 8px 4px;
+          font-size: 0.96rem;
+        }
+      }
+      @media (max-width: 700px) {
+        .cuadro-historial {
+          padding: 0.6rem 0.1rem 0.8rem 0.1rem;
+          border-width: 2px;
+        }
+        #tablaSolicitudes th, #tablaSolicitudes td {
+          padding: 5px 2px;
+          font-size: 0.85rem;
+        }
+      }
     </style>
 </head>
 <body class="fondo-azul">
@@ -82,59 +173,70 @@
 
     <a href="{{ url_for('logout') }}" class="btn-cerrar-sesion">Cerrar Sesión</a>
 
-    <div class="container-historial">
-        <h2 class="titulo-historial">Historial de Solicitudes</h2>
-        <div class="cuadro-historial">
-            <div class="tabla-responsive">
-                <table id="tablaSolicitudes">
-                    <thead>
-                        <tr>
-                            <th>N°</th>
-                            <th>Tipo de Solicitud</th>
-                            <th>Fecha</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for solicitud in solicitudes %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ solicitud[1] }}</td>
-                            <td>{{ solicitud[2] }}</td>
-                            <td>
-                                <span class="estado 
-                                    {% if solicitud[3] == 'pendiente' %}pendiente
-                                    {% elif solicitud[3] == 'aprobado' %}aprobado
-                                    {% elif solicitud[3] == 'rechazado' %}rechazado
-                                    {% endif %}">
-                                </span>
-                            </td>
-                            <td>
-                                {% if solicitud[3] == 'rechazado' %}
-                                    <button type="button"
-                                        onclick="mostrarObservacion(this)"
-                                        data-observacion="{{ solicitud[4]|escape }}"
-                                        class="btn btn-danger btn-sm">
-                                        Observación
-                                    </button>
-                                    <a href="{{ url_for('editar_solicitud', id=solicitud[0]) }}" class="btn btn-warning btn-sm">Editar</a>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="leyenda" style="margin-top:14px; display:flex; gap:18px; background:#222a; border-radius:9px; padding:8px 18px; color:white; font-size:16px; width:fit-content;">
-                <div><span class="estado pendiente"></span> Pendiente</div>
-                <div><span class="estado aprobado"></span> Aprobado</div>
-                <div><span class="estado rechazado"></span> Rechazado</div>
-            </div>
-        </div>
-        <a href="{{ url_for('dashboard_solicitante') }}" class="btn-volver">
-            <img src="{{ url_for('static', filename='img/volver.png') }}" alt="Volver">
-        </a>
+    <div class="centrar-contenido">
+      <div class="cuadro-historial">
+          <h2 class="titulo-historial">Historial de Solicitudes</h2>
+          <div class="tabla-responsive">
+              <table id="tablaSolicitudes">
+                  <thead>
+                      <tr>
+                          <th>N°</th>
+                          <th>Tipo de Solicitud</th>
+                          <th>Fecha</th>
+                          <th>Estado</th>
+                          <th>Acción</th>
+                          <th>Revisado por</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    {% for solicitud in solicitudes %}
+                    <tr>
+                      <td>{{ loop.index }}</td>
+                      <td>{{ solicitud.tipo }}</td>
+                      <td>{{ solicitud.fecha_solicitud }}</td>
+                      <td>
+                        <span class="estado 
+                          {% if solicitud.estado == 'pendiente' %}pendiente
+                          {% elif solicitud.estado == 'aprobado' %}aprobado
+                          {% elif solicitud.estado == 'rechazado' %}rechazado
+                          {% endif %}">
+                        </span>
+                      </td>
+                      <td>
+                        {% if solicitud.estado == 'rechazado' %}
+                          <button type="button"
+                            onclick="mostrarObservacion(this)"
+                            data-observacion="{{ solicitud.observaciones|escape }}"
+                            class="btn btn-danger btn-sm">
+                            Observación
+                          </button>
+                          <a href="{{ url_for('editar_solicitud', id=solicitud.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if solicitud.nombre_admin_revisor %}
+                          {{ solicitud.nombre_admin_revisor }}
+                        {% else %}
+                          ---
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+
+              </table>
+              <div class="leyenda" style="margin-top:14px; display:flex; gap:18px; background:#222a; border-radius:9px; padding:8px 18px; color:white; font-size:16px; width:fit-content;">
+                  <div><span class="estado pendiente"></span> Pendiente</div>
+                  <div><span class="estado aprobado"></span> Aprobado</div>
+                  <div><span class="estado rechazado"></span> Rechazado</div>
+              </div>
+
+          </div>
+          <!-- Leyenda eliminada para más limpieza visual -->
+      </div>
+      <a href="{{ url_for('dashboard_solicitante') }}" class="btn-volver">
+          <img src="{{ url_for('static', filename='img/volver.png') }}" alt="Volver">
+      </a>
     </div>
 
     <!-- Modal Observación -->
@@ -151,6 +253,8 @@
     <script>
         $(document).ready(function() {
           $('#tablaSolicitudes').DataTable({
+            "pageLength": 5,
+            "lengthMenu": [ [5, 7], [5, 7] ],
             "language": {
               "lengthMenu": "Mostrar _MENU_ resultados",
               "zeroRecords": "No se encontraron resultados",
