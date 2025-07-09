@@ -207,7 +207,7 @@ CREATE TABLE `solicitud_detalle` (
   PRIMARY KEY (`id`),
   KEY `solicitud_id` (`solicitud_id`),
   CONSTRAINT `solicitud_detalle_ibfk_1` FOREIGN KEY (`solicitud_id`) REFERENCES `solicitudes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -229,7 +229,11 @@ INSERT INTO `solicitud_detalle` VALUES
 (18,41,'2025-06-18','Daniela','infraestrcu','danielamoran@quito.fov.das','0997985834','noi','Correo institucional','ddfaf','asdasdas','Producci├│n','Windows Server','2019',3,100,100,100,'12 ms','faife','centro de computo','Daniela moran','inafrestructura','daniela.moran@quito.gob.ec','ffdfsdf','danielamoran','operadoe it','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (19,49,'2025-07-01','Juan Godoy','Pasante','juangodoy@hotmail.com','0987456352','no',NULL,NULL,NULL,NULL,'Windows',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'wegwegwe','Juan Godoy','Pasante','','','asfas','172.258.235','Producción','2025-07-01','fwegwgwe','respaldo, no_requerido','migracion, obsolescencia',''),
 (20,50,'2025-07-01','Pedro Sanchez','Pasante','Pedrosanchez@hotmail.com','0987458745','no','Correo institucional, Anteproyecto aprobado','SGEGS','HRHJEWW','Producción, Desarrollo','Windows Server','2020',50,505,50,50,'2 AÑOS','AEGEWHJHW','WEGWE','WEHWHE','WEHWE','0984857532','QWEHWEHWH','Pedro Snachez','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(21,51,'2025-07-03','darwin guachamin','pasante','darwinmario98@gmail.com','0984083414','no','Correo institucional','fqwfh','wergweg','Producción, Desarrollo','Windows Server','2020',50,50,50,50,'4 años','gwegweg','wegwewe','hwerhweh','wegwegw','whwrhw','whgwewe','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+(21,51,'2025-07-03','darwin guachamin','pasante','darwinmario98@gmail.com','0984083414','no','Correo institucional','fqwfh','wergweg','Producción, Desarrollo','Windows Server','2020',50,50,50,50,'4 años','gwegweg','wegwewe','hwerhweh','wegwegw','whwrhw','whgwewe','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(22,54,'2025-07-09','Darwin Guachamin','Pasante','darwinmario98@gmail.com','0984083414','si','','','','','Windows','',NULL,NULL,NULL,NULL,'','','','','','','Eliminacion del servidor','Darwin Guachamin','Pasante','','','dar','172.35.26','Producción, Desarrollo','2025-07-09','eliminacion','respaldo, no_requerido','migracion, obsolescencia',''),
+(23,55,'2025-07-09','','','','','','','','','','','',NULL,NULL,NULL,NULL,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(24,56,'2025-07-09','','','','','','','','','','','',NULL,NULL,NULL,NULL,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(25,58,'2025-07-09','','','','','','','','','','','',NULL,NULL,NULL,NULL,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `solicitud_detalle` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -252,7 +256,7 @@ CREATE TABLE `solicitudes` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   CONSTRAINT `solicitudes_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -274,7 +278,11 @@ INSERT INTO `solicitudes` VALUES
 (41,1,'crear','2025-06-18 15:44:14','pendiente','ffdfsdf',NULL),
 (49,4,'eliminar','2025-07-01 12:08:19','rechazado','falta observaciones',NULL),
 (50,5,'crear','2025-07-01 12:11:21','aprobado','QWEHWEHWH',NULL),
-(51,6,'crear','2025-07-03 12:23:04','aprobado','Falta documentos',16);
+(51,6,'crear','2025-07-03 12:23:04','aprobado','Falta documentos',16),
+(54,6,'eliminar','2025-07-09 11:26:50','pendiente','falta observaciones',3),
+(55,15,'crear','2025-07-09 12:11:15','pendiente','',NULL),
+(56,15,'crear','2025-07-09 12:11:22','pendiente','',NULL),
+(58,15,'crear','2025-07-09 12:11:33','pendiente','falta datos',3);
 /*!40000 ALTER TABLE `solicitudes` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -337,4 +345,4 @@ commit;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-07-08 16:16:39
+-- Dump completed on 2025-07-09 14:40:30
