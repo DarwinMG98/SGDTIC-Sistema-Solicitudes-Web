@@ -71,6 +71,12 @@
       #tablaUsuarios tr:last-child td {
         border-bottom: none;
       }
+      .volver {
+        width: 50px;
+        position: absolute;
+        bottom: 30px;
+        left: 30px;
+      }
     </style>
 </head>
 <body>
@@ -168,5 +174,10 @@
     });
   }
 </script>
+
+<a href="{{ url_for('dashboard_solicitante') }}">
+  <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+</a>
+
 </body>
 </html>

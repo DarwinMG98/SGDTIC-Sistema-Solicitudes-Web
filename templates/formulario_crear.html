@@ -98,37 +98,37 @@
       <!-- Paso 1 -->
       <div class="formbold-form-step active" id="step-1">
         <h2>Información del solicitante</h2><br>
-        <input type="hidden" name="tipo" value="{{ request.args.get('tipo', 'crear') }}">
+        <input type="hidden" name="tipo" value="{{ request.args.get('tipo', 'crear') }}" required>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Fecha de la Solicitud</label>
-            <input type="date" name="fecha" class="formbold-form-input">
+            <input type="date" name="fecha" class="formbold-form-input" required>
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre completo</label>
-            <input type="text" name="nombre_completo" class="formbold-form-input">
+            <input type="text" name="nombre_completo" class="formbold-form-input" required>
           </div>
           <div>
             <label class="formbold-form-label">Unidad/Dirección solicitante</label>
-            <input type="text" name="unidad" class="formbold-form-input">
+            <input type="text" name="unidad" class="formbold-form-input" required>
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Correo institucional</label>
-            <input type="text" name="correo" class="formbold-form-input">
+            <input type="text" name="correo" class="formbold-form-input" required>
           </div>
           <div>
             <label class="formbold-form-label">Teléfono de contacto</label>
-            <input type="tel" name="telefono" class="formbold-form-input">
+            <input type="tel" name="telefono" class="formbold-form-input" required>
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Responsable técnico (si aplica)</label>
-            <input type="text" name="responsable_tecnico" class="formbold-form-input">
+            <input type="text" name="responsable_tecnico" class="formbold-form-input" required>
           </div>
         </div>
         <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
@@ -145,7 +145,7 @@
         </div>
         <div>
           <label class="formbold-form-label">Número o nombre del anteproyecto (si aplica)</label>
-          <input type="text" name="anteproyecto" class="formbold-form-input">
+          <input type="text" name="anteproyecto" class="formbold-form-input" required>
         </div>
         <div>
           <label class="formbold-form-label">Descripción del motivo de la solicitud</label>
@@ -153,11 +153,11 @@
         </div>
         <div class="formbold-form-section" style="margin-bottom: 1.2rem;">
           <label class="formbold-form-label">Adjuntar documentación de respaldo</label>
-          <input type="file" id="fileInput" name="documentos" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
+          <input type="file" id="fileInput" name="documentos" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input" required>
           <ul id="fileList" style="margin-top: 0.7rem;"></ul>
           <small>Máximo 5 MB por archivo.</small>
           
-          <input type="hidden" id="archivosHidden" name="archivosHidden">
+          <input type="hidden" id="archivosHidden" name="archivosHidden"required>
         </div>
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(2)">← Anterior</button>
@@ -187,41 +187,41 @@
           </select>
           <div id="windowsVersion" style="display:none; margin-top:.7rem;">
             <label class="formbold-form-label">Versión (ej: 2022)</label>
-            <input type="text" name="version_windows" class="formbold-form-input" placeholder="Versión (ej: 2022)">
+            <input type="text" name="version_windows" class="formbold-form-input" placeholder="Versión (ej: 2022)" required>
           </div>
           <div id="linuxVersion" style="display:none; margin-top:.7rem;">
             <label class="formbold-form-label">Distribución y versión</label>
-            <input type="text" name="version_linux" class="formbold-form-input" placeholder="Distribución y versión">
+            <input type="text" name="version_linux" class="formbold-form-input" placeholder="Distribución y versión" required>
           </div>
           <div id="otroSO" style="display:none; margin-top:.7rem;">
             <label class="formbold-form-label">Especifique</label>
-            <input type="text" name="so_otro" class="formbold-form-input" placeholder="Especifique">
+            <input type="text" name="so_otro" class="formbold-form-input" placeholder="Especifique" required>
           </div>
         </div>
 
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">vCPU</label>
-            <input type="number" name="vcpu" class="formbold-form-input" min="1">
+            <input type="number" name="vcpu" class="formbold-form-input" min="1" required>
           </div>
           <div>
             <label class="formbold-form-label">Memoria RAM (GB)</label>
-            <input type="number" name="ram" class="formbold-form-input" min="1">
+            <input type="number" name="ram" class="formbold-form-input" min="1" required>
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Disco de sistema (GB)</label>
-            <input type="number" name="disco_sistema" class="formbold-form-input" min="1">
+            <input type="number" name="disco_sistema" class="formbold-form-input" min="1" required>
           </div>
           <div>
             <label class="formbold-form-label">Disco de datos (GB)</label>
-            <input type="number" name="disco_datos" class="formbold-form-input" min="0">
+            <input type="number" name="disco_datos" class="formbold-form-input" min="0" required>
           </div>
         </div>
         <div>
           <label class="formbold-form-label">Tiempo estimado de vida útil (meses/años)</label>
-          <input type="text" name="vida_util" class="formbold-form-input">
+          <input type="text" name="vida_util" class="formbold-form-input" required>
         </div>
         <div>
           <label class="formbold-form-label">Justificación detallada de los recursos solicitados</label>
@@ -239,23 +239,23 @@
         <h2>Accesos y responsables</h2><br>
         <div>
           <label class="formbold-form-label">Grupos o usuarios que accederán al servidor</label>
-          <textarea name="accesos" rows="2" class="formbold-form-input"></textarea>
+          <textarea name="accesos" rows="2" class="formbold-form-input" required></textarea>
         </div>
         <div>
           <label class="formbold-form-label">Nombre responsable de la aplicación</label>
-          <input type="text" name="responsable_aplicacion" class="formbold-form-input">
+          <input type="text" name="responsable_aplicacion" class="formbold-form-input" required>
         </div>
         <div>
           <label class="formbold-form-label">Unidad responsable de la aplicación</label>
-          <input type="text" name="unidad_responsable" class="formbold-form-input">
+          <input type="text" name="unidad_responsable" class="formbold-form-input" required>
         </div>
         <div>
           <label class="formbold-form-label">Correo/contacto para soporte</label>
-          <input type="text" name="contacto_soporte" class="formbold-form-input">
+          <input type="text" name="contacto_soporte" class="formbold-form-input" required>
         </div>
         <div>
           <label class="formbold-form-label">Observaciones adicionales</label>
-          <textarea name="observaciones" rows="2" class="formbold-form-input"></textarea>
+          <textarea name="observaciones" rows="2" class="formbold-form-input" required></textarea>
         </div>
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(4)">← Anterior</button>
@@ -270,21 +270,21 @@
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
-            <input type="text" name="firma_solicitante" class="formbold-form-input">
+            <input type="text" name="firma_solicitante" class="formbold-form-input" required>
           </div>
           <div>
-            <label class="formbold-form-label">Cargo</label>
-            <input type="text" name="cargo_solicitante" class="formbold-form-input">
+            <label class="formbold-form-label">Cargo</label><br><br>
+            <input type="text" name="cargo_solicitante" class="formbold-form-input" required>
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
-            <input type="text" name="firma_jefe" class="formbold-form-input">
+            <input type="text" name="firma_jefe" class="formbold-form-input" required>
           </div>
           <div>
             <label class="formbold-form-label">Cargo</label>
-            <input type="text" name="cargo_jefe" class="formbold-form-input">
+            <input type="text" name="cargo_jefe" class="formbold-form-input" required>
           </div>
         </div>
 

@@ -9,9 +9,21 @@ import pymysql
 from datetime import datetime
 import uuid
 import time
+from functools import wraps
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 UPLOAD_FOLDER = 'static/img'
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('usuario_id') or session.get('rol') != 'admin':
+            flash("Debes iniciar sesión como administrador.")
+            return redirect(url_for('login_admin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -429,7 +441,7 @@ def editar_solicitud(id):
         responsable_aplicacion = request.form.get('responsable_aplicacion', '')
         unidad_responsable = request.form.get('unidad_responsable', '')
         contacto_soporte = request.form.get('contacto_soporte', '')
-        observaciones_adicionales = request.form.get('observaciones', '')
+        observaciones_adicionales = request.form.get('observaciones_adicionales', '')
         firma_solicitante = request.form.get('firma_solicitante', '')
         cargo_solicitante = request.form.get('cargo_solicitante', '')
         firma_jefe = request.form.get('firma_jefe', '')
@@ -573,6 +585,7 @@ def crear_eliminacion():
 
 
 @app.route('/actualizar_logo', methods=['GET', 'POST'])
+@admin_required
 def actualizar_logo():
     if request.method == 'POST':
         file = request.files['logo']
@@ -593,6 +606,7 @@ def actualizar_logo():
     return render_template('actualizar_logo.html')
 
 @app.route('/agregar_usuario', methods=['GET', 'POST'])
+@admin_required
 def agregar_usuario():
     if request.method == 'POST':
         nombre = request.form['nombre']
@@ -641,30 +655,32 @@ def inject_logo():
     return dict(logo_path=obtener_logo())
 
 @app.route('/ver_usuarios')
+@admin_required
 def ver_usuarios():
 
     usuarios = obtener_todos_los_usuarios() 
     return render_template('ver_usuarios.html', usuarios=usuarios)
 
-@app.route('/eliminar_usuario/<int:id>')
-def eliminar_usuario(id):
-
-    if 'usuario_id' not in session:
-        return redirect(url_for('login_admin'))
-    
-    if id == session['usuario_id']:
-        flash("No puedes eliminarte a ti mismo.")
-        return redirect(url_for('ver_usuarios'))
-
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM usuarios WHERE id=%s AND rol='admin'", (id,))
-    conn.commit()
-    conn.close()
-    flash('Administrador eliminado correctamente.')
-    return redirect(url_for('ver_usuarios'))
+#@app.route('/eliminar_usuario/<int:id>')
+#def eliminar_usuario(id):
+#
+#    if 'usuario_id' not in session:
+#        return redirect(url_for('login_admin'))
+#    
+#    if id == session['usuario_id']:
+#        flash("No puedes eliminarte a ti mismo.")
+#        return redirect(url_for('ver_usuarios'))
+#
+#    conn = get_connection()
+#    cursor = conn.cursor()
+#    cursor.execute("DELETE FROM usuarios WHERE id=%s AND rol='admin'", (id,))
+#    conn.commit()
+#    conn.close()
+#    flash('Administrador eliminado correctamente.')
+#    return redirect(url_for('ver_usuarios'))
 
 @app.route('/cambiar_estado_usuario/<int:id>/<int:nuevo_estado>')
+@admin_required
 def cambiar_estado_usuario(id, nuevo_estado):
     conn = get_connection()
     cursor = conn.cursor()

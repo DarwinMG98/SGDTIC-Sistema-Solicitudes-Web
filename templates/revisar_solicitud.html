@@ -12,6 +12,12 @@
     .formbold-form-wrapper { background: #fff; border-radius: 12px; box-shadow: 0 6px 24px #0001; padding: 2rem 2.5rem; max-width: 650px; width: 100%; margin: auto; }
     .formbold-form-step { display: none; }
     .formbold-form-step.active { display: block; animation: fadeIn .4s;}
+    .volver {
+      width: 50px;
+      position: absolute;
+      bottom: 30px;
+      left: 30px;
+    }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: none;} }
     .formbold-btn { margin-top: 1.5rem;}
     .formbold-btn-secondary { margin-left: 1rem; background: #e0e7ef; color: #6366f1; border: none; }
@@ -216,7 +222,7 @@
             <input type="text" value="{{ detalle.firma_solicitante }}" class="formbold-form-input" readonly>
           </div>
           <div>
-            <label class="formbold-form-label">Cargo</label>
+            <label class="formbold-form-label">Cargo</label><br><br>
             <input type="text" value="{{ detalle.cargo_solicitante }}" class="formbold-form-input" readonly>
           </div>
         </div>
@@ -287,5 +293,10 @@
     document.getElementById("modalObservacion").style.display = "none";
   }
 </script>
+
+<a href="{{ url_for('dashboard_admin') }}">
+  <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+</a>
+
 </body>
 </html>
