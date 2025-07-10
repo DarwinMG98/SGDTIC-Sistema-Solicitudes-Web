@@ -69,32 +69,32 @@
     </div>
       <!-- Paso 1 -->
       <div class="formbold-form-step active" id="step-1">
-        <input type="hidden" name="tipo" value="eliminar">
+        <input type="hidden" name="tipo" value="eliminar" required>
         <h2>Información del Solicitante</h2><br>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre completo</label>
-            <input type="text" name="nombre_completo" class="formbold-form-input">
+            <input type="text" name="nombre_completo" class="formbold-form-input" required>
           </div>
           <div>
             <label class="formbold-form-label">Unidad/Dirección solicitante</label>
-            <input type="text" name="unidad" class="formbold-form-input">
+            <input type="text" name="unidad" class="formbold-form-input" required>
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Correo institucional</label>
-            <input type="text" name="correo" class="formbold-form-input">
+            <input type="text" name="correo" class="formbold-form-input" required>
           </div>
           <div>
             <label class="formbold-form-label">Teléfono de contacto</label>
-            <input type="tel" name="telefono" class="formbold-form-input">
+            <input type="tel" name="telefono" class="formbold-form-input" required>
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Responsable técnico (si aplica)</label>
-            <input type="text" name="responsable_tecnico" class="formbold-form-input">
+            <input type="text" name="responsable_tecnico" class="formbold-form-input" required>
           </div>
         </div>
         <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
@@ -104,15 +104,15 @@
         <h2>Datos del Servidor a Eliminar</h2><br>
         <div>
           <label class="formbold-form-label">Nombre del servidor</label>
-          <input type="text" name="nombre_servidor" class="formbold-form-input">
+          <input type="text" name="nombre_servidor" class="formbold-form-input" required>
         </div>
         <div>
           <label class="formbold-form-label">Dirección IP</label>
-          <input type="text" name="ip_servidor" class="formbold-form-input">
+          <input type="text" name="ip_servidor" class="formbold-form-input" required>
         </div>
         <div>
           <label class="formbold-form-label">Sistema operativo</label>
-          <input type="text" name="sistema_operativo" class="formbold-form-input">
+          <input type="text" name="sistema_operativo" class="formbold-form-input" required>
         </div>
         <div>
           <label class="formbold-form-label">Rol de servidor</label><br>
@@ -125,11 +125,11 @@
 
         <div>
           <label class="formbold-form-label">Fecha de creación del servidor</label><br>
-          <input type="date" name="fecha_creacion_servidor" class="formbold-form-input"><br>
+          <input type="date" name="fecha_creacion_servidor" class="formbold-form-input" required><br>
         </div>
         <div>
           <label class="formbold-form-label">Motivo de la eliminación</label>
-          <textarea name="motivo_eliminacion" rows="2" class="formbold-form-input"></textarea>
+          <textarea name="motivo_eliminacion" rows="2" class="formbold-form-input" required></textarea>
         </div>
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(2)">← Anterior</button>
@@ -141,10 +141,10 @@
       <!-- Paso 3 -->
       <div class="formbold-form-step" id="step-3">
         <h2>Validaciones Previas</h2><br>
-        <label><input type="checkbox" name="validaciones[]" value="respaldo"> Se ha realizado respaldo del servidor</label><br>
-        <label><input type="checkbox" name="validaciones[]" value="no_requerido"> El servidor ya no es requerido por la unidad solicitante</label><br>
-        <label><input type="checkbox" name="validaciones[]" value="verificado"> Se ha verificado que no está siendo utilizado por otros sistemas o usuarios</label><br>
-        <label><input type="checkbox" name="validaciones[]" value="comunicado"> Se ha comunicado la baja a las áreas técnicas correspondientes</label><br>
+        <label><input type="checkbox" name="validaciones[]" value="respaldo" required> Se ha realizado respaldo del servidor</label><br>
+        <label><input type="checkbox" name="validaciones[]" value="no_requerido" required> El servidor ya no es requerido por la unidad solicitante</label><br>
+        <label><input type="checkbox" name="validaciones[]" value="verificado" required> Se ha verificado que no está siendo utilizado por otros sistemas o usuarios</label><br>
+        <label><input type="checkbox" name="validaciones[]" value="comunicado" required> Se ha comunicado la baja a las áreas técnicas correspondientes</label><br>
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(3)">← Anterior</button>
           <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(3)">Siguiente →</button>
@@ -155,12 +155,12 @@
       <!-- Paso 4 -->
       <div class="formbold-form-step" id="step-4">
         <h2>Motivo de la Eliminación</h2><br>
-        <label><input type="checkbox" name="motivo_check[]" value="migracion"> Migración a nueva infraestructura</label><br>
-        <label><input type="checkbox" name="motivo_check[]" value="obsolescencia"> Obsolescencia / Fin de vida útil</label><br>
-        <label><input type="checkbox" name="motivo_check[]" value="falta_uso"> Falta de uso / Baja demanda</label><br>
-        <label><input type="checkbox" name="motivo_check[]" value="reubicacion"> Reubicación de recursos</label><br>
-        <label><input type="checkbox" name="motivo_check[]" value="otro" id="otroMotivoCheck" onchange="toggleOtroMotivo()"> Otros</label>
-        <input type="text" name="motivo_otro" id="inputOtroMotivo" class="formbold-form-input" placeholder="Especifique" style="display:none; margin-top: 0.5rem;">
+        <label><input type="checkbox" name="motivo_check[]" value="migracion" required> Migración a nueva infraestructura</label><br>
+        <label><input type="checkbox" name="motivo_check[]" value="obsolescencia" required> Obsolescencia / Fin de vida útil</label><br>
+        <label><input type="checkbox" name="motivo_check[]" value="falta_uso" required> Falta de uso / Baja demanda</label><br>
+        <label><input type="checkbox" name="motivo_check[]" value="reubicacion" required> Reubicación de recursos</label><br>
+        <label><input type="checkbox" name="motivo_check[]" value="otro" id="otroMotivoCheck" onchange="toggleOtroMotivo()" required> Otros</label>
+        <input type="text" name="motivo_otro" id="inputOtroMotivo" class="formbold-form-input" placeholder="Especifique" style="display:none; margin-top: 0.5rem;" required>
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-secondary" style="float:left" onclick="prevStep(4)">← Anterior</button>
           <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(4)">Siguiente →</button>
@@ -185,21 +185,21 @@
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre del Funcionario Municipal Solicitante</label>
-            <input type="text" name="firma_solicitante" class="formbold-form-input">
+            <input type="text" name="firma_solicitante" class="formbold-form-input" required>
           </div>
           <div>
             <label class="formbold-form-label">Cargo</label><br><br>
-            <input type="text" name="cargo_solicitante" class="formbold-form-input">
+            <input type="text" name="cargo_solicitante" class="formbold-form-input" required>
           </div>
         </div>
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
-            <input type="text" name="firma_jefe" class="formbold-form-input">
+            <input type="text" name="firma_jefe" class="formbold-form-input" readonly>
           </div>
           <div>
             <label class="formbold-form-label">Cargo</label>
-            <input type="text" name="cargo_jefe" class="formbold-form-input">
+            <input type="text" name="cargo_jefe" class="formbold-form-input" readonly>
           </div>
         </div>
         <div class="formbold-btn-group">

@@ -59,7 +59,7 @@ def obtener_todos_los_usuarios():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("SELECT id, nombre, apellido, correo, rol, activo FROM usuarios WHERE rol = 'admin'")
-            usuarios = cursor.fetchall()  # Obtienes una lista de diccionarios
+            usuarios = cursor.fetchall()  
     finally:
         conexion.close()
     return usuarios
@@ -227,7 +227,7 @@ def verificar_login_admin():
 
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-    cursor.execute("SELECT * FROM usuarios WHERE correo=%s AND contraseña=%s AND rol='admin'", (usuario, password))
+    cursor.execute("SELECT * FROM usuarios WHERE correo=%s AND password=%s AND rol='admin'", (usuario, password))
     admin = cursor.fetchone()
     conn.close()
 
@@ -242,6 +242,7 @@ def verificar_login_admin():
         return redirect(url_for('login_admin'))
 
     session['usuario_id'] = admin['id']
+    session['rol'] = admin['rol']
     return redirect(url_for('dashboard_admin'))
 
 
@@ -286,7 +287,7 @@ def login_solicitante():
         if not usuario:
             try:
                 cursor.execute("""
-                    INSERT INTO usuarios (nombre, apellido, correo, rol, contraseña)
+                    INSERT INTO usuarios (nombre, apellido, correo, rol, password)
                     VALUES (%s, %s, %s, %s, %s)
                 """, (nombre, apellido, correo, 'solicitante', None))
                 conn.commit()
@@ -629,7 +630,7 @@ def agregar_usuario():
         admin_id = session.get('usuario_id')
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT contraseña FROM usuarios WHERE id=%s AND rol='admin'", (admin_id,))
+        cursor.execute("SELECT password FROM usuarios WHERE id=%s AND rol='admin'", (admin_id,))
         admin = cursor.fetchone()
 
 
@@ -641,7 +642,7 @@ def agregar_usuario():
 
 
         cursor.execute("""
-            INSERT INTO usuarios (nombre, apellido, correo, rol, contraseña)
+            INSERT INTO usuarios (nombre, apellido, correo, rol, password)
             VALUES (%s, %s, %s, %s, %s)
         """, (nombre, apellido, correo, rol, password))
         conn.commit()
