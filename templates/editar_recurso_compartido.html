@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Editar Solicitud Recursos Compartidos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <style>
+    body { background: #f5f6fa; }
+    .formbold-main-wrapper {
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 2rem 0; background: #f5f6fa;
+    }
+    .formbold-form-wrapper {
+      background: #fff; border-radius: 12px; box-shadow: 0 6px 24px #0001;
+      padding: 2rem 2.5rem; max-width: 700px; width: 100%; margin: auto;
+    }
+    .formbold-form-step { display: none; }
+    .formbold-form-step.active { display: block; animation: fadeIn .4s;}
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: none;} }
+    .formbold-btn { margin-top: 1.5rem;}
+    .formbold-btn-secondary {
+      margin-left: 1rem; background: #e0e7ef; color: #6366f1; border: none;
+    }
+    .formbold-step-menu { margin-bottom: 2rem;}
+    .formbold-step-circle { font-weight: bold; }
+    .formbold-step-label { font-weight: bold; font-size: 1.1rem; }
+    .formbold-input-flex { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .formbold-input-flex > div { flex: 1 1 250px; }
+    .observacion-admin {
+      background: #ffe5e5; border: 1px solid #ee6666; color: #c00000;
+      padding: 12px; border-radius: 8px; margin-bottom: 18px; font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+    {% if observacion %}
+      <div class="observacion-admin">
+        Observación del administrador: {{ observacion }}
+      </div>
+    {% endif %}
+
+    <form id="editarRecursoForm" method="POST" action="" autocomplete="off">
+      <!-- PASOS -->
+      <div class="formbold-step-menu">
+        <div class="step-indicator"><span class="formbold-step-circle active">1</span><span class="formbold-step-label">Solicitante</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">2</span><span class="formbold-step-label">Carpeta</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">3</span><span class="formbold-step-label">Ubicación</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">4</span><span class="formbold-step-label">Responsables</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">5</span><span class="formbold-step-label">Firmas</span></div>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="formbold-form-step active" id="step-1">
+        <h2>Información del solicitante</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre Completo</label>
+            <input type="text" name="nombre_completo" class="formbold-form-input" value="{{ detalle.nombre_completo|default('') }}">
+          </div>
+          <div>
+            <label class="formbold-form-label">Unidad solicitante</label>
+            <input type="text" name="unidad" class="formbold-form-input" value="{{ detalle.unidad|default('') }}">
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Correo institucional</label>
+            <input type="email" name="correo" class="formbold-form-input" value="{{ detalle.correo|default('') }}">
+          </div>
+          <div>
+            <label class="formbold-form-label">Teléfono</label>
+            <input type="text" name="telefono" class="formbold-form-input" value="{{ detalle.telefono|default('') }}">
+          </div>
+        </div>
+        <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="formbold-form-step" id="step-2">
+        <h2>Datos de la carpeta compartida</h2><br>
+        <div>
+          <label class="formbold-form-label">Nombre de la carpeta</label>
+          <input type="text" name="nombre_carpeta" class="formbold-form-input" value="{{ detalle.nombre_carpeta|default('') }}">
+        </div>
+        <div>
+          <label class="formbold-form-label">Justificación</label>
+          <textarea name="justificacion" rows="3" class="formbold-form-input">{{ detalle.justificacion|default('') }}</textarea>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(2)">← Anterior</button>
+          <button type="button" class="formbold-btn" onclick="nextStep(2)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="formbold-form-step" id="step-3">
+        <h2>Ubicación y acceso</h2><br>
+        <div>
+          <label class="formbold-form-label">Unidad donde se creará la carpeta</label>
+          <input type="text" name="unidad_creacion" class="formbold-form-input" value="{{ detalle.unidad_creacion|default('') }}">
+        </div>
+        <div>
+          <label class="formbold-form-label">Usuarios que accederán</label>
+          <textarea name="usuarios_acceso" rows="3" class="formbold-form-input">{{ detalle.usuarios_acceso|default('') }}</textarea>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(3)">← Anterior</button>
+          <button type="button" class="formbold-btn" onclick="nextStep(3)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="formbold-form-step" id="step-4">
+        <h2>Responsables del recurso</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Responsable principal</label>
+            <input type="text" name="responsable" class="formbold-form-input" value="{{ detalle.responsable|default('') }}">
+          </div>
+          <div>
+            <label class="formbold-form-label">Correo de responsable</label>
+            <input type="email" name="correo_responsable" class="formbold-form-input" value="{{ detalle.correo_responsable|default('') }}">
+          </div>
+        </div>
+        <div>
+          <label class="formbold-form-label">Observaciones adicionales</label>
+          <textarea name="observaciones" rows="2" class="formbold-form-input">{{ detalle.observaciones|default('') }}</textarea>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(4)">← Anterior</button>
+          <button type="button" class="formbold-btn" onclick="nextStep(4)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 5 -->
+      <div class="formbold-form-step" id="step-5">
+        <h2>Firmas</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Funcionario solicitante</label>
+            <input type="text" name="firma_solicitante" class="formbold-form-input" value="{{ detalle.firma_solicitante|default('') }}">
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" name="cargo_solicitante" class="formbold-form-input" value="{{ detalle.cargo_solicitante|default('') }}">
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
+            <input type="text" name="firma_jefe" class="formbold-form-input" value="{{ detalle.firma_jefe|default('') }}">
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo del Jefe</label>
+            <input type="text" name="cargo_jefe" class="formbold-form-input" value="{{ detalle.cargo_jefe|default('') }}">
+          </div>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(5)">← Anterior</button>
+          <button type="submit" class="formbold-btn">Guardar Cambios</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+  function showStep(n) {
+    document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+    let circles = document.querySelectorAll('.formbold-step-circle');
+    circles.forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+  }
+  function nextStep(n) { if (n < 5) { currentStep = n + 1; showStep(currentStep); } }
+  function prevStep(n) { if (n > 1) { currentStep = n - 1; showStep(currentStep); } }
+  showStep(1);
+</script>
+
+<a href="{{ url_for('dashboard_solicitante') }}">
+  <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+</a>
+</body>
+</html>

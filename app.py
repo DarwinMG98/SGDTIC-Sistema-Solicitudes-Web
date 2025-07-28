@@ -10,6 +10,8 @@ from datetime import datetime
 import uuid
 import time
 from functools import wraps
+import sys
+sys.stderr = open('error.log', 'w')
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 UPLOAD_FOLDER = 'static/img'
@@ -24,12 +26,30 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def solicitante_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('usuario_id') or session.get('rol') != 'solicitante':
+            flash("Debes iniciar sesión como solicitante.")
+            return redirect(url_for('login_solicitante'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta'
+
+@app.route('/')
+def inicio():
+    return render_template("inicio.html")
+
+#@app.route('/inicio')
+#def inicio_():
+#    return render_template("inicio.html")
+
 
 def to_int(valor):
     """Convierte valor a int si no está vacío, si no, retorna None"""
@@ -49,13 +69,7 @@ def allowed_file(filename):
 
 
 def obtener_todos_los_usuarios():
-    conexion = pymysql.connect(
-        host='localhost',
-        user='root',
-        password='2636587',
-        database='sistema_solicitudes',
-        cursorclass=pymysql.cursors.DictCursor
-    )
+    conexion = get_connection()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("SELECT id, nombre, apellido, correo, rol, activo FROM usuarios WHERE rol = 'admin'")
@@ -63,8 +77,6 @@ def obtener_todos_los_usuarios():
     finally:
         conexion.close()
     return usuarios
-
-
 
 
 @app.route("/crear_solicitud", methods=["GET", "POST"])
@@ -177,14 +189,27 @@ def solicitud_enviada():
 
 
 # Conexión a base de datos
+#def get_connection():
+#    return pymysql.connect(
+#        host='172.22.12.212',
+#        user='flask_user',
+#        password='S3rv!d0r2025',
+#        database='sistema_solicitudes',
+#        port=3306,
+#        cursorclass=pymysql.cursors.DictCursor
+
+#    )
+
 def get_connection():
     return pymysql.connect(
-        host='localhost',
-        user='root',
+        host='localhost',  # ← CAMBIA ESTO
+        user='root',       # o tu usuario local
         password='2636587',
-        database='sistema_solicitudes'
-
+        database='sistema_solicitudes',
+        port=3306,
+        cursorclass=pymysql.cursors.DictCursor
     )
+
 
 def obtener_logo():
     conn = get_connection()
@@ -193,16 +218,12 @@ def obtener_logo():
     result = cursor.fetchone()
     conn.close()
     
-    return result[0] if result else 'img/logo_municipio3.png'
+    return result.get('valor', 'img/logo_municipio3.png') if result else 'img/logo_municipio3.png'
     
 @app.context_processor
 def inject_logo():
     return dict(logo_path=obtener_logo())
 
-
-@app.route('/')
-def inicio():
-    return render_template("inicio.html")
 
 
 @app.route('/usuarios')
@@ -247,6 +268,7 @@ def verificar_login_admin():
 
 
 @app.route('/dashboard_admin')
+@admin_required
 def dashboard_admin():
     conn = get_connection()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -300,7 +322,7 @@ def login_solicitante():
         conn.close()
 
         if usuario:
-            session['usuario_id'] = usuario[0]
+            session['usuario_id'] = usuario['id']
             session['nombre'] = nombre
             return redirect(url_for('dashboard_solicitante'))
         else:
@@ -321,8 +343,8 @@ def dashboard_solicitante():
     conn.close()
 
     if usuario:
-        nombre = usuario[0] or ""
-        apellido = usuario[1] or ""
+        nombre = usuario['nombre'] or ""
+        apellido = usuario['apellido'] or ""
     else:
         nombre = ""
         apellido = ""
@@ -542,14 +564,12 @@ def crear_eliminacion():
 
         conn = get_connection()
         cursor = conn.cursor()
-
         
         cursor.execute("""
             INSERT INTO solicitudes (usuario_id, tipo, fecha_solicitud, estado)
             VALUES (%s, %s, %s, %s)
         """, (usuario_id, tipo, fecha, "pendiente"))
         solicitud_id = cursor.lastrowid
-
         
         cursor.execute("""
             INSERT INTO solicitud_detalle (
@@ -565,8 +585,7 @@ def crear_eliminacion():
             motivo_eliminacion, validaciones, motivo_check, motivo_otro,
             observaciones_adicionales, firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
         ))
-
-        
+       
         archivos = request.files.getlist('documentos')
         for archivo in archivos:
             if archivo and archivo.filename and allowed_file(archivo.filename):
@@ -583,7 +602,6 @@ def crear_eliminacion():
         return redirect(url_for("solicitud_enviada"))
 
     return render_template("formulario_eliminar.html")
-
 
 @app.route('/actualizar_logo', methods=['GET', 'POST'])
 @admin_required
@@ -616,30 +634,24 @@ def agregar_usuario():
         rol = request.form['rol']
         password = request.form['password']
         password_confirm = request.form['password_confirm']
-
-
-        
+     
         if password != password_confirm:
             return render_template('agregar_usuario.html', error="Las contraseñas no coinciden.")
 
-        
+     
         if len(password) < 4:
             return render_template('agregar_usuario.html', error="La contraseña debe tener al menos 4 caracteres.")
-
        
         admin_id = session.get('usuario_id')
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT password FROM usuarios WHERE id=%s AND rol='admin'", (admin_id,))
         admin = cursor.fetchone()
-
-
         cursor.execute("SELECT id FROM usuarios WHERE correo=%s", (correo,))
         usuario = cursor.fetchone()
         if usuario:
             conn.close()
             return render_template('agregar_usuario.html', error="El correo ya está registrado.")
-
 
         cursor.execute("""
             INSERT INTO usuarios (nombre, apellido, correo, rol, password)
@@ -680,6 +692,157 @@ def ver_usuarios():
 #    flash('Administrador eliminado correctamente.')
 #    return redirect(url_for('ver_usuarios'))
 
+
+@app.route('/crear_recurso_compartido', methods=['GET', 'POST'])
+def crear_recurso_compartido():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login_solicitante'))
+
+    if request.method == 'POST':
+        usuario_id = session['usuario_id']
+        fecha = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # Recoger campos del formulario
+        nombre_solicitante = request.form['nombre_completo']
+        dependencia = request.form['unidad']
+        cargo = request.form['cargo']
+        correo = request.form['correo']
+        telefono = request.form['telefono']
+        nombre_recurso = request.form['nombre_recurso']
+        ubicacion = request.form['ubicacion']
+        proposito = request.form['proposito']
+        usuarios_acceso = request.form['usuarios_acceso']
+        permisos = request.form['permisos']
+        tipo_info = request.form['tipo_info']
+        volumen = request.form['volumen']
+        tiempo_uso = request.form['tiempo_uso']
+        firma_solicitante = request.form['firma_solicitante']
+        firma_jefe = request.form['firma_jefe']
+        cargo_solicitante = request.form['cargo_solicitante']
+        cargo_jefe = request.form['cargo_jefe']
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        # Insertar solicitud
+        cursor.execute("""
+            INSERT INTO solicitudes (usuario_id, tipo, fecha_solicitud, estado)
+            VALUES (%s, %s, %s, %s)
+        """, (usuario_id, 'recursos', fecha, 'pendiente'))
+        solicitud_id = cursor.lastrowid
+
+        # Insertar detalle
+        cursor.execute("""
+            INSERT INTO solicitud_detalle (
+                solicitud_id, fecha, nombre_completo, unidad, cargo, correo, telefono,
+                nombre_recurso, ubicacion, proposito, usuarios_acceso, permisos,
+                tipo_informacion, volumen, tiempo_uso,
+                firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            solicitud_id, fecha, nombre_solicitante, dependencia, cargo, correo, telefono,
+            nombre_recurso, ubicacion, proposito, usuarios_acceso, permisos,
+            tipo_info, volumen, tiempo_uso,
+            firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
+        ))
+
+        conn.commit()
+        conn.close()
+        flash("¡Solicitud de recurso compartido enviada correctamente!")
+        return redirect(url_for("solicitud_enviada"))
+
+    return render_template('formulario_recursos.html')
+
+@app.route('/editar_recurso_compartido/<int:id>', methods=['GET', 'POST'])
+@solicitante_required
+def editar_recurso_compartido(id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Obtener datos existentes
+    cursor.execute("SELECT * FROM recursos_compartidos WHERE id = %s", (id,))
+    detalle = cursor.fetchone()
+
+    # Verificar si existe observación del administrador
+    cursor.execute("SELECT observacion FROM observaciones WHERE recurso_id = %s", (id,))
+    obs_result = cursor.fetchone()
+    observacion = obs_result['observacion'] if obs_result else None
+
+    if request.method == 'POST':
+        data = {
+            'nombre_completo': request.form['nombre_completo'],
+            'unidad': request.form['unidad'],
+            'correo': request.form['correo'],
+            'telefono': request.form['telefono'],
+            'nombre_carpeta': request.form['nombre_carpeta'],
+            'justificacion': request.form['justificacion'],
+            'unidad_creacion': request.form['unidad_creacion'],
+            'usuarios_acceso': request.form['usuarios_acceso'],
+            'responsable': request.form['responsable'],
+            'correo_responsable': request.form['correo_responsable'],
+            'observaciones': request.form['observaciones'],
+            'firma_solicitante': request.form['firma_solicitante'],
+            'cargo_solicitante': request.form['cargo_solicitante'],
+            'firma_jefe': request.form['firma_jefe'],
+            'cargo_jefe': request.form['cargo_jefe'],
+        }
+
+        sql = """
+        UPDATE recursos_compartidos SET
+            nombre_completo = %(nombre_completo)s,
+            unidad = %(unidad)s,
+            correo = %(correo)s,
+            telefono = %(telefono)s,
+            nombre_carpeta = %(nombre_carpeta)s,
+            justificacion = %(justificacion)s,
+            unidad_creacion = %(unidad_creacion)s,
+            usuarios_acceso = %(usuarios_acceso)s,
+            responsable = %(responsable)s,
+            correo_responsable = %(correo_responsable)s,
+            observaciones = %(observaciones)s,
+            firma_solicitante = %(firma_solicitante)s,
+            cargo_solicitante = %(cargo_solicitante)s,
+            firma_jefe = %(firma_jefe)s,
+            cargo_jefe = %(cargo_jefe)s
+        WHERE id = %s
+        """
+        cursor.execute(sql, (*data.values(), id))
+        conn.commit()
+        conn.close()
+        flash('Solicitud actualizada correctamente.', 'success')
+        return redirect(url_for('dashboard_solicitante'))
+
+    conn.close()
+    return render_template("editar_recurso_compartido.html", detalle=detalle, observacion=observacion)
+
+
+@app.route('/revisar_recurso_compartido/<int:id>', methods=['GET', 'POST'])
+@solicitante_required
+def revisar_recurso_compartido(id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM recursos_compartidos WHERE id = %s", (id,))
+    detalle = cursor.fetchone()
+
+    if request.method == 'POST':
+        if request.form['accion'] == 'aprobar':
+            cursor.execute("UPDATE recursos_compartidos SET estado = 'Aprobado' WHERE id = %s", (id,))
+            conn.commit()
+            flash("Solicitud aprobada.", "success")
+        elif request.form['accion'] == 'rechazar':
+            observacion = request.form['observacion']
+            cursor.execute("UPDATE recursos_compartidos SET estado = 'Rechazado' WHERE id = %s", (id,))
+            cursor.execute("INSERT INTO observaciones (recurso_id, observacion) VALUES (%s, %s)", (id, observacion))
+            conn.commit()
+            flash("Solicitud rechazada con observación.", "danger")
+        conn.close()
+        return redirect(url_for('dashboard_admin'))
+
+    conn.close()
+    return render_template("revisar_recurso_compartido.html", detalle=detalle)
+
+
 @app.route('/cambiar_estado_usuario/<int:id>/<int:nuevo_estado>')
 @admin_required
 def cambiar_estado_usuario(id, nuevo_estado):
@@ -692,6 +855,13 @@ def cambiar_estado_usuario(id, nuevo_estado):
 
 
 # Iniciar servidor
+#if __name__ == '__main__':
+#   app.run(debug=True, host="0.0.0.0", port=8000)
+
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=8000)
+    app.run(debug=True, host='127.0.0.1', port=5000)
+
+
+application = app
+
 

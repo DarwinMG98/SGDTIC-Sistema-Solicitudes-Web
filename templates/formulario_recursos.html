@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Solicitud de Recursos Compartidos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <style>
+    body { background: #f5f6fa; }
+    .formbold-main-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem 0; }
+    .formbold-form-wrapper { background: #fff; border-radius: 12px; box-shadow: 0 6px 24px #0001; padding: 2rem 2.5rem; max-width: 650px; width: 100%; margin: auto; }
+    .formbold-form-step { display: none; }
+    .formbold-form-step.active { display: block; animation: fadeIn .4s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: none;} }
+    .formbold-btn { margin-top: 1.5rem;}
+    .formbold-btn-secondary { margin-left: 1rem; background: #e0e7ef; color: #6366f1; border: none; }
+    .formbold-step-menu { margin-bottom: 2rem;}
+  </style>
+</head>
+<body>
+
+<div class="bg-logo-superior">
+  <img src="{{ url_for('static', filename=logo_path) }}" class="decoracion-izquierda">
+</div>
+
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+    <form method="POST" action="{{ url_for('crear_recurso_compartido') }}" autocomplete="off">
+      <div class="formbold-step-menu">
+        <div class="step-indicator"><span class="formbold-step-circle active">1</span><span class="formbold-step-label">Solicitante</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">2</span><span class="formbold-step-label">Recurso</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">3</span><span class="formbold-step-label">Uso</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">4</span><span class="formbold-step-label">Firmas</span></div>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="formbold-form-step active" id="step-1">
+        <h2>Información del Solicitante</h2>
+        <label>Nombre del Solicitante</label><input type="text" name="nombre_completo" class="formbold-form-input" required>
+        <label>Dependencia/Área</label><input type="text" name="unidad" class="formbold-form-input" required>
+        <label>Cargo o Puesto</label><input type="text" name="cargo" class="formbold-form-input" required>
+        <label>Correo Electrónico</label><input type="email" name="correo" class="formbold-form-input" required>
+        <label>Teléfono de Contacto</label><input type="text" name="telefono" class="formbold-form-input" required>
+        <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="formbold-form-step" id="step-2">
+        <h2>Detalles del Recurso Solicitado</h2>
+        <label>Nombre sugerido del Recurso</label><input type="text" name="nombre_recurso" class="formbold-form-input" required>
+        <label>Ubicación en la estructura</label><input type="text" name="ubicacion" class="formbold-form-input" required>
+        <label>Propósito o Función del Recurso</label><textarea name="proposito" class="formbold-form-input" required></textarea>
+        <label>Grupos o Usuarios con Acceso</label><textarea name="usuarios_acceso" class="formbold-form-input" required></textarea>
+        <label>Nivel de Permisos</label>
+        <select name="permisos" class="formbold-form-input" required>
+          <option value="Lectura">Lectura</option>
+          <option value="Escritura">Escritura</option>
+        </select>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(2)">← Anterior</button>
+          <button type="button" class="formbold-btn" onclick="nextStep(2)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="formbold-form-step" id="step-3">
+        <h2>Uso Estimado y Clasificación</h2>
+        <label>Tipo de Información a Almacenar</label><input type="text" name="tipo_info" class="formbold-form-input" required>
+        <label>Volumen Estimado (GB)</label><input type="number" name="volumen" class="formbold-form-input" required>
+        <label>Tiempo Estimado de Uso (meses/años)</label><input type="text" name="tiempo_uso" class="formbold-form-input" required>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(3)">← Anterior</button>
+          <button type="button" class="formbold-btn" onclick="nextStep(3)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="formbold-form-step" id="step-4">
+        <h2>Firmas y Envío</h2>
+        <label>Nombre del Funcionario Solicitante</label><input type="text" name="firma_solicitante" class="formbold-form-input" required>
+        <label>Cargo</label><input type="text" name="cargo_solicitante" class="formbold-form-input" required>
+        <label>Nombre del Jefe Inmediato</label><input type="text" name="firma_jefe" class="formbold-form-input" required>
+        <label>Cargo del Jefe</label><input type="text" name="cargo_jefe" class="formbold-form-input" required>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(4)">← Anterior</button>
+          <button type="submit" class="formbold-btn">Enviar Solicitud</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+let currentStep = 1;
+function showStep(n) {
+  document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
+    el.classList.toggle('active', i === n - 1);
+  });
+  document.querySelectorAll('.formbold-step-circle').forEach((el, i) => {
+    el.classList.toggle('active', i === n - 1);
+  });
+}
+function nextStep(n) { if (n < 4) { currentStep = n + 1; showStep(currentStep); }}
+function prevStep(n) { if (n > 1) { currentStep = n - 1; showStep(currentStep); }}
+showStep(1);
+</script>
+
+<a href="{{ url_for('dashboard_solicitante') }}">
+  <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+</a>
+
+</body>
+</html>

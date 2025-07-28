@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Revisión Recursos Compartidos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <style>
+    body { background: #f5f6fa; }
+    .formbold-main-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem 0; }
+    .formbold-form-wrapper { background: #fff; border-radius: 12px; box-shadow: 0 6px 24px #0001; padding: 2rem 2.5rem; max-width: 700px; width: 100%; }
+    .formbold-form-step { display: none; }
+    .formbold-form-step.active { display: block; animation: fadeIn .4s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: none;} }
+    .formbold-step-menu { margin-bottom: 2rem; }
+    .formbold-step-circle.active { background: #6366f1; color: #fff; }
+    .formbold-step-circle {
+      border-radius: 50%; border: 2px solid #6366f1;
+      width: 32px; height: 32px; display: inline-flex;
+      align-items: center; justify-content: center;
+      margin-right: 6px; font-weight: bold;
+    }
+    .formbold-step-label { font-weight: bold; font-size: 1.1rem; }
+    .formbold-btn-group { margin-top: 1.5rem; }
+    .formbold-input-flex { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .formbold-input-flex > div { flex: 1 1 200px; }
+    .formbold-form-label { font-weight: bold; display: block; margin-bottom: .5rem; }
+    .formbold-form-input, textarea {
+      width: 100%; padding: .6rem .9rem; font-size: 1rem;
+      border: 1px solid #ccc; border-radius: 8px;
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+    <form method="POST" action="" autocomplete="off">
+      <!-- Barra de pasos -->
+      <div class="formbold-step-menu">
+        <div class="step-indicator"><span class="formbold-step-circle active">1</span><span class="formbold-step-label">Solicitante</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">2</span><span class="formbold-step-label">Justificación</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">3</span><span class="formbold-step-label">Recurso</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">4</span><span class="formbold-step-label">Ubicación</span></div>
+        <div class="step-indicator"><span class="formbold-step-circle">5</span><span class="formbold-step-label">Firmas</span></div>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="formbold-form-step active" id="step-1">
+        <h2>Datos del solicitante</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Fecha de la solicitud</label>
+            <input type="text" value="{{ detalle.fecha }}" class="formbold-form-input" readonly>
+          </div>
+          <div>
+            <label class="formbold-form-label">Nombre completo</label>
+            <input type="text" value="{{ detalle.nombre_completo }}" class="formbold-form-input" readonly>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Unidad/Dirección</label>
+            <input type="text" value="{{ detalle.unidad }}" class="formbold-form-input" readonly>
+          </div>
+          <div>
+            <label class="formbold-form-label">Correo institucional</label>
+            <input type="text" value="{{ detalle.correo }}" class="formbold-form-input" readonly>
+          </div>
+        </div>
+        <button type="button" class="formbold-btn" onclick="nextStep(1)">Siguiente →</button>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="formbold-form-step" id="step-2">
+        <h2>Justificación</h2><br>
+        <div>
+          <label class="formbold-form-label">Motivo de la solicitud</label>
+          <textarea class="formbold-form-input" readonly>{{ detalle.motivo }}</textarea>
+        </div>
+        <div>
+          <label class="formbold-form-label">Documentos adjuntos</label>
+          {% if documentos and documentos|length > 0 %}
+            <ul>
+              {% for doc in documentos %}
+                <li><a href="{{ url_for('descargar_archivo', filename=doc['ruta_archivo']) }}" target="_blank">{{ doc['nombre_archivo'] }}</a></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <em>No hay documentos adjuntos.</em>
+          {% endif %}
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(2)">← Anterior</button>
+          <button type="button" class="formbold-btn" onclick="nextStep(2)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="formbold-form-step" id="step-3">
+        <h2>Información del recurso</h2><br>
+        <label class="formbold-form-label">Nombre del recurso compartido</label>
+        <input type="text" value="{{ detalle.nombre_recurso }}" class="formbold-form-input" readonly>
+
+        <label class="formbold-form-label">Usuarios con acceso</label>
+        <textarea class="formbold-form-input" readonly>{{ detalle.usuarios_acceso }}</textarea>
+
+        <label class="formbold-form-label">Responsable del recurso</label>
+        <input type="text" value="{{ detalle.responsable_recurso }}" class="formbold-form-input" readonly>
+
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(3)">← Anterior</button>
+          <button type="button" class="formbold-btn" onclick="nextStep(3)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="formbold-form-step" id="step-4">
+        <h2>Ubicación</h2><br>
+        <label class="formbold-form-label">Ruta deseada para el recurso</label>
+        <input type="text" value="{{ detalle.ruta_recurso }}" class="formbold-form-input" readonly>
+
+        <label class="formbold-form-label">Observaciones adicionales</label>
+        <textarea class="formbold-form-input" readonly>{{ detalle.observaciones }}</textarea>
+
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(4)">← Anterior</button>
+          <button type="button" class="formbold-btn" onclick="nextStep(4)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 5 -->
+      <div class="formbold-form-step" id="step-5">
+        <h2>Firmas y aprobación</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Solicitante</label>
+            <input type="text" value="{{ detalle.firma_solicitante }}" class="formbold-form-input" readonly>
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" value="{{ detalle.cargo_solicitante }}" class="formbold-form-input" readonly>
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
+            <input type="text" name="firma_jefe" class="formbold-form-input" required>
+          </div>
+          <div>
+            <label class="formbold-form-label">Cargo</label>
+            <input type="text" name="cargo_jefe" class="formbold-form-input" required>
+          </div>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(5)">← Anterior</button>
+          <button type="submit" name="accion" value="aprobar" class="formbold-btn">Aprobar</button>
+          <button type="button" class="formbold-btn formbold-btn-secondary" onclick="abrirObservacion()">Rechazar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de rechazo -->
+<div id="modalObservacion" class="modal" style="display: none;">
+  <div class="modal-contenido">
+    <h3>Motivo de Rechazo</h3>
+    <form method="POST">
+      <textarea name="observacion" rows="5" required placeholder="Escriba el motivo del rechazo..."></textarea>
+      <div class="botones-observacion">
+        <button type="submit" name="accion" value="rechazar" class="btn-enviar">Enviar</button>
+        <button type="button" onclick="cerrarObservacion()" class="btn-cancelar">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+<style>
+  .modal {
+    position: fixed; z-index: 9999; left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-contenido {
+    background: #fff; padding: 2rem; border-radius: 12px;
+    box-shadow: 0 6px 30px #0003; max-width: 480px; width: 100%;
+  }
+  textarea { width: 100%; padding: 1rem; resize: none; border-radius: 8px; border: 1px solid #ccc; }
+  .botones-observacion { margin-top: 1rem; text-align: right; display: flex; gap: 1rem; }
+  .btn-enviar, .btn-cancelar {
+    padding: 0.5rem 1.5rem; font-weight: bold; border: none; border-radius: 6px;
+    cursor: pointer;
+  }
+  .btn-enviar { background-color: #ef4444; color: white; }
+  .btn-enviar:hover { background-color: #dc2626; }
+  .btn-cancelar { background-color: #f3f4f6; color: #374151; }
+</style>
+<script>
+  let currentStep = 1;
+  function showStep(n) {
+    document.querySelectorAll('.formbold-form-step').forEach((el, i) => el.classList.toggle('active', i === n - 1));
+    document.querySelectorAll('.formbold-step-circle').forEach((el, i) => el.classList.toggle('active', i === n - 1));
+  }
+  function nextStep(n) { if (n < 5) { currentStep = n + 1; showStep(currentStep); } }
+  function prevStep(n) { if (n > 1) { currentStep = n - 1; showStep(currentStep); } }
+  showStep(1);
+  function abrirObservacion() { document.getElementById("modalObservacion").style.display = "flex"; }
+  function cerrarObservacion() { document.getElementById("modalObservacion").style.display = "none"; }
+</script>
+
+</body>
+</html>

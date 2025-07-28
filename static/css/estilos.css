@@ -89,6 +89,33 @@ p {
   z-index: 10;
 }
 
+.fila-botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.opcion {
+  text-align: center;
+}
+
+.icono-opcion {
+  width: 60px;
+  height: auto;
+}
+
+.texto-opcion {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  background: #243c5a;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
 
 /*.decoracion-inferior {
   position: absolute;

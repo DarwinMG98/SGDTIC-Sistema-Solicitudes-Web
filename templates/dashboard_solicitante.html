@@ -28,26 +28,32 @@
     <h3 class="subtitulo-dashboard">Escoja su solicitud que desea:</h3>
   </div>
 
-    <div class="opciones-dashboard">
-      <div class="opcion">
-        <a href="/crear_solicitud?tipo=crear">
-          <img src="{{ url_for('static', filename='img/crear.png') }}" class="icono-opcion" />
-          <p class="texto-opcion">Crear Servidor</p>
-        </a>
-      </div>
-      <div class="opcion">
-        <a href="/crear_eliminacion?tipo=eliminar">
-          <img src="{{ url_for('static', filename='img/eliminar.png') }}" class="icono-opcion" />
-          <p class="texto-opcion">Eliminar Servidor</p>
-        </a>
-      </div>
-      <div class="opcion">
-        <a href="/historial_solicitante">
-          <img src="{{ url_for('static', filename='img/historial.png') }}" class="icono-opcion" />
-          <p class="texto-opcion">Historial de Solicitudes</p>
-        </a>
-      </div>
+  <div class="fila-botones">
+    <div class="opcion">
+      <a href="{{ url_for('crear_solicitud') }}">
+        <img src="{{ url_for('static', filename='img/crear.png') }}" class="icono-opcion" />
+        <p class="texto-opcion">Crear Servidor</p>
+      </a>
     </div>
+    <div class="opcion">
+      <a href="{{ url_for('crear_eliminacion') }}?tipo=eliminar">
+        <img src="{{ url_for('static', filename='img/eliminar.png') }}" class="icono-opcion" />
+        <p class="texto-opcion">Eliminar Servidor</p>
+      </a>
+    </div>
+    <div class="opcion">
+      <a href="{{ url_for('crear_recurso_compartido') }}">
+        <img src="{{ url_for('static', filename='img/recursos.png') }}" class="icono-opcion" />
+        <p class="texto-opcion">Recursos Compartidos</p>
+      </a>
+    </div>
+    <div class="opcion">
+      <a href="{{ url_for('historial') }}">
+        <img src="{{ url_for('static', filename='img/historial.png') }}" class="icono-opcion" />
+        <p class="texto-opcion">Historial de Solicitudes</p>
+      </a>
+    </div>
+  </div>
   </div>
 
   <a href="{{ url_for('inicio') }}">
