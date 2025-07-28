@@ -148,13 +148,13 @@ LOCK TABLES `solicitantes` WRITE;
 /*!40000 ALTER TABLE `solicitantes` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `solicitantes` VALUES
-(1,'Juan','P├®rez','juan.perez@example.com'),
+(1,'Juan','P?????rez','juan.perez@example.com'),
 (2,'Darwin','Guachamin','darwinmario98_@hotmail.com'),
 (3,'Darwin','Guachamin','juan.perez@example.com'),
 (4,'Daniela','Moran','daniela.moran@quito.gob.ec'),
 (5,'Byron','Carpio','byron.carpio@quito.gob.ec'),
 (6,'alexandra ','paullan','alexandra.paullan@quito.gob.ec'),
-(7,'Alfredo','Muñoz','alfredom@hotmail.com');
+(7,'Alfredo','Mu??oz','alfredom@hotmail.com');
 /*!40000 ALTER TABLE `solicitantes` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -218,19 +218,19 @@ LOCK TABLES `solicitud_detalle` WRITE;
 /*!40000 ALTER TABLE `solicitud_detalle` DISABLE KEYS */;
 set autocommit=0;
 INSERT INTO `solicitud_detalle` VALUES
-(10,24,'2025-06-16','Darwin Guachamin','Pasante','darwinmario98_@hotmail.com','0984083414','si aplica','Correo institucional','nombre','crear servidor','Producci├│n','Windows Server','2020',2,2,2,2,'2 a├▒os','crear servidor','todos los pasantes','Darwin Guachamin','Pasantes','darwin98@gmail.com','Ninguna','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(11,25,'2025-06-16','Juan Perez','Pasante','juanperez@hotmail.com','0984083414','no ','Correo institucional','nombre','ascjnekjnfw','Producci├│n','Windows Server','2020',1,1,1,1,'2 a├▒os','asfcewqvg','acwqvqwa','qvcqawvf','qawvqawv','qwvqawv','qwvqwv','Juan Perez','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(12,27,'2025-06-17','Darwin Guachamin','Pasante','darwinmario98@gmail.com','0984083414','no','','','','','windows','',NULL,NULL,NULL,NULL,'','','','','','','','Darwin Guachamin','Pasante','','','asdwaq','178.255.25','Producci├│n','2025-06-17','ascqweagw','respaldo, no_requerido','migracion, obsolescencia',''),
-(13,28,'2025-06-17','Darwin Guachamin','Pasante','darwin98@gmal.comi','0984083414','no','Correo institucional','asfasf','asfasf','Producci├│n','Windows Server','2020',3,2,2,2,'2 a├▒os ','acwevfwesavf','cqwcq','qcwqwc','qcqw','qcwqw','cqwwqc','darwin guachamin','pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(14,29,'2025-06-17','Juan Perez','Pasante','darwinmario98_@hotmail.com','0984083414','no','','','','','Windows','',NULL,NULL,NULL,NULL,'','','','','','','','Juan Perez','Pasante','','','asf','172.258.26','Producci├│n, Desarrollo','2025-06-17','fvqawegwg','respaldo, no_requerido','migracion, obsolescencia',''),
-(15,30,'2025-06-17','Darwin Guachamin','Pasante','darwinmario98_@hotmail.com','0984083414','no','Correo institucional, Anteproyecto aprobado','asdasd','asdas','Producci├│n, Desarrollo','Linux','2020',2,2,2,2,'2 a├▒os','sdfdf','dfsdf','sdfsd','sdfsd','sdfsd','sdfsd','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(16,33,'2025-06-17','Darwin Guachamin','Pasante','darwinmario98_@hotmail.com','0984083414','no','Correo institucional, Anteproyecto aprobado','frdgfd','dfgdf','Producci├│n, Desarrollo','Windows Server','2020',2,2,2,2,'2 a├▒os','ascascdas','asdcasc','ascdas','casc','ascas','ascasc','darwin guachamin','pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(17,38,'2025-06-18','darwin guachamin','pasante','darwinmario98_@hotmail.com','0984083414','no',NULL,NULL,NULL,NULL,'windows',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ewfwefewf','darwin guachamin','pasante','','','scqwc','172.25.254','Producci├│n','2025-06-18','ascfdqwf','respaldo, no_requerido','migracion, falta_uso',''),
-(18,41,'2025-06-18','Daniela','infraestrcu','danielamoran@quito.fov.das','0997985834','noi','Correo institucional','ddfaf','asdasdas','Producci├│n','Windows Server','2019',3,100,100,100,'12 ms','faife','centro de computo','Daniela moran','inafrestructura','daniela.moran@quito.gob.ec','ffdfsdf','danielamoran','operadoe it','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(19,49,'2025-07-01','Juan Godoy','Pasante','juangodoy@hotmail.com','0987456352','no',NULL,NULL,NULL,NULL,'Windows',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'wegwegwe','Juan Godoy','Pasante','','','asfas','172.258.235','Producción','2025-07-01','fwegwgwe','respaldo, no_requerido','migracion, obsolescencia',''),
-(20,50,'2025-07-01','Pedro Sanchez','Pasante','Pedrosanchez@hotmail.com','0987458745','no','Correo institucional, Anteproyecto aprobado','SGEGS','HRHJEWW','Producción, Desarrollo','Windows Server','2020',50,505,50,50,'2 AÑOS','AEGEWHJHW','WEGWE','WEHWHE','WEHWE','0984857532','QWEHWEHWH','Pedro Snachez','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(21,51,'2025-07-03','darwin guachamin','pasante','darwinmario98@gmail.com','0984083414','no','Correo institucional','fqwfh','wergweg','Producción, Desarrollo','Windows Server','2020',50,50,50,50,'4 años','gwegweg','wegwewe','hwerhweh','wegwegw','whwrhw','whgwewe','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(22,54,'2025-07-09','Darwin Guachamin','Pasante','darwinmario98@gmail.com','0984083414','si','','','','','Windows','',NULL,NULL,NULL,NULL,'','','','','','','Eliminacion del servidor','Darwin Guachamin','Pasante','','','dar','172.35.26','Producción, Desarrollo','2025-07-09','eliminacion','respaldo, no_requerido','migracion, obsolescencia',''),
+(10,24,'2025-06-16','Darwin Guachamin','Pasante','darwinmario98_@hotmail.com','0984083414','si aplica','Correo institucional','nombre','crear servidor','Producci??????n','Windows Server','2020',2,2,2,2,'2 a??????os','crear servidor','todos los pasantes','Darwin Guachamin','Pasantes','darwin98@gmail.com','Ninguna','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(11,25,'2025-06-16','Juan Perez','Pasante','juanperez@hotmail.com','0984083414','no ','Correo institucional','nombre','ascjnekjnfw','Producci??????n','Windows Server','2020',1,1,1,1,'2 a??????os','asfcewqvg','acwqvqwa','qvcqawvf','qawvqawv','qwvqawv','qwvqwv','Juan Perez','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(12,27,'2025-06-17','Darwin Guachamin','Pasante','darwinmario98@gmail.com','0984083414','no','','','','','windows','',NULL,NULL,NULL,NULL,'','','','','','','','Darwin Guachamin','Pasante','','','asdwaq','178.255.25','Producci??????n','2025-06-17','ascqweagw','respaldo, no_requerido','migracion, obsolescencia',''),
+(13,28,'2025-06-17','Darwin Guachamin','Pasante','darwin98@gmal.comi','0984083414','no','Correo institucional','asfasf','asfasf','Producci??????n','Windows Server','2020',3,2,2,2,'2 a??????os ','acwevfwesavf','cqwcq','qcwqwc','qcqw','qcwqw','cqwwqc','darwin guachamin','pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(14,29,'2025-06-17','Juan Perez','Pasante','darwinmario98_@hotmail.com','0984083414','no','','','','','Windows','',NULL,NULL,NULL,NULL,'','','','','','','','Juan Perez','Pasante','','','asf','172.258.26','Producci??????n, Desarrollo','2025-06-17','fvqawegwg','respaldo, no_requerido','migracion, obsolescencia',''),
+(15,30,'2025-06-17','Darwin Guachamin','Pasante','darwinmario98_@hotmail.com','0984083414','no','Correo institucional, Anteproyecto aprobado','asdasd','asdas','Producci??????n, Desarrollo','Linux','2020',2,2,2,2,'2 a??????os','sdfdf','dfsdf','sdfsd','sdfsd','sdfsd','sdfsd','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(16,33,'2025-06-17','Darwin Guachamin','Pasante','darwinmario98_@hotmail.com','0984083414','no','Correo institucional, Anteproyecto aprobado','frdgfd','dfgdf','Producci??????n, Desarrollo','Windows Server','2020',2,2,2,2,'2 a??????os','ascascdas','asdcasc','ascdas','casc','ascas','ascasc','darwin guachamin','pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(17,38,'2025-06-18','darwin guachamin','pasante','darwinmario98_@hotmail.com','0984083414','no',NULL,NULL,NULL,NULL,'windows',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'ewfwefewf','darwin guachamin','pasante','','','scqwc','172.25.254','Producci??????n','2025-06-18','ascfdqwf','respaldo, no_requerido','migracion, falta_uso',''),
+(18,41,'2025-06-18','Daniela','infraestrcu','danielamoran@quito.fov.das','0997985834','noi','Correo institucional','ddfaf','asdasdas','Producci??????n','Windows Server','2019',3,100,100,100,'12 ms','faife','centro de computo','Daniela moran','inafrestructura','daniela.moran@quito.gob.ec','ffdfsdf','danielamoran','operadoe it','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(19,49,'2025-07-01','Juan Godoy','Pasante','juangodoy@hotmail.com','0987456352','no',NULL,NULL,NULL,NULL,'Windows',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'wegwegwe','Juan Godoy','Pasante','','','asfas','172.258.235','Producci??n','2025-07-01','fwegwgwe','respaldo, no_requerido','migracion, obsolescencia',''),
+(20,50,'2025-07-01','Pedro Sanchez','Pasante','Pedrosanchez@hotmail.com','0987458745','no','Correo institucional, Anteproyecto aprobado','SGEGS','HRHJEWW','Producci??n, Desarrollo','Windows Server','2020',50,505,50,50,'2 A??OS','AEGEWHJHW','WEGWE','WEHWHE','WEHWE','0984857532','QWEHWEHWH','Pedro Snachez','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(21,51,'2025-07-03','darwin guachamin','pasante','darwinmario98@gmail.com','0984083414','no','Correo institucional','fqwfh','wergweg','Producci??n, Desarrollo','Windows Server','2020',50,50,50,50,'4 a??os','gwegweg','wegwewe','hwerhweh','wegwegw','whwrhw','whgwewe','Darwin Guachamin','Pasante','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(22,54,'2025-07-09','Darwin Guachamin','Pasante','darwinmario98@gmail.com','0984083414','si','','','','','Windows','',NULL,NULL,NULL,NULL,'','','','','','','Eliminacion del servidor','Darwin Guachamin','Pasante','','','dar','172.35.26','Producci??n, Desarrollo','2025-07-09','eliminacion','respaldo, no_requerido','migracion, obsolescencia',''),
 (23,55,'2025-07-09','','','','','','','','','','','',NULL,NULL,NULL,NULL,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (24,56,'2025-07-09','','','','','','','','','','','',NULL,NULL,NULL,NULL,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (25,58,'2025-07-09','','','','','','','','','','','',NULL,NULL,NULL,NULL,'','','','','','','','','','','',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
@@ -281,8 +281,8 @@ INSERT INTO `solicitudes` VALUES
 (51,6,'crear','2025-07-03 12:23:04','aprobado','Falta documentos',16),
 (54,6,'eliminar','2025-07-09 11:26:50','pendiente','falta observaciones',3),
 (55,15,'crear','2025-07-09 12:11:15','pendiente','',NULL),
-(56,15,'crear','2025-07-09 12:11:22','pendiente','',NULL),
-(58,15,'crear','2025-07-09 12:11:33','pendiente','falta datos',3);
+(56,15,'crear','2025-07-09 12:11:22','aprobado','',15),
+(58,15,'crear','2025-07-09 12:11:33','aprobado','falta datos',3);
 /*!40000 ALTER TABLE `solicitudes` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
@@ -299,7 +299,7 @@ CREATE TABLE `usuarios` (
   `nombre` varchar(100) DEFAULT NULL,
   `apellido` varchar(100) DEFAULT NULL,
   `correo` varchar(100) DEFAULT NULL,
-  `contraseña` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `rol` enum('admin','solicitante') NOT NULL,
   `activo` tinyint(1) DEFAULT 1,
   PRIMARY KEY (`id`),
@@ -321,7 +321,7 @@ INSERT INTO `usuarios` VALUES
 (4,'Juan ','Gody','juangodoy@hotmail.com',NULL,'solicitante',1),
 (5,'Pedro','Sanchez','pedrosanchez_@hotmail.com',NULL,'solicitante',1),
 (6,'Darwin','Guachamin','darwinmario98_@hotmail.com',NULL,'solicitante',1),
-(7,'Juan','Pérez','juan.perez@example.com',NULL,'solicitante',1),
+(7,'Juan','P??rez','juan.perez@example.com',NULL,'solicitante',1),
 (8,'Daniela','Moran','daniela.moran@quito.gob.ec',NULL,'solicitante',1),
 (9,'Byron','Carpio','carpio.byron89@gmail.com',NULL,'solicitante',1),
 (10,'Byron','Carpio','carpio.byron89@quito.gob.ec',NULL,'solicitante',1),
@@ -329,7 +329,7 @@ INSERT INTO `usuarios` VALUES
 (12,'daniel','alvarez','daniel98@hotmail.com',NULL,'solicitante',1),
 (13,'Pedro','Benitez','pedrobenites@hotmail.com',NULL,'solicitante',1),
 (14,'Alan ','Brito','alanbrito@hotmail.com',NULL,'solicitante',1),
-(15,'Darwin','Guachamin','darwinmario98@gmail.com','darwin98.','admin',0),
+(15,'Darwin','Guachamin','darwinmario98@gmail.com','darwin98.','admin',1),
 (16,'Byron','Carpio','byron.carpio@quito.gob.ec','12345','admin',1),
 (17,'pedro','almeida','pedroalmeida_@hotmail.com','pedro1234','admin',1);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
@@ -345,4 +345,4 @@ commit;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-07-09 14:54:15
+-- Dump completed on 2025-07-28 13:48:21
