@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Solicitud de Creación de Servidor Virtual</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 13px; color: #222; margin: 30px 40px; }
+        h1, h2 { text-align: center; color: #333; margin: 4px 0; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; vertical-align: top; }
+        th { background: #f5f6fa; text-align: left; }
+        .section-title { background: #e5e7ef; font-weight: bold; padding: 6px; }
+        .firma-box { margin-top: 30px; }
+        .logo-muni { width: 110px; position: absolute; top: 18px; left: 18px; }
+        .foot { font-size: 10px; color: #888; margin-top: 35px; text-align: right; }
+        .center { text-align: center; }
+    </style>
+</head>
+<body>
+    <!-- Logo institucional -->
+    <img src="{{ url_for('static', filename='img/logo_quito.png') }}" class="logo-muni">
+
+    <h1>FORMULARIO DE SOLICITUD DE CREACIÓN DE SERVIDOR VIRTUAL</h1>
+    <h2>DIRECCIÓN METROPOLITANA DE INFRAESTRUCTURA Y SEGURIDAD DE TIC</h2>
+    <br>
+
+    <!-- Información general -->
+    <table>
+        <tr>
+            <th>Código:</th>
+            <td>{{ solicitud.codigo or '' }}</td>
+            <th>Fecha de la Solicitud:</th>
+            <td>{{ solicitud.fecha }}</td>
+        </tr>
+        <tr>
+            <th>Unidad/Dirección solicitante</th>
+            <td>{{ solicitud.unidad }}</td>
+            <th>Nombre sugerido del servidor</th>
+            <td>{{ solicitud.nombre_servidor or '' }}</td>
+        </tr>
+    </table>
+
+    <!-- 1. Información del solicitante -->
+    <table>
+        <tr><th colspan="4" class="section-title">1. Información del Solicitante</th></tr>
+        <tr>
+            <th>Nombre completo</th>
+            <td>{{ solicitud.nombre_completo }}</td>
+            <th>Correo institucional</th>
+            <td>{{ solicitud.correo }}</td>
+        </tr>
+        <tr>
+            <th>Teléfono de contacto</th>
+            <td>{{ solicitud.telefono }}</td>
+            <th>Responsable técnico</th>
+            <td>{{ solicitud.responsable_tecnico }}</td>
+        </tr>
+    </table>
+
+    <!-- 2. Justificación -->
+    <table>
+        <tr><th colspan="4" class="section-title">2. Justificación y Documentación de Respaldo</th></tr>
+        <tr>
+            <th>Origen de la solicitud</th>
+            <td colspan="3">{{ solicitud.origen }}</td>
+        </tr>
+        <tr>
+            <th>Número o nombre del anteproyecto</th>
+            <td colspan="3">{{ solicitud.anteproyecto }}</td>
+        </tr>
+        <tr>
+            <th>Motivo de la solicitud</th>
+            <td colspan="3">{{ solicitud.motivo }}</td>
+        </tr>
+    </table>
+
+    <!-- 3. Especificaciones Técnicas -->
+    <table>
+        <tr><th colspan="4" class="section-title">3. Especificaciones Técnicas</th></tr>
+        <tr>
+            <th>Tipo de servidor</th>
+            <td>{{ solicitud.tipo_servidor }}</td>
+            <th>Sistema operativo</th>
+            <td>
+                {{ solicitud.sistema_operativo }}
+                {% if solicitud.version_windows %} {{ solicitud.version_windows }}{% endif %}
+                {% if solicitud.version_linux %} {{ solicitud.version_linux }}{% endif %}
+                {% if solicitud.so_otro %} {{ solicitud.so_otro }}{% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>vCPU</th>
+            <td>{{ solicitud.vcpu }}</td>
+            <th>RAM (GB)</th>
+            <td>{{ solicitud.ram }}</td>
+        </tr>
+        <tr>
+            <th>Disco de sistema (GB)</th>
+            <td>{{ solicitud.disco_sistema }}</td>
+            <th>Disco de datos (GB)</th>
+            <td>{{ solicitud.disco_datos }}</td>
+        </tr>
+        <tr>
+            <th>Vida útil (meses/años)</th>
+            <td>{{ solicitud.vida_util }}</td>
+            <th>Justificación de recursos</th>
+            <td>{{ solicitud.justificacion_recursos }}</td>
+        </tr>
+    </table>
+
+    <!-- 4. Accesos -->
+    <table>
+        <tr><th colspan="4" class="section-title">4. Accesos y Responsables</th></tr>
+        <tr>
+            <th>Grupos o usuarios que accederán</th>
+            <td>{{ solicitud.accesos }}</td>
+            <th>Responsable de la aplicación</th>
+            <td>{{ solicitud.responsable_aplicacion }}</td>
+        </tr>
+        <tr>
+            <th>Unidad responsable</th>
+            <td>{{ solicitud.unidad_responsable }}</td>
+            <th>Contacto de soporte</th>
+            <td>{{ solicitud.contacto_soporte }}</td>
+        </tr>
+        <tr>
+            <th>Observaciones adicionales</th>
+            <td colspan="3">{{ solicitud.observaciones }}</td>
+        </tr>
+    </table>
+
+    <!-- 5. Firmas -->
+    <table class="firma-box">
+        <tr><th colspan="2" class="section-title">5. Firmas de responsabilidad</th></tr>
+        <tr>
+            <th>Funcionario Municipal Solicitante</th>
+            <th>Jefe Inmediato</th>
+        </tr>
+        <tr>
+            <td>{{ solicitud.firma_solicitante }}<br>{{ solicitud.cargo_solicitante }}</td>
+            <td>{{ solicitud.firma_jefe }}<br>{{ solicitud.cargo_jefe }}</td>
+        </tr>
+    </table>
+
+    <!-- Aprobación -->
+    <!-- Sección de aprobación -->
+    <table>
+    <tr><th colspan="2" class="section-title">6. Aprobación Unidad de Infraestructura</th></tr>
+    <tr>
+        <th>Jefe de Unidad de Infraestructura</th>
+        <th>Administrador de Infraestructura</th>
+    </tr>
+    <tr>
+        <td>{{ jefe_unidad.nombre|default('') }}</td>
+        <td>{{ aprobador.nombre|default('') }}</td>
+    </tr>
+    <tr>
+        <td>{{ jefe_unidad.cargo|default('') }}</td>
+        <td>{{ aprobador.cargo|default('') }}</td>
+    </tr>
+    </table>
+
+    <div class="foot">
+        Documento generado automáticamente por el sistema | Fecha de generación: {{ fecha_actual }}
+    </div>
+</body>
+</html>

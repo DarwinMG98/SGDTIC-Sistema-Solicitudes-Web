@@ -65,7 +65,7 @@
         Observación del administrador: {{ observacion }}
       </div>
     {% endif %}
-    <form id="editarServidorForm" method="POST" action="" enctype="multipart/form-data" autocomplete="off">
+    <form id="editarServidorForm" method="POST" action="{{ url_for('editar_solicitud', id=solicitud.id) }}" enctype="multipart/form-data" autocomplete="off">
     <div class="formbold-step-menu">
       <div class="step-indicator">
         <span class="formbold-step-circle active">1</span>

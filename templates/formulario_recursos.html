@@ -63,23 +63,29 @@
 
       <!-- Paso 3 -->
       <div class="formbold-form-step" id="step-3">
-        <h2>Uso Estimado y Clasificación</h2>
-        <label>Tipo de Información a Almacenar</label><input type="text" name="tipo_info" class="formbold-form-input" required>
-        <label>Volumen Estimado (GB)</label><input type="number" name="volumen" class="formbold-form-input" required>
-        <label>Tiempo Estimado de Uso (meses/años)</label><input type="text" name="tiempo_uso" class="formbold-form-input" required>
+        <h2>Uso Estimado y Clasificación</h2><br>
+
+        <label class="formbold-form-label">Tipo de Información a Almacenar</label>
+        <input type="text" name="tipo_informacion" class="formbold-form-input" required>
+
+        <label class="formbold-form-label">Volumen Estimado (GB)</label>
+        <input type="text" name="volumen" class="formbold-form-input" required>
+
+        <label class="formbold-form-label">Tiempo Estimado de Uso (meses/años)</label>
+        <input type="text" name="tiempo_uso" class="formbold-form-input" required>
+
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(3)">← Anterior</button>
           <button type="button" class="formbold-btn" onclick="nextStep(3)">Siguiente →</button>
         </div>
       </div>
-
       <!-- Paso 4 -->
       <div class="formbold-form-step" id="step-4">
         <h2>Firmas y Envío</h2>
         <label>Nombre del Funcionario Solicitante</label><input type="text" name="firma_solicitante" class="formbold-form-input" required>
         <label>Cargo</label><input type="text" name="cargo_solicitante" class="formbold-form-input" required>
-        <label>Nombre del Jefe Inmediato</label><input type="text" name="firma_jefe" class="formbold-form-input" required>
-        <label>Cargo del Jefe</label><input type="text" name="cargo_jefe" class="formbold-form-input" required>
+        <label>Nombre del Jefe Inmediato</label><input type="text" name="firma_jefe" class="formbold-form-input" readonly>
+        <label>Cargo del Jefe</label><input type="text" name="cargo_jefe" class="formbold-form-input" readonly>
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-secondary" onclick="prevStep(4)">← Anterior</button>
           <button type="submit" class="formbold-btn">Enviar Solicitud</button>
@@ -90,19 +96,35 @@
 </div>
 
 <script>
-let currentStep = 1;
-function showStep(n) {
-  document.querySelectorAll('.formbold-form-step').forEach((el, i) => {
-    el.classList.toggle('active', i === n - 1);
+  const steps = Array.from(document.querySelectorAll('.formbold-form-step'));
+  const form  = document.querySelector('form');
+  let currentStep = 1;
+
+  function setStep(n) {
+    currentStep = n;
+    steps.forEach((step, i) => {
+      const active = (i === n - 1);
+      step.classList.toggle('active', active);
+      step.querySelectorAll('input, select, textarea').forEach(el => {
+        el.disabled = !active; // no valida lo oculto
+      });
+    });
+    document.querySelectorAll('.formbold-step-circle').forEach((el, i) => {
+      el.classList.toggle('active', i === n - 1);
+    });
+  }
+  function nextStep(n) { if (n < steps.length) setStep(n + 1); }
+  function prevStep(n) { if (n > 1)           setStep(n - 1); }
+
+  form.addEventListener('submit', () => {
+    steps.forEach(step => step
+      .querySelectorAll('input, select, textarea')
+      .forEach(el => el.disabled = false));
   });
-  document.querySelectorAll('.formbold-step-circle').forEach((el, i) => {
-    el.classList.toggle('active', i === n - 1);
-  });
-}
-function nextStep(n) { if (n < 4) { currentStep = n + 1; showStep(currentStep); }}
-function prevStep(n) { if (n > 1) { currentStep = n - 1; showStep(currentStep); }}
-showStep(1);
+
+  setStep(1);
 </script>
+
 
 <a href="{{ url_for('dashboard_solicitante') }}">
   <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">

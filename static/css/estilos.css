@@ -26,7 +26,8 @@
     font-size: 16px;
 }
 
-body {
+/* El centrado global NO aplica al dashboard */
+body:not(.layout-app) {
   margin: 0;
   padding: 0;
   height: 100vh;
@@ -37,6 +38,7 @@ body {
   justify-content: center;
   align-items: center;
 }
+
 
 .contenedor {
   display: flex;
@@ -221,6 +223,14 @@ form button {
   position: absolute;
   bottom: 30px;
   left: 30px;
+}
+
+body.layout-app .volver{
+  position: fixed !important;   /* SIEMPRE pegado a la ventana */
+  left: 22px;
+  bottom: 22px;
+  width: 54px;                  /* ajusta si quieres 50px */
+  z-index: 1200;                /* por encima del card */
 }
 
 /* Dashboard Admin*/
@@ -693,6 +703,231 @@ input, textarea, select {
   .modal-observacion button:hover {
     background: #2e3968;
   }
+
+  /* ====== FIX ESPECÍFICO PARA dashboard_admin ====== */
+  body.layout-app{
+    /* Cancela el centrado global del body que rompe el layout */
+    display: block !important;
+    align-items: unset !important;
+    justify-content: unset !important;
+    height: auto !important;
+
+    margin: 0;
+    padding-top: 88px;                 /* deja espacio para los iconos de arriba */
+    min-height: 100vh;
+    background-color: #38579A;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Que el card del dashboard use el ancho correcto y NO tenga scroll interno */
+  body.layout-app .bloque-tabla-admin{
+    max-width: 1000px !important;
+    width: 96% !important;
+    margin: 0 auto 40px !important;
+    padding: 22px !important;
+    overflow: visible !important;
+  }
+
+  /* DataTables: apilar “Mostrar” y “Buscar” cuando no quepa, y ajustar el input */
+  body.layout-app .dataTables_wrapper .dataTables_filter input{
+    width: clamp(180px, 24vw, 340px);
+  }
+
+  /* ==== FIX FINAL: SIN SCROLL INTERNO EN EL CARD DEL DASHBOARD ==== */
+  body.layout-app .bloque-tabla-admin{
+    overflow: visible !important;      /* el card nunca genera su propio scroll */
+    max-height: none !important;
+  }
+
+  body.layout-app .tabla-responsive-admin{
+    overflow-x: hidden !important;      /* mantenemos sin scroll horizontal */
+    overflow-y: visible !important;     /* y anulamos cualquier scroll vertical */
+  }
+
+  /* Cualquier wrapper que DataTables pueda crear: sin altura fija ni scroll */
+  body.layout-app #tablaSolicitudes_wrapper{
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scroll,
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scrollBody{
+    overflow: visible !important;       /* ojo: sin -y para asegurarnos */
+    height: auto !important;
+    max-height: none !important;
+  }
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scrollBody::-webkit-scrollbar{
+    display:none !important;
+  }
+
+  /* El input de búsqueda con ancho “sano” para que no choque visualmente */
+  body.layout-app .dataTables_wrapper .dataTables_filter input{
+    width: clamp(220px, 26vw, 360px);
+  }
+
+
+  @media (max-width:1350px){
+    body.layout-app .dataTables_wrapper .dataTables_length,
+    body.layout-app .dataTables_wrapper .dataTables_filter{
+      float: none !important;
+      display: block !important;
+      width: 100% !important;
+    }
+    body.layout-app .dataTables_wrapper .dataTables_filter{
+      text-align: left; 
+      margin-top: 8px;
+    }
+    body.layout-app .dataTables_wrapper .dataTables_filter input{
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+
+  /* Forzar SIN scroll vertical interno de DataTables */
+  body.layout-app #tablaSolicitudes_wrapper,
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scroll,
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scrollBody{
+    overflow-y: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scrollBody::-webkit-scrollbar{
+    display: none !important;
+  }
+
+  /* Neutraliza estilos globales de tablas solo dentro del dashboard */
+  body.layout-app table.tabla-admin th,
+  body.layout-app table.tabla-admin td{
+    text-align: center;
+  }
+ 
+
+    /* ===================== Dashboard Admin (layout-app) ===================== */
+  body.layout-app{
+    /* Anula el centrado global y deja espacio para iconos superiores */
+    display:block!important; align-items:unset!important; justify-content:unset!important; height:auto!important;
+    margin:0; padding-top:88px; min-height:100vh;
+    background:#38579A; color:white; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Botón volver SIEMPRE fijo en esquina */
+  body.layout-app .volver{
+    position:fixed!important; left:22px; bottom:22px; width:54px; z-index:1200;
+  }
+
+  /* Card principal del dashboard */
+  body.layout-app .bloque-tabla-admin{
+    background:#e8edf6; border:4px solid #4058a2; border-radius:16px;
+    max-width:1000px!important; width:96%!important; margin:0 auto 40px!important;
+    padding:22px!important; box-shadow:0 6px 22px rgba(0,0,0,.12);
+    overflow:visible!important; max-height:none!important;
+  }
+
+  /* Sin scroll interno en el card ni en DataTables */
+  body.layout-app .tabla-responsive-admin{ width:100%; overflow-x:hidden!important; overflow-y:visible!important; }
+  body.layout-app #tablaSolicitudes_wrapper,
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scroll,
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scrollBody{
+    overflow:visible!important; height:auto!important; max-height:none!important;
+  }
+  body.layout-app #tablaSolicitudes_wrapper .dataTables_scrollBody::-webkit-scrollbar{ display:none!important; }
+
+  /* Buscador de DataTables con ancho sano */
+  body.layout-app .dataTables_wrapper .dataTables_filter input{ width:clamp(220px,26vw,360px); }
+
+
+/* ======= KILL-SCROLL TOTAL SOLO EN DASHBOARD ======= */
+body.layout-app{
+  padding-top: 88px; /* espacio para los iconos */
+  background: #38579A;
+}
+
+/* Botón volver fijo */
+body.layout-app .volver{
+  position: fixed !important;
+  left: 22px; bottom: 22px; width: 54px; z-index: 1200;
+}
+
+/* Card sin scroll propio */
+body.layout-app .bloque-tabla-admin{
+  overflow: visible !important; max-height: none !important;
+  background: #e8edf6; border: 4px solid #4058a2; border-radius: 16px;
+  max-width: 1000px; width: 96%; margin: 0 auto 40px; padding: 22px;
+}
+
+/* Contenedor directo de la tabla */
+body.layout-app .tabla-responsive-admin{
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+}
+
+/* DataTables wrapper y posibles wrappers de scroll */
+body.layout-app #tablaSolicitudes_wrapper,
+body.layout-app #tablaSolicitudes_wrapper .dataTables_scroll,
+body.layout-app #tablaSolicitudes_wrapper .dataTables_scrollBody{
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Si DataTables mete estilos inline, los pisamos igual */
+body.layout-app #tablaSolicitudes_wrapper [style*="overflow"]{ overflow: visible !important; }
+body.layout-app #tablaSolicitudes_wrapper [style*="height"]  { height: auto !important; max-height: none !important; }
+
+/* (Opcional) Oculta cualquier scrollbar visual dentro del card por si quedara */
+body.layout-app .bloque-tabla-admin::-webkit-scrollbar{ width:0 !important; height:0 !important; }
+body.layout-app .tabla-responsive-admin::-webkit-scrollbar{ width:0 !important; height:0 !important; }
+
+
+/* Centrar el card del dashboard cuando el contenido es corto */
+body.layout-app .centro-dashboard{
+  /* 88px es tu padding-top para los iconos superiores */
+  min-height: calc(100vh - 88px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* centra horizontal */
+  justify-content: center; /* centra vertical   */
+  padding: 0 16px;
+}
+
+/* Cuando hay muchas filas, que respire un poco arriba */
+@media (max-height: 820px){
+  body.layout-app .centro-dashboard{
+    justify-content: flex-start;
+    padding-top: 8px;
+  }
+}
+
+
+/* Controles DataTables: ancho del buscador + apilado en pantallas medianas */
+body.layout-app .dataTables_wrapper .dataTables_filter input{ width: clamp(220px, 26vw, 360px); }
+@media (max-width:1350px){
+  body.layout-app .dataTables_wrapper .dataTables_length,
+  body.layout-app .dataTables_wrapper .dataTables_filter{
+    float:none !important; display:block !important; width:100% !important;
+  }
+  body.layout-app .dataTables_wrapper .dataTables_filter{ text-align:left; margin-top:8px; }
+  body.layout-app .dataTables_wrapper .dataTables_filter input{ width:100% !important; max-width:100% !important; }
+}
+
+
+/* Cuando no hay ancho, apilar Mostrar/Buscar */
+@media (max-width:1350px){
+  body.layout-app .dataTables_wrapper .dataTables_length,
+  body.layout-app .dataTables_wrapper .dataTables_filter{
+    float:none!important; display:block!important; width:100%!important;
+  }
+  body.layout-app .dataTables_wrapper .dataTables_filter{ text-align:left; margin-top:8px; }
+  body.layout-app .dataTables_wrapper .dataTables_filter input{ width:100%!important; max-width:100%!important; }
+}
+
+/* (Opcional) Modo compacto en pantallas bajas (ej. 1366x768) */
+@media (max-height:800px){
+  body.layout-app{ padding-top:64px; }
+  body.layout-app .bloque-tabla-admin{ padding:14px 18px 10px; }
+}
+
 
 
 /* 7. Responsive para todas las resoluciones */

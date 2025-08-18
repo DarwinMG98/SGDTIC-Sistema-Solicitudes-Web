@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>PDF Recursos Compartidos</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm 18mm 14mm; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color:#222; }
+  h1 { font-size: 18px; margin:0 0 4px; text-transform:uppercase; }
+  h2 { font-size: 13px; margin:0; }
+  table { width:100%; border-collapse:collapse; table-layout:fixed; margin:10px 0 16px; }
+  th,td { border:1px solid #cfcfd1; padding:6px 8px; vertical-align:top; word-wrap:break-word; }
+  th { background:#f4f6fa; text-align:left; }
+  .section-title th { background:#e7eaf3; font-weight:700; }
+  .header td { border:none; }
+  .logo-cell,.spacer-cell { width:120px; }
+  .logo { width:100px; display:block; }
+  .title-cell { text-align:center; }
+</style>
+</head>
+<body>
+
+<!-- Header centrado con logo -->
+<table class="header">
+  <tr>
+    <td class="logo-cell">
+      <img src="{{ url_for('static', filename='img/logo_quito.png') }}" class="logo">
+    </td>
+    <td class="title-cell">
+      <h1>Formulario de solicitud de creación de recursos compartidos</h1>
+      <h2>Dirección Metropolitana de Infraestructura y Seguridad de TIC</h2>
+    </td>
+    <td class="spacer-cell">&nbsp;</td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th class="w-25">Fecha de la Solicitud</th>
+    <td>{{ detalle.fecha }}</td>
+    <th class="w-25">Código</th>
+    <td>{{ solicitud.id }}</td>
+  </tr>
+</table>
+
+<table class="section-title"><tr><th>1. Información del Solicitante</th></tr></table>
+<table>
+  <tr><th>Nombre del Solicitante</th><td>{{ detalle.nombre_completo }}</td>
+      <th>Dependencia/Área</th><td>{{ detalle.unidad }}</td></tr>
+  <tr><th>Cargo o Puesto</th><td>{{ detalle.cargo }}</td>
+      <th>Correo</th><td>{{ detalle.correo }}</td></tr>
+  <tr><th>Teléfono</th><td>{{ detalle.telefono }}</td>
+      <th></th><td></td></tr>
+</table>
+
+<table class="section-title"><tr><th>2. Detalles del Recurso Solicitado</th></tr></table>
+<table>
+  <tr><th>Nombre sugerido del recurso</th><td colspan="3">{{ detalle.nombre_recurso }}</td></tr>
+  <tr><th>Ubicación en la estructura</th><td colspan="3">{{ detalle.ubicacion }}</td></tr>
+  <tr><th>Propósito o función</th><td colspan="3">{{ detalle.proposito }}</td></tr>
+  <tr><th>Grupos o usuarios con acceso</th><td colspan="3">{{ detalle.usuarios_acceso }}</td></tr>
+  <tr><th>Nivel de permisos</th><td colspan="3">{{ detalle.permisos }}</td></tr>
+</table>
+
+<table class="section-title"><tr><th>3. Uso estimado y clasificación</th></tr></table>
+<table>
+  <tr><th>Tipo de información</th><td>{{ detalle.tipo_informacion }}</td>
+      <th>Volumen (GB)</th><td>{{ detalle.volumen }}</td></tr>
+  <tr><th>Tiempo estimado de uso</th><td colspan="3">{{ detalle.tiempo_uso }}</td></tr>
+</table>
+
+<table class="section-title"><tr><th>4. Firmas</th></tr></table>
+<table>
+  <tr><th>Funcionario Municipal Responsable del Área</th>
+      <th>Administrador de Infraestructura</th></tr>
+  <tr><td style="height:60px; vertical-align:bottom;">{{ detalle.firma_solicitante }}<br>{{ detalle.cargo_solicitante }}</td>
+      <td style="vertical-align:bottom;">{{ jefe_unidad.nombre or '' }}<br>{{ jefe_unidad.cargo or '' }}</td></tr>
+</table>
+
+</body>
+</html>

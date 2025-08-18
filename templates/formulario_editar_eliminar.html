@@ -48,7 +48,7 @@
       </div>
     {% endif %}
 
-    <form id="editarEliminarForm" method="POST" action="" autocomplete="off">
+    <form id="editarEliminarForm" method="POST" action="{{ url_for('editar_solicitud', id=solicitud.id) }}" autocomplete="off">
       <!-- BARRA DE PASOS IGUAL AL DE CREAR -->
       <div class="formbold-step-menu">
         <div class="step-indicator">
@@ -214,11 +214,11 @@
         <div class="formbold-input-flex">
           <div>
             <label class="formbold-form-label">Nombre del Jefe Inmediato</label>
-            <input type="text" name="firma_jefe" class="formbold-form-input" value="{{ detalle.firma_jefe|default('') }}">
+            <input type="text" name="firma_jefe" class="formbold-form-input" value="{{ detalle.firma_jefe|default('') }}" readonly>
           </div>
           <div>
             <label class="formbold-form-label">Cargo</label>
-            <input type="text" name="cargo_jefe" class="formbold-form-input" value="{{ detalle.cargo_jefe|default('') }}">
+            <input type="text" name="cargo_jefe" class="formbold-form-input" value="{{ detalle.cargo_jefe|default('') }}" readonly>
           </div>
         </div>
         <div class="formbold-btn-group">

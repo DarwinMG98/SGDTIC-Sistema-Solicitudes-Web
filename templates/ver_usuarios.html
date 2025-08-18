@@ -5,6 +5,7 @@
     <title>Lista de Usuarios</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
     <style>
       body { background: #38579A; min-height: 100vh; margin: 0; }
       .centrar-contenido {
@@ -80,6 +81,11 @@
     </style>
 </head>
 <body>
+
+<div class="bg-logo-superior">
+  <img src="{{ url_for('static', filename=logo_path) }}" class="decoracion-izquierda">
+</div>
+
   <div class="centrar-contenido">
     <div class="cuadro-usuarios">
       <h2 class="titulo-usuarios">Usuarios del Sistema</h2>

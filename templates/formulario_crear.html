@@ -153,11 +153,11 @@
         </div>
         <div class="formbold-form-section" style="margin-bottom: 1.2rem;">
           <label class="formbold-form-label">Adjuntar documentación de respaldo</label>
-          <input type="file" id="fileInput" name="documentos" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input" required>
+          <input type="file" id="fileInput" name="documentos" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.doc" class="formbold-form-input">
           <ul id="fileList" style="margin-top: 0.7rem;"></ul>
           <small>Máximo 5 MB por archivo.</small>
           
-          <input type="hidden" id="archivosHidden" name="archivosHidden"required>
+          <input type="hidden" id="archivosHidden" name="archivosHidden">
         </div>
         <div class="formbold-btn-group">
           <button type="button" class="formbold-btn formbold-btn-sec" style="float:left" onclick="prevStep(2)">← Anterior</button>
@@ -187,15 +187,15 @@
           </select>
           <div id="windowsVersion" style="display:none; margin-top:.7rem;">
             <label class="formbold-form-label">Versión (ej: 2022)</label>
-            <input type="text" name="version_windows" class="formbold-form-input" placeholder="Versión (ej: 2022)" required>
+            <input type="text" name="version_windows" class="formbold-form-input" placeholder="Versión (ej: 2022)" >
           </div>
           <div id="linuxVersion" style="display:none; margin-top:.7rem;">
             <label class="formbold-form-label">Distribución y versión</label>
-            <input type="text" name="version_linux" class="formbold-form-input" placeholder="Distribución y versión" required>
+            <input type="text" name="version_linux" class="formbold-form-input" placeholder="Distribución y versión">
           </div>
           <div id="otroSO" style="display:none; margin-top:.7rem;">
             <label class="formbold-form-label">Especifique</label>
-            <input type="text" name="so_otro" class="formbold-form-input" placeholder="Especifique" required>
+            <input type="text" name="so_otro" class="formbold-form-input" placeholder="Especifique">
           </div>
         </div>
 

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Editar Solicitud de Recursos Compartidos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formbold-multistep.css') }}">
+  <style>
+    body { background:#f5f6fa; }
+
+    .formbold-main-wrapper{
+      display:flex;justify-content:center;align-items:center;min-height:100vh;padding:2rem 0;
+    }
+    .formbold-form-wrapper{
+      background:#fff;border-radius:12px;box-shadow:0 6px 24px #0001;padding:2rem 2.5rem;max-width:700px;width:100%;
+    }
+
+    /* --- Stepper (igual al estilo del otro formulario) --- */
+    .formbold-step-menu{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
+    .step-indicator{display:inline-flex;align-items:center;gap:.5rem}
+    .formbold-step-circle{
+      width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      background:#e5e7eb;color:#111827;font-weight:700
+    }
+    .formbold-step-circle.active{background:#6366f1;color:#fff}
+    .formbold-step-label{font-weight:700;font-size:1.05rem;margin-right:.5rem}
+
+    /* Observación del admin (caja roja) */
+    .observacion-admin{
+      background:#ffe5e5;border:1px solid #ee6666;color:#c00000;padding:12px;border-radius:8px;margin-bottom:18px;font-weight:700
+    }
+
+        /* Logo arriba-izquierda */
+    .bg-logo-superior{position:fixed; top:24px; left:24px; z-index:20;}
+    .decoracion-izquierda{width:120px; height:auto; filter:drop-shadow(0 2px 6px #0003);}
+
+    /* Botón volver abajo-izquierda */
+    .volver{
+      position:fixed; bottom:24px; left:24px; z-index:999;
+      width:52px; height:52px; cursor:pointer; transition:transform .15s;
+    }
+    .volver:hover{ transform:scale(1.06); }
+
+    /* Inputs / layout */
+    .formbold-form-step{display:none}
+    .formbold-form-step.active{display:block;animation:fadeIn .25s}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none}}
+    .formbold-input-flex{display:flex;gap:1rem;flex-wrap:wrap}
+    .formbold-input-flex>div{flex:1 1 220px}
+    .formbold-form-input, textarea, select{
+      width:100%;padding:.65rem .9rem;border:1px solid #d1d5db;border-radius:10px;background:#f9f9f9
+    }
+
+    /* Botones */
+    .formbold-btn-group{margin-top:1rem;display:flex;gap:.7rem;justify-content:flex-end}
+    .formbold-btn{
+      background:#6366f1;color:#fff;border:none;border-radius:10px;padding:.65rem 1rem;cursor:pointer
+    }
+    .formbold-btn-secondary{
+      background:#e0e7ef;color:#374151;border:none;border-radius:10px;padding:.65rem 1rem;cursor:pointer
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-logo-superior">
+  <img src="{{ url_for('static', filename=logo_path) }}" class="decoracion-izquierda">
+</div>
+
+<div class="formbold-main-wrapper">
+  <div class="formbold-form-wrapper">
+
+    {% if observacion %}
+      <div class="observacion-admin">
+        Observación del administrador: {{ observacion }}
+      </div>
+    {% endif %}
+
+    <!-- Stepper -->
+    <div class="formbold-step-menu">
+      <div class="step-indicator">
+        <span class="formbold-step-circle active">1</span>
+        <span class="formbold-step-label">Solicitante</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle">2</span>
+        <span class="formbold-step-label">Recurso</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle">3</span>
+        <span class="formbold-step-label">Uso</span>
+      </div>
+      <div class="step-indicator">
+        <span class="formbold-step-circle">4</span>
+        <span class="formbold-step-label">Firmas</span>
+      </div>
+    </div>
+
+    <form method="POST" action="" autocomplete="off">
+      <!-- Paso 1: Solicitante -->
+      <div class="formbold-form-step active" id="step-1">
+        <h2>Información del Solicitante</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label>Nombre del Solicitante</label>
+            <input name="nombre_completo" class="formbold-form-input"
+                   value="{{ detalle.nombre_completo|default('', true) }}">
+          </div>
+          <div>
+            <label>Dependencia/Área</label>
+            <input name="unidad" class="formbold-form-input"
+                   value="{{ detalle.unidad|default('', true) }}">
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label>Cargo</label>
+            <input name="cargo" class="formbold-form-input"
+                   value="{{ detalle.cargo|default('', true) }}">
+          </div>
+          <div>
+            <label>Correo Electrónico</label>
+            <input name="correo" class="formbold-form-input"
+                   value="{{ detalle.correo|default('', true) }}">
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label>Teléfono de Contacto</label>
+            <input name="telefono" class="formbold-form-input"
+                   value="{{ detalle.telefono|default('', true) }}">
+          </div>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(1)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 2: Recurso -->
+      <div class="formbold-form-step" id="step-2">
+        <h2>Detalles del Recurso Solicitado</h2><br>
+        <label>Nombre sugerido del Recurso</label>
+        <input name="nombre_recurso" class="formbold-form-input"
+               value="{{ detalle.nombre_recurso|default('', true) }}">
+
+        <label>Ubicación en la estructura</label>
+        <input name="ubicacion" class="formbold-form-input"
+               value="{{ detalle.ubicacion|default('', true) }}">
+
+        <label>Propósito o Función del Recurso</label>
+        <textarea name="proposito" class="formbold-form-input">{{ detalle.proposito|default('', true) }}</textarea>
+
+        <label>Grupos o Usuarios con Acceso</label>
+        <textarea name="usuarios_acceso" class="formbold-form-input">{{ detalle.usuarios_acceso|default('', true) }}</textarea>
+
+        <label>Nivel de Permisos</label>
+        <select name="permisos" class="formbold-form-input">
+          <option value="Lectura"   {% if detalle.permisos=='Lectura' %}selected{% endif %}>Lectura</option>
+          <option value="Escritura" {% if detalle.permisos=='Escritura' %}selected{% endif %}>Escritura</option>
+        </select>
+
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn-secondary" style="float:left" onclick="prevStep(2)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(2)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 3: Uso -->
+      <div class="formbold-form-step" id="step-3">
+        <h2>Uso Estimado y Clasificación</h2><br>
+        <label>Tipo de Información a Almacenar</label>
+        <input name="tipo_informacion" class="formbold-form-input"
+               value="{{ detalle.tipo_informacion|default('', true) }}">
+
+        <label>Volumen Estimado (GB)</label>
+        <input name="volumen" class="formbold-form-input"
+               value="{{ detalle.volumen|default('', true) }}">
+
+        <label>Tiempo Estimado de Uso (meses/años)</label>
+        <input name="tiempo_uso" class="formbold-form-input"
+               value="{{ detalle.tiempo_uso|default('', true) }}">
+
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn-secondary" style="float:left" onclick="prevStep(3)">← Anterior</button>
+          <button type="button" class="formbold-btn" style="float:right" onclick="nextStep(3)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- Paso 4: Firmas -->
+      <div class="formbold-form-step" id="step-4">
+        <h2>Firmas</h2><br>
+        <div class="formbold-input-flex">
+          <div>
+            <label>Nombre del Funcionario Solicitante</label>
+            <input name="firma_solicitante" class="formbold-form-input"
+                   value="{{ detalle.firma_solicitante|default('', true) }}">
+          </div>
+          <div>
+            <label>Cargo del Solicitante</label>
+            <input name="cargo_solicitante" class="formbold-form-input"
+                   value="{{ detalle.cargo_solicitante|default('', true) }}">
+          </div>
+        </div>
+        <div class="formbold-input-flex">
+          <div>
+            <label>Nombre del Jefe Inmediato</label>
+            <input name="firma_jefe" class="formbold-form-input"
+                   value="{{ detalle.firma_jefe|default('', true) }}">
+          </div>
+          <div>
+            <label>Cargo del Jefe</label>
+            <input name="cargo_jefe" class="formbold-form-input"
+                   value="{{ detalle.cargo_jefe|default('', true) }}">
+          </div>
+        </div>
+        <div class="formbold-btn-group">
+          <button type="button" class="formbold-btn-secondary" style="float:left" onclick="prevStep(4)">← Anterior</button>
+          <button type="submit" class="formbold-btn">Guardar cambios</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+
+  function showStep(n){
+    document.querySelectorAll('.formbold-form-step')
+      .forEach((el,i)=>el.classList.toggle('active', i===n-1));
+
+    const circles = document.querySelectorAll('.formbold-step-circle');
+    circles.forEach((c,i)=>c.classList.toggle('active', i===n-1));
+  }
+
+  function nextStep(n){ if(n<4){ currentStep = n+1; showStep(currentStep); } }
+  function prevStep(n){ if(n>1){ currentStep = n-1; showStep(currentStep); } }
+
+  showStep(1);
+</script>
+
+<a href="{{ url_for('dashboard_solicitante') }}">
+  <img src="{{ url_for('static', filename='img/volver.png') }}" class="volver">
+</a>
+
+</body>
+</html>

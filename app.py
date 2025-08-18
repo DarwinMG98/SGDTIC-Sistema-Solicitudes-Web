@@ -1,9 +1,10 @@
-from flask import Flask, render_template,redirect, request, session, url_for, flash
+from flask import Flask, render_template,redirect, request, session, url_for, flash, send_file, make_response
 import pymysql.cursors
 from werkzeug.utils import secure_filename
 from flask import send_from_directory
 from datetime import datetime
 from pymysql.err import IntegrityError
+from weasyprint import HTML
 import os
 import pymysql
 from datetime import datetime
@@ -11,7 +12,22 @@ import uuid
 import time
 from functools import wraps
 import sys
+import re
 sys.stderr = open('error.log', 'w')
+
+
+
+app = Flask(__name__)
+app.secret_key = 'tu_clave_secreta'
+
+PDF_FOLDER = os.path.join(app.root_path, 'storage', 'pdfs')
+os.makedirs(PDF_FOLDER, exist_ok=True)
+
+def guardar_pdf(html, solicitud_id):
+    nombre = f"solicitud_{solicitud_id}.pdf"
+    ruta = os.path.join(PDF_FOLDER, nombre)
+    HTML(string=html, base_url=app.root_path).write_pdf(ruta)
+    return nombre
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 UPLOAD_FOLDER = 'static/img'
@@ -39,8 +55,22 @@ def solicitante_required(f):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta'
+def parse_vida_util(texto: str) -> int | None:
+    """
+    Convierte '2 meses', '1 año 6 meses', '18 meses', '3' (meses) -> meses (int)
+    """
+    if not texto: return None
+    t = texto.lower().strip()
+    anos = 0; meses = 0
+    m = re.search(r'(\d+)\s*a(ño|nos)', t)
+    if m: anos = int(m.group(1))
+    m = re.search(r'(\d+)\s*mes', t)
+    if m: meses = int(m.group(1))
+    if anos == 0 and meses == 0 and t.isdigit():
+        meses = int(t)
+    total = anos*12 + meses
+    return total if total > 0 else None
+
 
 @app.route('/')
 def inicio():
@@ -131,6 +161,7 @@ def crear_solicitud():
             request.form.get('so_otro', '')
         )
         vida_util = request.form['vida_util']
+        vida_util_meses = parse_vida_util(vida_util) 
         justificacion_recursos = request.form['justificacion_recursos']
         accesos = request.form['accesos']
         responsable_aplicacion = request.form['responsable_aplicacion']
@@ -159,6 +190,25 @@ def crear_solicitud():
             responsable_aplicacion, unidad_responsable, contacto_soporte, observaciones_adicionales,
             firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
         ))
+
+                # ========= PEGAR AQUÍ (NUEVO) =========
+        # Guarda los meses derivados en el detalle
+        cursor.execute("""
+            UPDATE solicitud_detalle
+            SET vida_util_meses=%s
+            WHERE solicitud_id=%s
+        """, (vida_util_meses, solicitud_id))
+
+        # Expiración provisional (desde fecha_solicitud ya guardada)
+        if vida_util_meses:
+            cursor.execute("""
+                UPDATE solicitudes
+                SET fecha_expiracion = DATE_ADD(DATE(fecha_solicitud), INTERVAL %s MONTH)
+                WHERE id=%s
+            """, (vida_util_meses, solicitud_id))
+        else:
+            cursor.execute("UPDATE solicitudes SET fecha_expiracion=NULL WHERE id=%s", (solicitud_id,))
+        # ========= HASTA AQUÍ =========
 
         # GUARDAR ARCHIVOS ADJUNTOS
         archivos = request.files.getlist('documentos')
@@ -271,20 +321,49 @@ def verificar_login_admin():
 @admin_required
 def dashboard_admin():
     conn = get_connection()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
-    cursor.execute("""
-        SELECT s.id, s.tipo, s.fecha_solicitud, s.estado, 
-            CONCAT(u.nombre, ' ', u.apellido) AS nombre_admin_revisor
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    cur.execute("""
+        SELECT COUNT(*) c
+        FROM solicitudes
+        WHERE fecha_expiracion IS NOT NULL
+          AND DATEDIFF(fecha_expiracion, CURDATE()) BETWEEN 1 AND 7
+    """)
+    por_vencer_count = cur.fetchone()['c']
+
+    cur.execute("""
+        SELECT COUNT(*) c
+        FROM solicitudes
+        WHERE fecha_expiracion IS NOT NULL
+          AND DATEDIFF(fecha_expiracion, CURDATE()) <= 0
+    """)
+    vencidos_count = cur.fetchone()['c']
+
+    cur.execute("""
+        SELECT s.id,
+               s.tipo,
+               s.fecha_solicitud,
+               s.estado,
+               DATE_FORMAT(s.fecha_expiracion,'%Y-%m-%d') AS fecha_expiracion,
+               DATEDIFF(s.fecha_expiracion, CURDATE()) AS dias_restantes,
+               CASE
+                 WHEN s.fecha_expiracion IS NULL THEN 'sin_fecha'
+                 WHEN DATEDIFF(s.fecha_expiracion, CURDATE()) <= 0 THEN 'vencido'
+                 WHEN DATEDIFF(s.fecha_expiracion, CURDATE()) <= 7 THEN 'por_vencer'
+                 ELSE 'ok'
+               END AS estado_exp,
+               COALESCE(CONCAT(u.nombre,' ',u.apellido), '---') AS nombre_admin_revisor
         FROM solicitudes s
         LEFT JOIN usuarios u ON s.id_admin_revisor = u.id
         ORDER BY s.fecha_solicitud DESC
     """)
-
-    solicitudes = cursor.fetchall()
+    solicitudes = cur.fetchall()
     conn.close()
 
-    logo_path = obtener_logo()
-    return render_template('dashboard_admin.html', solicitudes=solicitudes, logo_path=logo_path)
+    return render_template('dashboard_admin.html',
+                           solicitudes=solicitudes,
+                           por_vencer_count=por_vencer_count,
+                           vencidos_count=vencidos_count)
 
 
 @app.route('/logout')
@@ -376,148 +455,338 @@ def enviado():
 
 
 @app.route('/revisar_solicitud/<int:id>', methods=['GET', 'POST'])
+@admin_required
 def revisar_solicitud(id):
-    conn = get_connection()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
-    cursor.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
-    solicitud = cursor.fetchone()
+    with get_connection() as conn:
+        cur = conn.cursor(pymysql.cursors.DictCursor)
+        cur.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
+        solicitud = cur.fetchone()
+        cur.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
+        detalle = cur.fetchone() or {}
+        cur.execute("SELECT * FROM documentos_adjuntos WHERE solicitud_id=%s", (id,))
+        documentos = cur.fetchall()
 
-    cursor.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
-    detalle = cursor.fetchone()
-    cursor.execute("SELECT * FROM documentos_adjuntos WHERE solicitud_id = %s", (id,))
-    documentos = cursor.fetchall()
-    
-    conn.close()
+    if not solicitud:
+        flash("Solicitud no encontrada.")
+        return redirect(url_for('dashboard_admin'))
 
     if request.method == 'POST':
-        accion = request.form['accion']
+        accion = request.form.get('accion')
         id_admin = session.get('usuario_id')
-        print('ID del admin revisor:', id_admin)
-        if accion == 'aprobar':
-            with get_connection() as conn:
-                with conn.cursor() as cursor:
-                    cursor.execute(
-                        "UPDATE solicitudes SET estado='aprobado', id_admin_revisor=%s WHERE id=%s",
-                        (id_admin, id)
-                    )
-                    conn.commit()
-            return redirect(url_for('dashboard_admin'))
-        elif accion == 'rechazar':
-            observacion = request.form['observacion']
-            with get_connection() as conn:
-                with conn.cursor() as cursor:
-                    cursor.execute(
-                        "UPDATE solicitudes SET estado='rechazado', observaciones=%s, id_admin_revisor=%s WHERE id=%s",
-                        (observacion, id_admin, id)
-                    )
-                    conn.commit()
-            return redirect(url_for('dashboard_admin'))
 
-    
-    if solicitud['tipo'] == 'eliminar':
-        return render_template(
-            'revisar_solicitud_eliminar.html',
-            solicitud=solicitud,
-            detalle=detalle,
-            documentos=documentos
-        )
-    else:
-        return render_template(
-            'revisar_solicitud.html',
-            solicitud=solicitud,
-            detalle=detalle,
-            documentos=documentos
-        )
+        with get_connection() as conn:
+            # usaremos cursores dict para leer y normal para actualizar
+            cur = conn.cursor()
+            cur_det = conn.cursor(pymysql.cursors.DictCursor)
+
+            if accion == 'aprobar':
+                # 1) leer meses desde el detalle
+                cur_det.execute(
+                    "SELECT vida_util_meses FROM solicitud_detalle WHERE solicitud_id=%s",
+                    (id,)
+                )
+                det = cur_det.fetchone()
+                meses = det['vida_util_meses'] if det and det['vida_util_meses'] else None
+
+                # 2) actualizar cabecera con fecha_aprobacion y expiracion
+                if meses:
+                    cur.execute("""
+                        UPDATE solicitudes
+                        SET estado='aprobado',
+                            id_admin_revisor=%s,
+                            fecha_aprobacion=NOW(),
+                            fecha_expiracion=DATE_ADD(CURDATE(), INTERVAL %s MONTH)
+                        WHERE id=%s
+                    """, (id_admin, meses, id))
+                else:
+                    cur.execute("""
+                        UPDATE solicitudes
+                        SET estado='aprobado',
+                            id_admin_revisor=%s,
+                            fecha_aprobacion=NOW(),
+                            fecha_expiracion=NULL
+                        WHERE id=%s
+                    """, (id_admin, id))
+
+            elif accion == 'rechazar':
+                observacion = request.form.get('observacion','')
+                cur.execute("""
+                    UPDATE solicitudes
+                    SET estado='rechazado',
+                        observaciones=%s,
+                        id_admin_revisor=%s
+                    WHERE id=%s
+                """, (observacion, id_admin, id))
+
+            conn.commit()
+
+        return redirect(url_for('dashboard_admin'))
+
+    # GET -> plantilla por tipo
+    if solicitud.get('tipo') == 'recursos':
+        return render_template('revisar_recurso_compartido.html',
+                               solicitud=solicitud, detalle=detalle)
+    elif solicitud.get('tipo') == 'eliminar':
+        return render_template('revisar_solicitud_eliminar.html',
+                               solicitud=solicitud, detalle=detalle, documentos=documentos)
+    else:  # crear
+        return render_template('revisar_solicitud.html',
+                               solicitud=solicitud, detalle=detalle, documentos=documentos)
+
+
+
+@app.route('/revisar_recurso_compartido/<int:solicitud_id>')
+def revisar_recurso_compartido_legacy(solicitud_id):
+    return redirect(url_for('revisar_solicitud', id=solicitud_id))
+
 
 @app.route('/editar_solicitud/<int:id>', methods=['GET', 'POST'])
 def editar_solicitud(id):
     conn = get_connection()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
 
-    cursor.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
-    solicitud = cursor.fetchone()
-    cursor.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
-    detalle = cursor.fetchone()
-    cursor.execute("SELECT * FROM documentos_adjuntos WHERE solicitud_id=%s", (id,))
-    documentos = cursor.fetchall()
+    # Cargar cabecera + detalle + docs
+    cur.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
+    solicitud = cur.fetchone()
+    cur.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
+    detalle = cur.fetchone() or {}
+    cur.execute("SELECT * FROM documentos_adjuntos WHERE solicitud_id=%s", (id,))
+    documentos = cur.fetchall()
 
-    if request.method == "POST":
-        
-        nombre_completo = request.form.get('nombre_completo', '')
-        unidad = request.form.get('unidad', '')
-        correo = request.form.get('correo', '')
-        telefono = request.form.get('telefono', '')
-        responsable_tecnico = request.form.get('responsable_tecnico', '')
-        origen_solicitud = ', '.join(request.form.getlist('origen[]'))
-        anteproyecto = request.form.get('anteproyecto', '')
-        motivo = request.form.get('motivo', '')
-        tipo_servidor = ', '.join(request.form.getlist('tipo_servidor[]'))
-        sistema_operativo = request.form.get('sistema_operativo', '')
-        version_so = (
-            request.form.get('version_windows', '') or
-            request.form.get('version_linux', '') or
-            request.form.get('so_otro', '')
-        )
-        vida_util = request.form.get('vida_util', '')
-        justificacion_recursos = request.form.get('justificacion_recursos', '')
-        accesos = request.form.get('accesos', '')
-        responsable_aplicacion = request.form.get('responsable_aplicacion', '')
-        unidad_responsable = request.form.get('unidad_responsable', '')
-        contacto_soporte = request.form.get('contacto_soporte', '')
-        observaciones_adicionales = request.form.get('observaciones_adicionales', '')
-        firma_solicitante = request.form.get('firma_solicitante', '')
-        cargo_solicitante = request.form.get('cargo_solicitante', '')
-        firma_jefe = request.form.get('firma_jefe', '')
-        cargo_jefe = request.form.get('cargo_jefe', '')
-        vcpu = to_int(request.form.get('vcpu', ''))
-        ram = to_int(request.form.get('ram', ''))
-        disco_sistema = to_int(request.form.get('disco_sistema', ''))
-        disco_datos = to_int(request.form.get('disco_datos', ''))
-
-        vcpu = to_int(request.form.get('vcpu', ''))
-        ram = to_int(request.form.get('ram', ''))
-        disco_sistema = to_int(request.form.get('disco_sistema', ''))
-        disco_datos = to_int(request.form.get('disco_datos', ''))
-
-
-        cursor.execute("""
-            UPDATE solicitud_detalle SET
-                nombre_completo=%s, unidad=%s, correo=%s, telefono=%s, responsable_tecnico=%s,
-                origen_solicitud=%s, anteproyecto=%s, motivo=%s, tipo_servidor=%s, sistema_operativo=%s, version_so=%s,
-                vcpu=%s, ram=%s, disco_sistema=%s, disco_datos=%s, vida_util=%s, justificacion_recursos=%s,
-                accesos=%s, responsable_aplicacion=%s, unidad_responsable=%s, contacto_soporte=%s, observaciones_adicionales=%s,
-                firma_solicitante=%s, cargo_solicitante=%s, firma_jefe=%s, cargo_jefe=%s
-            WHERE solicitud_id=%s
-        """, (
-            nombre_completo, unidad, correo, telefono, responsable_tecnico, origen_solicitud, anteproyecto, motivo,
-            tipo_servidor, sistema_operativo, version_so, vcpu, ram, disco_sistema, disco_datos, vida_util, justificacion_recursos,
-            accesos, responsable_aplicacion, unidad_responsable, contacto_soporte, observaciones_adicionales,
-            firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe, id
-        ))
-
-        cursor.execute("UPDATE solicitudes SET estado='pendiente' WHERE id=%s", (id,))
-
-        archivos = request.files.getlist('documentos')
-        for archivo in archivos:
-            if archivo and archivo.filename and allowed_file(archivo.filename):
-                filename = secure_filename(archivo.filename)
-                ruta = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                archivo.save(ruta)
-                cursor.execute("""
-                    INSERT INTO documentos_adjuntos (solicitud_id, nombre_archivo, ruta_archivo)
-                    VALUES (%s, %s, %s)
-                """, (id, filename, filename))
-
-        conn.commit()
+    if not solicitud:
         conn.close()
-        return redirect(url_for("historial"))
+        flash("Solicitud no encontrada.", "warning")
+        return redirect(url_for('historial'))
 
-    conn.close()
+    if request.method == 'POST':
+        tipo = solicitud.get('tipo')
 
-    if solicitud['tipo'] == 'crear':
-        return render_template("formulario_editar.html", detalle=detalle, documentos=documentos, observacion=solicitud['observaciones'])
+        # ---------- EDITAR RECURSOS COMPARTIDOS ----------
+        if tipo == 'recursos':
+            nombre_completo   = request.form.get('nombre_completo','').strip()
+            unidad            = request.form.get('unidad','').strip()
+            cargo             = request.form.get('cargo','').strip()
+            correo            = request.form.get('correo','').strip()
+            telefono          = request.form.get('telefono','').strip()
+            nombre_recurso    = request.form.get('nombre_recurso','').strip()
+            ubicacion         = request.form.get('ubicacion','').strip()
+            proposito         = request.form.get('proposito','').strip()
+            usuarios_acceso   = request.form.get('usuarios_acceso','').strip()
+            permisos          = request.form.get('permisos','').strip()
+            tipo_informacion  = request.form.get('tipo_informacion','').strip()
+            volumen           = request.form.get('volumen','').strip()
+            tiempo_uso        = request.form.get('tiempo_uso','').strip()
+            firma_solicitante = request.form.get('firma_solicitante','').strip()
+            cargo_solicitante = request.form.get('cargo_solicitante','').strip()
+            firma_jefe        = request.form.get('firma_jefe','').strip()
+            cargo_jefe        = request.form.get('cargo_jefe','').strip()
+
+            cur.execute("""
+                UPDATE solicitud_detalle SET
+                    nombre_completo=%s, unidad=%s, cargo=%s, correo=%s, telefono=%s,
+                    nombre_recurso=%s, ubicacion=%s, proposito=%s, usuarios_acceso=%s, permisos=%s,
+                    tipo_informacion=%s, volumen=%s, tiempo_uso=%s,
+                    firma_solicitante=%s, cargo_solicitante=%s, firma_jefe=%s, cargo_jefe=%s
+                WHERE solicitud_id=%s
+            """, (nombre_completo, unidad, cargo, correo, telefono,
+                nombre_recurso, ubicacion, proposito, usuarios_acceso, permisos,
+                tipo_informacion, volumen, tiempo_uso,
+                firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe, id))
+
+            # === vida útil -> meses y expiración ===
+            vida_util_meses = parse_vida_util(tiempo_uso)
+            cur.execute("UPDATE solicitud_detalle SET vida_util_meses=%s WHERE solicitud_id=%s",
+                        (vida_util_meses, id))
+
+            if vida_util_meses:
+                cur.execute("""
+                    UPDATE solicitudes
+                    SET fecha_expiracion = DATE_ADD(DATE(fecha_solicitud), INTERVAL %s MONTH),
+                        id_admin_revisor=NULL, estado='pendiente'
+                    WHERE id=%s
+                """, (vida_util_meses, id))
+            else:
+                cur.execute("""
+                    UPDATE solicitudes
+                    SET fecha_expiracion=NULL,
+                        id_admin_revisor=NULL, estado='pendiente'
+                    WHERE id=%s
+                """, (id,))
+
+            conn.commit(); conn.close()
+            flash("Solicitud actualizada. Quedó nuevamente en revisión.", "success")
+            return redirect(url_for('historial'))
+
+
+        # ---------- EDITAR CREACIÓN DE SERVIDOR ----------
+        elif tipo == 'crear':
+            fecha  = request.form.get('fecha') or None
+            nombre_completo = request.form.get('nombre_completo','').strip()
+            unidad = request.form.get('unidad','').strip()
+            correo = request.form.get('correo','').strip()
+            telefono = request.form.get('telefono','').strip()
+            responsable_tecnico = request.form.get('responsable_tecnico','').strip()
+
+            origen = ', '.join(request.form.getlist('origen[]'))
+            anteproyecto = request.form.get('anteproyecto','').strip()
+            motivo = request.form.get('motivo','').strip()
+
+            tipo_servidor = ', '.join(request.form.getlist('tipo_servidor[]'))
+            so = request.form.get('sistema_operativo','').strip()
+            v_win = request.form.get('version_windows','').strip()
+            v_lin = request.form.get('version_linux','').strip()
+            v_otr = request.form.get('so_otro','').strip()
+            if so == 'Windows Server': version_so = v_win
+            elif so == 'Linux':        version_so = v_lin
+            elif so == 'Otro':         version_so = v_otr
+            else:                      version_so = ''
+
+            vcpu = request.form.get('vcpu') or None
+            ram  = request.form.get('ram') or None
+            disco_sistema = request.form.get('disco_sistema') or None
+            disco_datos   = request.form.get('disco_datos') or None
+            vida_util = request.form.get('vida_util','').strip()
+            justificacion_recursos = request.form.get('justificacion_recursos','').strip()
+
+            accesos = request.form.get('accesos','').strip()
+            responsable_aplicacion = request.form.get('responsable_aplicacion','').strip()
+            unidad_responsable = request.form.get('unidad_responsable','').strip()
+            contacto_soporte  = request.form.get('contacto_soporte','').strip()
+            observaciones_adicionales = request.form.get('observaciones','').strip()
+
+            firma_solicitante = request.form.get('firma_solicitante','').strip()
+            cargo_solicitante = request.form.get('cargo_solicitante','').strip()
+            firma_jefe = request.form.get('firma_jefe','').strip()
+            cargo_jefe = request.form.get('cargo_jefe','').strip()
+
+            cur.execute("""
+                UPDATE solicitud_detalle SET
+                    fecha=%s, nombre_completo=%s, unidad=%s, correo=%s, telefono=%s,
+                    responsable_tecnico=%s, origen_solicitud=%s, anteproyecto=%s, motivo=%s,
+                    tipo_servidor=%s, sistema_operativo=%s, version_so=%s,
+                    vcpu=%s, ram=%s, disco_sistema=%s, disco_datos=%s,
+                    vida_util=%s, justificacion_recursos=%s,
+                    accesos=%s, responsable_aplicacion=%s, unidad_responsable=%s,
+                    contacto_soporte=%s, observaciones_adicionales=%s,
+                    firma_solicitante=%s, cargo_solicitante=%s, firma_jefe=%s, cargo_jefe=%s
+                WHERE solicitud_id=%s
+            """, (fecha, nombre_completo, unidad, correo, telefono,
+                responsable_tecnico, origen, anteproyecto, motivo,
+                tipo_servidor, so, version_so,
+                vcpu, ram, disco_sistema, disco_datos,
+                vida_util, justificacion_recursos,
+                accesos, responsable_aplicacion, unidad_responsable,
+                contacto_soporte, observaciones_adicionales,
+                firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe, id))
+
+            # === vida útil -> meses y expiración (desde fecha_solicitud) ===
+            vida_util_meses = parse_vida_util(vida_util)
+            cur.execute("UPDATE solicitud_detalle SET vida_util_meses=%s WHERE solicitud_id=%s",
+                        (vida_util_meses, id))
+
+            if vida_util_meses:
+                cur.execute("""
+                    UPDATE solicitudes
+                    SET fecha_expiracion = DATE_ADD(DATE(fecha_solicitud), INTERVAL %s MONTH),
+                        id_admin_revisor=NULL, estado='pendiente'
+                    WHERE id=%s
+                """, (vida_util_meses, id))
+            else:
+                cur.execute("""
+                    UPDATE solicitudes
+                    SET fecha_expiracion=NULL,
+                        id_admin_revisor=NULL, estado='pendiente'
+                    WHERE id=%s
+                """, (id,))
+
+            conn.commit(); conn.close()
+            flash('Solicitud actualizada. Quedó nuevamente en revisión.', 'success')
+            return redirect(url_for('historial'))
+
+        # ---------- EDITAR ELIMINACIÓN DE SERVIDOR ----------
+        elif tipo == 'eliminar':
+            # Paso 1
+            nombre_completo = request.form.get('nombre_completo','').strip()
+            unidad          = request.form.get('unidad','').strip()
+            correo          = request.form.get('correo','').strip()
+            telefono        = request.form.get('telefono','').strip()
+            responsable_tecnico = request.form.get('responsable_tecnico','').strip()
+
+            # Paso 2
+            nombre_servidor = request.form.get('nombre_servidor','').strip()
+            ip_servidor     = request.form.get('ip_servidor','').strip()
+            sistema_operativo = request.form.get('sistema_operativo','').strip()
+            rol_servidor    = ', '.join(request.form.getlist('rol_servidor[]'))
+            fecha_creacion_servidor = request.form.get('fecha_creacion_servidor') or None
+            motivo_eliminacion = request.form.get('motivo_eliminacion','').strip()
+
+            # Paso 3
+            validaciones    = ', '.join(request.form.getlist('validaciones[]'))
+
+            # Paso 4
+            motivo_check    = ', '.join(request.form.getlist('motivo_check[]'))
+            motivo_otro     = request.form.get('motivo_otro','').strip()
+
+            # Paso 5
+            observaciones_adicionales = request.form.get('observaciones_adicionales','').strip()
+
+            # Paso 6
+            firma_solicitante = request.form.get('firma_solicitante','').strip()
+            cargo_solicitante = request.form.get('cargo_solicitante','').strip()
+            firma_jefe        = request.form.get('firma_jefe','').strip()
+            cargo_jefe        = request.form.get('cargo_jefe','').strip()
+
+            cur.execute("""
+                UPDATE solicitud_detalle SET
+                    nombre_completo=%s, unidad=%s, correo=%s, telefono=%s, responsable_tecnico=%s,
+                    nombre_servidor=%s, ip_servidor=%s, sistema_operativo=%s, rol_servidor=%s,
+                    fecha_creacion_servidor=%s, motivo_eliminacion=%s,
+                    validaciones=%s, motivo_check=%s, motivo_otro=%s,
+                    observaciones_adicionales=%s,
+                    firma_solicitante=%s, cargo_solicitante=%s, firma_jefe=%s, cargo_jefe=%s
+                WHERE solicitud_id=%s
+            """, (nombre_completo, unidad, correo, telefono, responsable_tecnico,
+                  nombre_servidor, ip_servidor, sistema_operativo, rol_servidor,
+                  fecha_creacion_servidor, motivo_eliminacion,
+                  validaciones, motivo_check, motivo_otro,
+                  observaciones_adicionales,
+                  firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe, id))
+
+            cur.execute("UPDATE solicitudes SET estado='pendiente', id_admin_revisor=NULL WHERE id=%s", (id,))
+            conn.commit(); conn.close()
+            flash('Solicitud de eliminación actualizada. Quedó nuevamente en revisión.', 'success')
+            return redirect(url_for('historial'))
+
+        # Si el tipo no coincide
+        else:
+            conn.close()
+            flash("Tipo de solicitud no reconocido.", "danger")
+            return redirect(url_for('historial'))
+
+    # ------- GET: render según tipo -------
+    observacion_admin = solicitud.get('observaciones')  # o el nombre real de la columna
+
+    if solicitud['tipo'] == 'recursos':
+        conn.close()
+        return render_template("formulario_editar_recursos.html",
+                               solicitud=solicitud,
+                               detalle=detalle, documentos=documentos,
+                               observacion=observacion_admin)
+
+    elif solicitud['tipo'] == 'crear':
+        conn.close()
+        return render_template("formulario_editar.html",
+                               solicitud=solicitud,
+                               detalle=detalle, documentos=documentos,
+                               observacion=observacion_admin)
+
     elif solicitud['tipo'] == 'eliminar':
-        return render_template("formulario_editar_eliminar.html", detalle=detalle, documentos=documentos, observacion=solicitud['observaciones'])
+        conn.close()
+        return render_template("formulario_editar_eliminar.html",
+                               solicitud=solicitud,
+                               detalle=detalle, documentos=documentos,
+                               observacion=observacion_admin)
+
 
 
 @app.route('/uploads/<filename>')
@@ -695,152 +964,79 @@ def ver_usuarios():
 
 @app.route('/crear_recurso_compartido', methods=['GET', 'POST'])
 def crear_recurso_compartido():
-    if 'usuario_id' not in session:
-        return redirect(url_for('login_solicitante'))
-
     if request.method == 'POST':
-        usuario_id = session['usuario_id']
-        fecha = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        f = request.form
+        usuario_id = session.get('usuario_id')
 
-        # Recoger campos del formulario
-        nombre_solicitante = request.form['nombre_completo']
-        dependencia = request.form['unidad']
-        cargo = request.form['cargo']
-        correo = request.form['correo']
-        telefono = request.form['telefono']
-        nombre_recurso = request.form['nombre_recurso']
-        ubicacion = request.form['ubicacion']
-        proposito = request.form['proposito']
-        usuarios_acceso = request.form['usuarios_acceso']
-        permisos = request.form['permisos']
-        tipo_info = request.form['tipo_info']
-        volumen = request.form['volumen']
-        tiempo_uso = request.form['tiempo_uso']
-        firma_solicitante = request.form['firma_solicitante']
-        firma_jefe = request.form['firma_jefe']
-        cargo_solicitante = request.form['cargo_solicitante']
-        cargo_jefe = request.form['cargo_jefe']
+        with get_connection() as conn:
+            cur = conn.cursor()
 
-        conn = get_connection()
-        cursor = conn.cursor()
+            # 1) Cabecera: usa DEFAULTS (fecha_solicitud y estado='pendiente')
+            cur.execute("""
+                INSERT INTO solicitudes (usuario_id, tipo)
+                VALUES (%s, %s)
+            """, (usuario_id, 'recursos'))
+            solicitud_id = cur.lastrowid
 
-        # Insertar solicitud
-        cursor.execute("""
-            INSERT INTO solicitudes (usuario_id, tipo, fecha_solicitud, estado)
-            VALUES (%s, %s, %s, %s)
-        """, (usuario_id, 'recursos', fecha, 'pendiente'))
-        solicitud_id = cursor.lastrowid
+            # 2) Detalle: columnas y valores 1:1 (18 columnas, 18 %s)
+            cur.execute("""
+                INSERT INTO solicitud_detalle (
+                    solicitud_id,
+                    nombre_completo, unidad, cargo, correo, telefono,
+                    nombre_recurso, ubicacion, proposito, usuarios_acceso, permisos,
+                    tipo_informacion, volumen, tiempo_uso,
+                    firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
+                )
+                VALUES (
+                    %s,
+                    %s,%s,%s,%s,%s,
+                    %s,%s,%s,%s,%s,
+                    %s,%s,%s,
+                    %s,%s,%s,%s
+                )
+            """, (
+                solicitud_id,
+                f.get('nombre_completo'), f.get('unidad'), f.get('cargo'),
+                f.get('correo'), f.get('telefono'),
 
-        # Insertar detalle
-        cursor.execute("""
-            INSERT INTO solicitud_detalle (
-                solicitud_id, fecha, nombre_completo, unidad, cargo, correo, telefono,
-                nombre_recurso, ubicacion, proposito, usuarios_acceso, permisos,
-                tipo_informacion, volumen, tiempo_uso,
-                firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (
-            solicitud_id, fecha, nombre_solicitante, dependencia, cargo, correo, telefono,
-            nombre_recurso, ubicacion, proposito, usuarios_acceso, permisos,
-            tipo_info, volumen, tiempo_uso,
-            firma_solicitante, cargo_solicitante, firma_jefe, cargo_jefe
-        ))
+                f.get('nombre_recurso'), f.get('ubicacion'), f.get('proposito'),
+                f.get('usuarios_acceso'), f.get('permisos'),
 
-        conn.commit()
-        conn.close()
-        flash("¡Solicitud de recurso compartido enviada correctamente!")
-        return redirect(url_for("solicitud_enviada"))
+                # En el form se llama "tipo_info", en BD la columna es "tipo_informacion"
+                f.get('tipo_informacion'), f.get('volumen'), f.get('tiempo_uso'),
 
-    return render_template('formulario_recursos.html')
+                f.get('firma_solicitante'), f.get('cargo_solicitante'),
+                f.get('firma_jefe'), f.get('cargo_jefe')
+            ))
 
-@app.route('/editar_recurso_compartido/<int:id>', methods=['GET', 'POST'])
-@solicitante_required
-def editar_recurso_compartido(id):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+            tiempo_uso = f.get('tiempo_uso') or ''
+            meses = parse_vida_util(tiempo_uso)
 
-    # Obtener datos existentes
-    cursor.execute("SELECT * FROM recursos_compartidos WHERE id = %s", (id,))
-    detalle = cursor.fetchone()
+            # guarda meses derivados
+            cur.execute("""
+                UPDATE solicitud_detalle
+                SET vida_util_meses=%s
+                WHERE solicitud_id=%s
+            """, (meses, solicitud_id))
 
-    # Verificar si existe observación del administrador
-    cursor.execute("SELECT observacion FROM observaciones WHERE recurso_id = %s", (id,))
-    obs_result = cursor.fetchone()
-    observacion = obs_result['observacion'] if obs_result else None
-
-    if request.method == 'POST':
-        data = {
-            'nombre_completo': request.form['nombre_completo'],
-            'unidad': request.form['unidad'],
-            'correo': request.form['correo'],
-            'telefono': request.form['telefono'],
-            'nombre_carpeta': request.form['nombre_carpeta'],
-            'justificacion': request.form['justificacion'],
-            'unidad_creacion': request.form['unidad_creacion'],
-            'usuarios_acceso': request.form['usuarios_acceso'],
-            'responsable': request.form['responsable'],
-            'correo_responsable': request.form['correo_responsable'],
-            'observaciones': request.form['observaciones'],
-            'firma_solicitante': request.form['firma_solicitante'],
-            'cargo_solicitante': request.form['cargo_solicitante'],
-            'firma_jefe': request.form['firma_jefe'],
-            'cargo_jefe': request.form['cargo_jefe'],
-        }
-
-        sql = """
-        UPDATE recursos_compartidos SET
-            nombre_completo = %(nombre_completo)s,
-            unidad = %(unidad)s,
-            correo = %(correo)s,
-            telefono = %(telefono)s,
-            nombre_carpeta = %(nombre_carpeta)s,
-            justificacion = %(justificacion)s,
-            unidad_creacion = %(unidad_creacion)s,
-            usuarios_acceso = %(usuarios_acceso)s,
-            responsable = %(responsable)s,
-            correo_responsable = %(correo_responsable)s,
-            observaciones = %(observaciones)s,
-            firma_solicitante = %(firma_solicitante)s,
-            cargo_solicitante = %(cargo_solicitante)s,
-            firma_jefe = %(firma_jefe)s,
-            cargo_jefe = %(cargo_jefe)s
-        WHERE id = %s
-        """
-        cursor.execute(sql, (*data.values(), id))
-        conn.commit()
-        conn.close()
-        flash('Solicitud actualizada correctamente.', 'success')
-        return redirect(url_for('dashboard_solicitante'))
-
-    conn.close()
-    return render_template("editar_recurso_compartido.html", detalle=detalle, observacion=observacion)
+            # fija fecha de expiración provisional desde fecha_solicitud
+            if meses:
+                cur.execute("""
+                    UPDATE solicitudes
+                    SET fecha_expiracion = DATE_ADD(DATE(fecha_solicitud), INTERVAL %s MONTH)
+                    WHERE id=%s
+                """, (meses, solicitud_id))
+            else:
+                cur.execute("UPDATE solicitudes SET fecha_expiracion=NULL WHERE id=%s", (solicitud_id,))
 
 
-@app.route('/revisar_recurso_compartido/<int:id>', methods=['GET', 'POST'])
-@solicitante_required
-def revisar_recurso_compartido(id):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM recursos_compartidos WHERE id = %s", (id,))
-    detalle = cursor.fetchone()
-
-    if request.method == 'POST':
-        if request.form['accion'] == 'aprobar':
-            cursor.execute("UPDATE recursos_compartidos SET estado = 'Aprobado' WHERE id = %s", (id,))
             conn.commit()
-            flash("Solicitud aprobada.", "success")
-        elif request.form['accion'] == 'rechazar':
-            observacion = request.form['observacion']
-            cursor.execute("UPDATE recursos_compartidos SET estado = 'Rechazado' WHERE id = %s", (id,))
-            cursor.execute("INSERT INTO observaciones (recurso_id, observacion) VALUES (%s, %s)", (id, observacion))
-            conn.commit()
-            flash("Solicitud rechazada con observación.", "danger")
-        conn.close()
-        return redirect(url_for('dashboard_admin'))
 
-    conn.close()
-    return render_template("revisar_recurso_compartido.html", detalle=detalle)
+        flash('Solicitud enviada con éxito.')
+        return redirect(url_for('historial'))
+
+    # GET
+    return render_template('formulario_recursos.html', logo_path='img/logo_quito.png')
 
 
 @app.route('/cambiar_estado_usuario/<int:id>/<int:nuevo_estado>')
@@ -854,12 +1050,159 @@ def cambiar_estado_usuario(id, nuevo_estado):
     return redirect(url_for('ver_usuarios'))
 
 
+@app.route('/descargar_pdf/<int:id>')
+def descargar_pdf(id):
+    with get_connection() as conn:
+        cur = conn.cursor(pymysql.cursors.DictCursor)
+
+        cur.execute("SELECT * FROM solicitudes WHERE id=%s", (id,))
+        sol = cur.fetchone()
+        if not sol:
+            return "No existe la solicitud", 404
+
+        cur.execute("SELECT * FROM solicitud_detalle WHERE solicitud_id=%s", (id,))
+        det = cur.fetchone() or {}
+
+        admin = None
+        if sol.get('id_admin_revisor'):
+            cur.execute("SELECT nombre, apellido FROM usuarios WHERE id=%s",(sol['id_admin_revisor'],))
+            admin = cur.fetchone() or {}
+            admin['cargo'] = 'Administrador de Infraestructura'
+
+    html = generar_pdf_por_tipo(sol, det, admin)
+
+    pdf_bytes = HTML(string=html, base_url=app.root_path).write_pdf()
+    resp = make_response(pdf_bytes)
+    resp.headers['Content-Type'] = 'application/pdf'
+    resp.headers['Content-Disposition'] = f'attachment; filename=solicitud_{id}.pdf'
+    return resp
+
+
+def plantilla_por_tipo(tipo):
+    return {
+        'crear':    'pdf_crear.html',        # tu plantilla actual de creación
+        'eliminar': 'pdf/eliminacion.html',  # la que acabas de guardar
+        'recurso':  'pdf/recurso.html',      # cuando la tengas lista
+    }.get(tipo, 'pdf_crear.html')
+
+
+# --- PDF de CREAR (tu plantilla pdf_crear.html) ---
+def generar_pdf_solicitud(sol, det, admin=None):
+    datos = {
+        "fecha": (sol or {}).get("fecha_solicitud") or (det or {}).get("fecha"),
+        "unidad": (det or {}).get("unidad"),
+        "nombre_completo": (det or {}).get("nombre_completo"),
+        "correo": (det or {}).get("correo"),
+        "telefono": (det or {}).get("telefono"),
+        "responsable_tecnico": (det or {}).get("responsable_tecnico"),
+        "origen": (det or {}).get("origen_solicitud"),
+        "anteproyecto": (det or {}).get("anteproyecto"),
+        "motivo": (det or {}).get("motivo"),
+        "tipo_servidor": (det or {}).get("tipo_servidor"),
+        "sistema_operativo": (det or {}).get("sistema_operativo"),
+        "version_windows": (det or {}).get("version_so"),
+        "version_linux": (det or {}).get("version_so"),
+        "so_otro": (det or {}).get("version_so"),
+        "vcpu": (det or {}).get("vcpu"),
+        "ram": (det or {}).get("ram"),
+        "disco_sistema": (det or {}).get("disco_sistema"),
+        "disco_datos": (det or {}).get("disco_datos"),
+        "vida_util": (det or {}).get("vida_util"),
+        "justificacion_recursos": (det or {}).get("justificacion_recursos"),
+        "accesos": (det or {}).get("accesos"),
+        "responsable_aplicacion": (det or {}).get("responsable_aplicacion"),
+        "unidad_responsable": (det or {}).get("unidad_responsable"),
+        "contacto_soporte": (det or {}).get("contacto_soporte"),
+        "observaciones": (det or {}).get("observaciones_adicionales"),
+        "firma_solicitante": (det or {}).get("firma_solicitante"),
+        "cargo_solicitante": (det or {}).get("cargo_solicitante"),
+        "firma_jefe": (det or {}).get("firma_jefe"),
+        "cargo_jefe": (det or {}).get("cargo_jefe"),
+        "nombre_servidor": (det or {}).get("nombre_servidor", ""),
+    }
+
+    aprobador = None
+    if admin:
+        aprobador = {
+            "nombre": f"{admin.get('nombre','')} {admin.get('apellido','')}".strip(),
+            "cargo": "Administrador de Infraestructura",
+        }
+
+    jefe_unidad = {
+        "nombre": (det or {}).get("firma_jefe") or "",
+        "cargo":  (det or {}).get("cargo_jefe") or "",
+    }
+
+    html = render_template(
+        "pdf_crear.html",
+        solicitud=datos,
+        fecha_actual=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        aprobador=aprobador,
+        jefe_unidad=jefe_unidad,
+    )
+    return html
+
+
+# --- Selector de plantilla por tipo ---
+def generar_pdf_por_tipo(sol, det, admin=None):
+    tipo = (sol or {}).get('tipo', 'crear')
+
+    if tipo == 'eliminar':
+        aprobador = None
+        if admin:
+            aprobador = {
+                "nombre": f"{admin.get('nombre','')} {admin.get('apellido','')}".strip(),
+                "cargo": "Administrador de Infraestructura",
+            }
+        jefe_unidad = {
+            "nombre": (det or {}).get("firma_jefe") or "",
+            "cargo":  (det or {}).get("cargo_jefe") or "",
+        }
+        return render_template(
+            "pdf_eliminacion.html",
+            solicitud=sol,
+            detalle=det or {},
+            aprobador=aprobador,
+            jefe_unidad=jefe_unidad,
+            fecha_actual=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        )
+
+    if tipo == 'recursos':
+        jefe_unidad = {
+            "nombre": (det or {}).get("firma_jefe") or "",
+            "cargo":  (det or {}).get("cargo_jefe") or "",
+        }
+        aprobador = None
+        if admin:
+            aprobador = {
+                "nombre": f"{admin.get('nombre','')} {admin.get('apellido','')}".strip(),
+                "cargo": "Administrador de Infraestructura",
+            }
+        return render_template(
+            "pdf_recurso.html",           # <-- tu plantilla de recursos
+            solicitud=sol,
+            detalle=det or {},
+            jefe_unidad=jefe_unidad,
+            aprobador=aprobador,
+            fecha_actual=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        )
+
+    # fallback a "crear"
+    return generar_pdf_solicitud(sol, det, admin)
+
+
+
+
+
+
 # Iniciar servidor
 #if __name__ == '__main__':
 #   app.run(debug=True, host="0.0.0.0", port=8000)
 
-if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)
+if __name__ == "__main__":
+    print("Iniciando Flask…")
+    app.run(host="127.0.0.1", port=5000, debug=True)
+
 
 
 application = app

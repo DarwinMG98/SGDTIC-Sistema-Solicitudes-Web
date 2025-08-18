@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitud de Eliminación de Servidor Virtual</title>
+  <style>
+    /* Config de página PDF */
+    @page {
+      size: A4;
+      margin: 16mm 14mm 18mm 14mm;
+      @bottom-right {
+        content: "Pág. " counter(page) " de " counter(pages);
+        font-size: 10px; color: #666;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #222; margin: 0; }
+
+    h1 { font-size: 18px; margin: 0 0 4px 0; text-transform: uppercase; }
+    h2 { font-size: 13px; font-weight: 600; margin: 0; color: #333; }
+
+    /* Tablas base */
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 10px 0 16px; }
+    th, td { border: 1px solid #cfcfd1; padding: 6px 8px; vertical-align: top; word-wrap: break-word; }
+    th { background: #f4f6fa; text-align: left; }
+    .section-title th { background: #e7eaf3; font-weight: 700; }
+
+    tr, td, th { page-break-inside: avoid; }
+
+    /* Header centrado real: 3 columnas (logo | título | espaciador-logo) */
+    .header { margin-top: 6px; margin-bottom: 6px; }
+    .header td { border: none; }
+    .logo-cell, .spacer-cell { width: 82px; }   /* prueba 80–90 si quieres afinar */
+    .logo { width: 78px; display:block; margin:0 auto; transform: translateX(-3px); }
+    .title-cell { text-align: center; padding: 0 8px; }
+
+    /* Utilidades de ancho */
+    .w-20 { width: 20%; } .w-25 { width: 25%; } .w-30 { width: 30%; } .w-35 { width: 35%; }
+    .w-40 { width: 40%; } .w-45 { width: 45%; } .w-50 { width: 50%; }
+
+    .firma-grid td { height: 64px; vertical-align: bottom; text-align: center; }
+    .firma-linea { border-top: 1px solid #aaa; padding-top: 6px; }
+
+    .foot { font-size: 10px; color: #666; text-align: right; margin-top: 12px; }
+
+    /* Marca de agua opcional */
+    .watermark {
+      position: fixed; top: 46%; left: 50%;
+      transform: translate(-50%, -50%) rotate(-20deg);
+      font-size: 64px; color: #17a34a; opacity: .12; font-weight: 800; z-index: 0;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  {% set jefe = jefe_unidad or {} %}
+  {% set apr  = aprobador   or {} %}
+
+  {# Marca de agua si hay aprobador #}
+  {% if apr.nombre %}
+    <div class="watermark">Aprobado</div>
+  {% endif %}
+
+  <!-- Encabezado centrado -->
+    <table class="header">
+    <colgroup>
+        <col style="width:82px"><col><col style="width:82px">
+    </colgroup>
+    <tr>
+        <td class="logo-cell">
+        <img src="static/{{ logo_path }}" class="logo" alt="Logo">
+        </td>
+        <td class="title-cell">
+        <h1>FORMULARIO DE SOLICITUD DE ELIMINACIÓN<br>DE SERVIDOR VIRTUAL</h1>
+        <h2>Dirección Metropolitana de Infraestructura y Seguridad de TIC</h2>
+        </td>
+        <td class="spacer-cell"></td>
+    </tr>
+    </table>
+
+  <!-- Cabecera de datos generales -->
+  <table>
+    <colgroup>
+      <col class="w-25"><col class="w-25"><col class="w-25"><col class="w-25">
+    </colgroup>
+    <tr>
+      <th>Código</th>
+      <td>{{ solicitud.codigo or solicitud.id }}</td>
+      <th>Fecha de la Solicitud</th>
+      <td>{{ solicitud.fecha_solicitud or detalle.fecha or '' }}</td>
+    </tr>
+    <tr>
+      <th>Unidad/Dirección solicitante</th>
+      <td>{{ detalle.unidad or solicitud.unidad or '' }}</td>
+      <th>Nombre del servidor</th>
+      <td>{{ detalle.nombre_servidor or '' }}</td>
+    </tr>
+  </table>
+
+  <!-- 1. Información del Solicitante -->
+  <table class="section-title"><tr><th colspan="4">1. Información del Solicitante</th></tr></table>
+  <table>
+    <colgroup><col class="w-25"><col class="w-25"><col class="w-25"><col class="w-25"></colgroup>
+    <tr>
+      <th>Nombre completo</th>
+      <td>{{ detalle.nombre_completo or solicitud.nombre_completo }}</td>
+      <th>Correo institucional</th>
+      <td>{{ detalle.correo or solicitud.correo }}</td>
+    </tr>
+    <tr>
+      <th>Teléfono de contacto</th>
+      <td>{{ detalle.telefono or solicitud.telefono }}</td>
+      <th>Responsable técnico (si aplica)</th>
+      <td>{{ detalle.responsable_tecnico or solicitud.responsable_tecnico }}</td>
+    </tr>
+  </table>
+
+  <!-- 2. Detalles del Servidor a Eliminar -->
+  <table class="section-title"><tr><th colspan="4">2. Detalles del Servidor a Eliminar</th></tr></table>
+  <table>
+    <colgroup><col class="w-25"><col class="w-25"><col class="w-25"><col class="w-25"></colgroup>
+    <tr>
+      <th>Dirección IP</th>
+      <td>{{ detalle.ip_servidor or '' }}</td>
+      <th>Sistema operativo</th>
+      <td>{{ detalle.sistema_operativo or '' }}</td>
+    </tr>
+    <tr>
+      <th>Rol de servidor</th>
+      <td>{{ detalle.rol_servidor or '' }}</td>
+      <th>Fecha de creación del servidor</th>
+      <td>{{ detalle.fecha_creacion_servidor or '' }}</td>
+    </tr>
+    <tr>
+      <th>Motivo de la eliminación</th>
+      <td colspan="3">{{ detalle.motivo_eliminacion or '' }}</td>
+    </tr>
+  </table>
+
+  <!-- 3. Validaciones Previas -->
+  <table class="section-title"><tr><th colspan="4">3. Validaciones Previas a la Eliminación</th></tr></table>
+  <table>
+    <tr>
+      <th class="w-25">Validaciones marcadas</th>
+      <td colspan="3">{{ detalle.validaciones or '' }}</td>
+    </tr>
+  </table>
+
+  <!-- 4. Motivo de la Eliminación -->
+  <table class="section-title"><tr><th colspan="4">4. Motivo de la Eliminación</th></tr></table>
+  {% if detalle.motivo_otro %}
+    <table>
+      <tr>
+        <th class="w-25">Motivos seleccionados</th>
+        <td class="w-35">{{ detalle.motivo_check or '' }}</td>
+        <th class="w-15">Otros</th>
+        <td class="w-25">{{ detalle.motivo_otro }}</td>
+      </tr>
+    </table>
+  {% else %}
+    <table>
+      <tr>
+        <th class="w-25">Motivos seleccionados</th>
+        <td colspan="3">{{ detalle.motivo_check or '' }}</td>
+      </tr>
+    </table>
+  {% endif %}
+
+  <!-- 5. Observaciones Adicionales -->
+  <table class="section-title"><tr><th colspan="4">5. Observaciones Adicionales</th></tr></table>
+  <table>
+    <tr>
+      <td colspan="4">{{ detalle.observaciones_adicionales or solicitud.observaciones or '' }}</td>
+    </tr>
+  </table>
+
+  <!-- 6. Firmas solicitante -->
+  <table class="section-title"><tr><th colspan="2">6. Firmas de responsabilidad de la dependencia solicitante</th></tr></table>
+  <table class="firma-grid">
+    <colgroup><col class="w-50"><col class="w-50"></colgroup>
+    <tr>
+      <th>Funcionario Municipal Solicitante</th>
+      <th>Jefe Inmediato</th>
+    </tr>
+    <tr>
+      <td class="firma-linea">
+        {{ detalle.firma_solicitante or solicitud.firma_solicitante }}<br>
+        {{ detalle.cargo_solicitante or solicitud.cargo_solicitante }}
+      </td>
+      <td class="firma-linea">
+        {{ detalle.firma_jefe or solicitud.firma_jefe }}<br>
+        {{ detalle.cargo_jefe or solicitud.cargo_jefe }}
+      </td>
+    </tr>
+  </table>
+
+  <!-- 7. Aprobación -->
+  <table class="section-title"><tr><th colspan="2">7. Aprobación de la Unidad de Infraestructura</th></tr></table>
+  <table class="firma-grid">
+    <colgroup><col class="w-50"><col class="w-50"></colgroup>
+    <tr>
+      <th>Jefe de Unidad de Infraestructura</th>
+      <th>Administrador de Infraestructura</th>
+    </tr>
+    <tr>
+      <td class="firma-linea">
+        {{ jefe.nombre|default('') }}<br>
+        {{ jefe.cargo|default('') }}
+      </td>
+      <td class="firma-linea">
+        {{ apr.nombre|default('') }}<br>
+        {{ apr.cargo|default('') }}
+        {% if solicitud.fecha_aprobacion %}<br>
+          <small>Aprobado el {{ solicitud.fecha_aprobacion }}</small>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <div class="foot">
+    Documento generado automáticamente por el sistema · Fecha de generación: {{ fecha_actual }}
+  </div>
+</body>
+</html>
