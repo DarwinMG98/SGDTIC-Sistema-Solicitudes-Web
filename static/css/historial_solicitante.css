@@ -15,7 +15,6 @@ body {
     overflow: hidden;
 }
 
-/* Centra el cuadro de historial vertical y horizontal */
 
 .cuadro-historial {
     background: #e5e5e5;
@@ -229,7 +228,7 @@ th {
   position: absolute;
   top: 20px;
   left: 20px;
-  width: 150px;  /* Ajusta el tamaño */
+  width: 150px;  
   height: auto;
   z-index: 10;
 }

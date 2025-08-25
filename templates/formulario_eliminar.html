@@ -233,14 +233,14 @@ function toggleOtroMotivo() {
   const inp = document.getElementById('inputOtroMotivo');
   const show = chk.checked;
   inp.style.display = show ? 'block' : 'none';
-  inp.required = show;     // <- sólo requerido si “Otros” está marcado
-  if (!show) inp.value = '';// limpia si se desmarca
+  inp.required = show;     
+  if (!show) inp.value = '';
 }
 
-// al cargar, deja el estado coherente
+
 document.addEventListener('DOMContentLoaded', toggleOtroMotivo);
 
-// Vista previa de archivos seleccionados
+
 document.addEventListener('DOMContentLoaded', function () {
   const fileInput = document.getElementById('fileInput');
   const fileList = document.getElementById('fileList');

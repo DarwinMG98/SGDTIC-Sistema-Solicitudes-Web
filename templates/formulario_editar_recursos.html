@@ -14,7 +14,7 @@
       background:#fff;border-radius:12px;box-shadow:0 6px 24px #0001;padding:2rem 2.5rem;max-width:700px;width:100%;
     }
 
-    /* --- Stepper (igual al estilo del otro formulario) --- */
+  
     .formbold-step-menu{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
     .step-indicator{display:inline-flex;align-items:center;gap:.5rem}
     .formbold-step-circle{
@@ -24,23 +24,21 @@
     .formbold-step-circle.active{background:#6366f1;color:#fff}
     .formbold-step-label{font-weight:700;font-size:1.05rem;margin-right:.5rem}
 
-    /* Observación del admin (caja roja) */
     .observacion-admin{
       background:#ffe5e5;border:1px solid #ee6666;color:#c00000;padding:12px;border-radius:8px;margin-bottom:18px;font-weight:700
     }
 
-        /* Logo arriba-izquierda */
     .bg-logo-superior{position:fixed; top:24px; left:24px; z-index:20;}
     .decoracion-izquierda{width:120px; height:auto; filter:drop-shadow(0 2px 6px #0003);}
 
-    /* Botón volver abajo-izquierda */
+ 
     .volver{
       position:fixed; bottom:24px; left:24px; z-index:999;
       width:52px; height:52px; cursor:pointer; transition:transform .15s;
     }
     .volver:hover{ transform:scale(1.06); }
 
-    /* Inputs / layout */
+
     .formbold-form-step{display:none}
     .formbold-form-step.active{display:block;animation:fadeIn .25s}
     @keyframes fadeIn{from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none}}
@@ -50,7 +48,7 @@
       width:100%;padding:.65rem .9rem;border:1px solid #d1d5db;border-radius:10px;background:#f9f9f9
     }
 
-    /* Botones */
+
     .formbold-btn-group{margin-top:1rem;display:flex;gap:.7rem;justify-content:flex-end}
     .formbold-btn{
       background:#6366f1;color:#fff;border:none;border-radius:10px;padding:.65rem 1rem;cursor:pointer
@@ -75,7 +73,6 @@
       </div>
     {% endif %}
 
-    <!-- Stepper -->
     <div class="formbold-step-menu">
       <div class="step-indicator">
         <span class="formbold-step-circle active">1</span>
